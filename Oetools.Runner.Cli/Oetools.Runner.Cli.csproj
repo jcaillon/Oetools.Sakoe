@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
+    <PackageReference Include="ShellProgressBar" Version="4.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Oetools.Packager\Oetools.Packager\Oetools.Packager.csproj" />
+    <ProjectReference Include="..\Oetools.Packager\Oetools.Utilities\Oetools.Utilities\Oetools.Utilities.csproj" />
+  </ItemGroup>
+
+</Project>
