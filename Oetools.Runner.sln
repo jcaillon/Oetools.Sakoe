@@ -16,6 +16,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Oetools.Packager", "Oetools
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Oetools.Utilities", "Oetools.Utilities", "{F96E9980-FE60-48C1-84DD-CDB2BC20B629}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Oetools.Runner.Cli.Test", "Oetools.Runner.Cli.Test\Oetools.Runner.Cli.Test.csproj", "{2B26AD29-0096-426A-8D70-C10D2DECC33D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{88BF140B-288F-4CD9-A6F0-0BBAD9FCC77A}"
+	ProjectSection(SolutionItems) = preProject
+		README.txt = README.txt
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -86,6 +93,18 @@ Global
 		{43A5D2ED-B550-4381-BB5C-A1E569A9A47D}.Release|x64.Build.0 = Release|Any CPU
 		{43A5D2ED-B550-4381-BB5C-A1E569A9A47D}.Release|x86.ActiveCfg = Release|Any CPU
 		{43A5D2ED-B550-4381-BB5C-A1E569A9A47D}.Release|x86.Build.0 = Release|Any CPU
+		{2B26AD29-0096-426A-8D70-C10D2DECC33D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B26AD29-0096-426A-8D70-C10D2DECC33D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B26AD29-0096-426A-8D70-C10D2DECC33D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2B26AD29-0096-426A-8D70-C10D2DECC33D}.Debug|x64.Build.0 = Debug|Any CPU
+		{2B26AD29-0096-426A-8D70-C10D2DECC33D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2B26AD29-0096-426A-8D70-C10D2DECC33D}.Debug|x86.Build.0 = Debug|Any CPU
+		{2B26AD29-0096-426A-8D70-C10D2DECC33D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B26AD29-0096-426A-8D70-C10D2DECC33D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B26AD29-0096-426A-8D70-C10D2DECC33D}.Release|x64.ActiveCfg = Release|Any CPU
+		{2B26AD29-0096-426A-8D70-C10D2DECC33D}.Release|x64.Build.0 = Release|Any CPU
+		{2B26AD29-0096-426A-8D70-C10D2DECC33D}.Release|x86.ActiveCfg = Release|Any CPU
+		{2B26AD29-0096-426A-8D70-C10D2DECC33D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -95,6 +114,7 @@ Global
 		{857821EF-1EE8-47E4-9E13-E49D07EE9C54} = {F96E9980-FE60-48C1-84DD-CDB2BC20B629}
 		{9DBFD4E7-5759-4FC5-81EA-54AAD23BC5A2} = {DAE1057D-8FDD-4282-B12B-647AB80C78F4}
 		{43A5D2ED-B550-4381-BB5C-A1E569A9A47D} = {F96E9980-FE60-48C1-84DD-CDB2BC20B629}
+		{F96E9980-FE60-48C1-84DD-CDB2BC20B629} = {DAE1057D-8FDD-4282-B12B-647AB80C78F4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5B7286FC-2D23-46B9-A69B-A447D5963726}
