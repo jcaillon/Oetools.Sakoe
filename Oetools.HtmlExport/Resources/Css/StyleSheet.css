@@ -1,0 +1,89 @@
+﻿html {
+    color: #1E1E1E;
+    Font: 12px "Segoe UI";
+}
+
+img {
+    vertical-align: sub;
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background: #647687 no-repeat scroll center;
+    width: 70%;
+}
+
+a {
+    color: #1580B3;
+    text-decoration: underline;
+}
+
+h2 {
+    margin-top: 10px;
+    margin-bottom: 7px;
+}
+
+h2 {
+    margin-top: 12px;
+    margin-bottom: 8px;
+}
+
+pre {
+    background-color: #E6E6E6;
+    Font: 11px "Consolas";
+}
+
+code {
+    background-color: #E6E6E6;
+    padding-left: 5px;
+    padding-right: 5px;
+    Font: 11px "Consolas";
+}
+
+.errors {
+    background-color: #E6E6E6;
+    padding: 5px;
+}
+
+table {
+    Font: 12px "Segoe UI";
+}
+
+.linkSeparator {
+    color: #093850;
+}
+
+.AccentColor {
+    color: #1BA1E2;
+}
+
+.SubTextColor {
+    color: #093850;
+}
+
+.AlternatBackColor {
+    background-color: #E6E6E6;
+    color: #1E1E1E;
+}
+
+.NormalBackColor {
+    background-color: #FAFAFA;
+    color: #1E1E1E;
+}
+
+.Title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #1E1E1E;
+}
+
+.SubTitle {
+    font-size: 18px;
+    font-weight: bold;
+    color: #093850;
+}
+
+.IndentDiv {
+    margin-left: 8px;
+}
