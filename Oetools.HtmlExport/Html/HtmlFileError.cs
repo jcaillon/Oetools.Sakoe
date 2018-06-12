@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Text;
 using Oetools.HtmlExport.Lib;
 using Oetools.Packager.Core;
 
-namespace csdeployer.Html {
+namespace Oetools.HtmlExport.Html {
 
     internal static class HtmlFileError {
 
@@ -18,10 +15,10 @@ namespace csdeployer.Html {
             sb.Append("'>");
             if (!error.CompiledFilePath.Equals(error.SourcePath)) {
                 sb.Append("in ");
-                sb.Append(error.SourcePath.ToHtmlLink(Path.GetFileName(error.SourcePath)));
+                sb.Append(Extensions.ToHtmlLink(error.SourcePath, Path.GetFileName(error.SourcePath)));
                 sb.Append(", ");
             }
-            sb.Append((error.SourcePath + "|" + error.Line).ToHtmlLink("Ligne " + (error.Line + 1)));
+            sb.Append(Extensions.ToHtmlLink((error.SourcePath + "|" + error.Line), "Ligne " + (error.Line + 1)));
             sb.Append(" (erreur n°" + error.ErrorNumber + ")");
             if (error.Times > 0) {
                 sb.Append(" (x" + error.Times + ")");

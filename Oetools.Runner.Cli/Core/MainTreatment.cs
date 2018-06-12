@@ -17,16 +17,18 @@
 // along with csdeployer. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.VisualBasic.CompilerServices;
+using Oetools.HtmlExport.Config;
 using Oetools.Packager.Core;
 using Oetools.Packager.Core.Config;
 
-namespace csdeployer.Core {
+namespace Oetools.Runner.Cli.Core {
 
     internal class MainTreatment : ProgressTreatment {
 
@@ -126,7 +128,7 @@ namespace csdeployer.Core {
                 _inputXml.ReturnCode = CsDeployerInterface.Instance.ReturnCode;
                 _inputXml.DeploymentDateTime = CsDeployerInterface.Instance.DeploymentDateTime;
                 if (_inputXml.ReturnCode == ReturnCode.NoSet) {
-                    _inputXml.ReturnCode = ReturnCode.Error;
+                    _inputXml.ReturnCode = ReturnCode.CompilationError;
                 }
                 if (_inputXml.DeployedFiles == null || _inputXml.DeployedFiles.Count == 0) {
                     _inputXml.DeployedFiles = _inputXml._previousDeployedFiles;
@@ -275,7 +277,7 @@ namespace csdeployer.Core {
         }
 
         private void OnExecutionFailed(DeploymentHandler deploymentHandler) {
-            CsDeployerInterface.Instance.ReturnCode = deploymentHandler.HasBeenCancelled ? ReturnCode.Canceled : ReturnCode.Error;
+            CsDeployerInterface.Instance.ReturnCode = deploymentHandler.HasBeenCancelled ? ReturnCode.Canceled : ReturnCode.CompilationError;
         }
 
         private static CsDeployerInterface GetConfigDeploymentPackaging(CsDeployerInterfaceXml interfaceXml) {

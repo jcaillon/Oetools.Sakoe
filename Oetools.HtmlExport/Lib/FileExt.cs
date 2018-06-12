@@ -17,7 +17,7 @@
 // along with csdeployer. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
-namespace csdeployer.Lib {
+namespace Oetools.HtmlExport.Lib {
     /// <summary>
     /// Enum of known file extensions
     /// </summary>

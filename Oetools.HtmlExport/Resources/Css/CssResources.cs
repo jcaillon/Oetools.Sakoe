@@ -18,13 +18,17 @@
 // ========================================================================
 #endregion
 
-using csdeployer.Lib;
-using Oetools.HtmlExport.Lib;
+using System.Text;
 
 namespace Oetools.HtmlExport.Resources.Css {
     public static class CssResources {
-        public static byte[] GetCssFromResources(string fileName) {
+        
+        private static byte[] GetCssFromResources(string fileName) {
             return Resources.GetBytesFromResource($"{nameof(Oetools)}.{nameof(HtmlExport)}.{nameof(Resources)}.{nameof(Css)}.{fileName}");
+        }
+
+        public static string GetCssAsStringFromResources(string fileName) {
+            return Encoding.Default.GetString(GetCssFromResources(fileName));
         }
     }
 }

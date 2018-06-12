@@ -17,6 +17,7 @@
 // along with csdeployer. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Diagnostics;
 using System.Globalization;
@@ -25,8 +26,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace csdeployer.Core {
+namespace Oetools.Runner.Cli.Core {
+    
     internal static class ErrorHandler {
+        
         /// <summary>
         /// Log a piece of information
         /// returns false if the error already occurred during the session, true otherwise

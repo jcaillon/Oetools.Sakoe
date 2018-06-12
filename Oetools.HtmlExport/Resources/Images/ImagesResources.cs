@@ -18,13 +18,34 @@
 // ========================================================================
 #endregion
 
-using csdeployer.Lib;
-using Oetools.HtmlExport.Lib;
+using System;
+using System.Collections.Generic;
 
 namespace Oetools.HtmlExport.Resources.Images {
+    
     public static class ImagesResource {
-        public static byte[] GetImageFromResources(string fileName) {
+        
+        /// <summary>
+        /// Get a resource image as bytes array
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        private static byte[] GetImageFromResources(string fileName) {
             return Resources.GetBytesFromResource($"{nameof(Oetools)}.{nameof(HtmlExport)}.{nameof(Resources)}.{nameof(Images)}.{fileName}");
+        }
+
+        private static Dictionary<string, string> _imagesAsBase64String = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
+        
+        /// <summary>
+        /// Returns the given image as a string encoded in base 64
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string GetImageBase64Encoded(string value) {
+            if (!_imagesAsBase64String.ContainsKey(value)) {
+                _imagesAsBase64String.Add(value, Convert.ToBase64String(GetImageFromResources(value)));
+            }
+            return _imagesAsBase64String[value];
         }
     }
 }

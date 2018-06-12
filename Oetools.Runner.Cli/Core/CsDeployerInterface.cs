@@ -6,13 +6,45 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using csdeployer.Lib;
+using Oetools.HtmlExport.Config;
 using Oetools.Packager.Core;
 using Oetools.Packager.Core.Config;
 using Oetools.Utilities.Lib;
 
-namespace csdeployer.Core {
+namespace Oetools.Runner.Cli.Core {
+    internal interface ICsDeployerInterface {
+        /// <summary>
+        ///     Indicates how the deployment went
+        /// </summary>
+        ReturnCode ReturnCode { get; set; }
 
-    internal class CsDeployerInterface : ConfigDeploymentPackaging{
+        DateTime DeploymentDateTime { get; set; }
+
+        /// <summary>
+        ///     Either pack or deploy
+        /// </summary>
+        RunMode RunMode { get; set; }
+
+        /// <summary>
+        ///     Path to the report directory, in which the html will be exporer
+        /// </summary>
+        string OutPathReportDir { get; set; }
+
+        /// <summary>
+        ///     Path to the output xml result that can later be used in PreviousDeploymentFiles
+        /// </summary>
+        string OutPathDeploymentResults { get; set; }
+
+        /// <summary>
+        ///     Path to the error log file to use
+        /// </summary>
+        string ErrorLogFilePath { get; set; }
+
+        string ExportXmlFile { get; set; }
+        string RaisedException { get; set; }
+    }
+
+    internal class CsDeployerInterface : ConfigDeploymentPackaging, ICsDeployerInterface {
 
         private static CsDeployerInterface _deployerInterface;
 
@@ -197,10 +229,10 @@ namespace csdeployer.Core {
 
                         
         [XmlIgnore]
-        internal string ExportXmlFile { get; set; }
+        public string ExportXmlFile { get; set; }
 
         [XmlIgnore]
-        internal string RaisedException { get; set; }
+        public string RaisedException { get; set; }
 
         public EnvExecutionCompilation Env { get; set; }
     }

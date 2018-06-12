@@ -1,3 +1,15 @@
+# Oetools.Runner.Cli
+
+## About
+
+todo
+
+## External libraries
+
+<https://github.com/natemcmaster/CommandLineUtils>
+<https://github.com/Mpdreamz/shellprogressbar>
+
+
 ```
 dotnet build
 dotnet Oetools.Runner.Cli\bin\Debug\netcoreapp2.0\Oetools.Runner.Cli.dll

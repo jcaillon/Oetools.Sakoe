@@ -1,12 +1,9 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Text;
-using csdeployer.Lib;
-using Oetools.HtmlExport.Html;
-using Oetools.HtmlExport.Lib;
 using Oetools.Packager.Core;
 
-namespace csdeployer.Html {
+namespace Oetools.HtmlExport.Html {
+    
     internal static class HtmlFileToDeploy {
 
         public static string Description(FileToDeploy toDeploy, string sourceDir = null) {
@@ -73,13 +70,13 @@ namespace csdeployer.Html {
                 return "<div style='padding-bottom: 5px;'><img src='Delete_15px' height='15px'><b>Fichiers supprimés dans les .pl</b></div>";
             }
             if (toDeploy is FileToDeployFtp) {
-                return "<div style='padding-bottom: 5px;'><img src='" + Utils.GetExtensionImage("Ftp", true) + "' height='15px'><b>" + toDeploy.GroupKey.ToHtmlLink(null, true) + "</b></div>";
+                return "<div style='padding-bottom: 5px;'><img src='" + Helper.GetExtensionImage("Ftp", true) + "' height='15px'><b>" + toDeploy.GroupKey.ToHtmlLink(null, true) + "</b></div>";
             }
             if (toDeploy is FileToDeployInPack) {
-                return "<div style='padding-bottom: 5px;'><img src='" + Utils.GetExtensionImage(((FileToDeployInPack)toDeploy).PackExt.Replace(".", "")) + "' height='15px'><b>" + toDeploy.GroupKey.ToHtmlLink(null, true) + "</b></div>";
+                return "<div style='padding-bottom: 5px;'><img src='" + Helper.GetExtensionImage(((FileToDeployInPack)toDeploy).PackExt.Replace(".", "")) + "' height='15px'><b>" + toDeploy.GroupKey.ToHtmlLink(null, true) + "</b></div>";
             }
 
-            return "<div style='padding-bottom: 5px;'><img src='" + Utils.GetExtensionImage("Folder", true) + "' height='15px'><b>" + toDeploy.GroupKey.ToHtmlLink(null, true) + "</b></div>";
+            return "<div style='padding-bottom: 5px;'><img src='" + Helper.GetExtensionImage("Folder", true) + "' height='15px'><b>" + toDeploy.GroupKey.ToHtmlLink(null, true) + "</b></div>";
         }
 
         /// <summary>
@@ -90,33 +87,22 @@ namespace csdeployer.Html {
                 return "Delete_15px";
             }
             if (toDeploy is FileToDeployDeleteFolder) {
-                return GetExtensionImage("Folder", true);
+                return Helper.GetExtensionImage("Folder", true);
             }
             if (toDeploy is FileToDeployDeleteInProlib) {
-                return GetExtensionImage("Pl", true);
+                return Helper.GetExtensionImage("Pl", true);
             }
             if (toDeploy is FileToDeployFtp) {
-                return GetExtensionImage("Ftp", true);
+                return Helper.GetExtensionImage("Ftp", true);
             }
             if (toDeploy is FileToDeployInPack) {
-                return GetExtensionImage(((FileToDeployInPack) toDeploy).PackExt.Replace(".", ""));
+                return Helper.GetExtensionImage(((FileToDeployInPack) toDeploy).PackExt.Replace(".", ""));
             }
             if (toDeploy is FileToDeployCopyFolder) {
-                return GetExtensionImage("Folder", true);
+                return Helper.GetExtensionImage("Folder", true);
             }
-            return GetExtensionImage((Path.GetExtension(toDeploy.To) ?? "").Replace(".", ""));
+            return Helper.GetExtensionImage((Path.GetExtension(toDeploy.To) ?? "").Replace(".", ""));
         }
-        
-        /// <summary>
-        /// Returns the name of the image to use for a particular extension
-        /// </summary>
-        public static string GetExtensionImage(string ext, bool exist = false) {
-            if (exist)
-                return "Ext" + ext;
-            FileExt fileExt;
-            if (!Enum.TryParse(ext, true, out fileExt))
-                fileExt = FileExt.Unknow;
-            return "Ext" + fileExt;
-        }
+
     }
 }
