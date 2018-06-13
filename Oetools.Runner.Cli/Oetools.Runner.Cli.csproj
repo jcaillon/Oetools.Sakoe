@@ -1,11 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' ">net461;netcoreapp2.0</TargetFrameworks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net461' ">
+    <!--<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>-->
+    <DefineConstants>$(DefineConstants);NET461;WINDOWSONLYBUILD</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.4" />
-    <PackageReference Include="ShellProgressBar" Version="4.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Oetools.HtmlExport\Oetools.HtmlExport.csproj" />
@@ -14,5 +17,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Config\v2" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ShellProgressBar\ShellProgressBar.csproj" />
   </ItemGroup>
 </Project>

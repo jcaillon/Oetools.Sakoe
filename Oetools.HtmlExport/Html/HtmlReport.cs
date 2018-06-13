@@ -80,10 +80,8 @@ namespace Oetools.HtmlExport.Html {
             if (result.RulesErrors != null && result.RulesErrors.Count > 0) {
                 html.AppendLine(@"<h2>Erreurs de règles :</h2>");
                 html.AppendLine(@"<div class='IndentDiv errors'>");
-                foreach (var file in result.RulesErrors) {
-                    foreach (var ruleError in file.rulesErrors) {
-                        html.AppendLine(HtmlDeployRule.Description(file.filePath, ruleError.Line) + " : " + ruleError.ErrorDescription);
-                    }
+                foreach (var error in result.RulesErrors) {
+                    html.AppendLine(HtmlDeployRule.Description(error.RuleFilePath, error.ErrorLine) + " : " + error.ErrorDescription);
                 }
                 html.AppendLine(@"</div>");
             }

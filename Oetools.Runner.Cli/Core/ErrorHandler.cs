@@ -29,7 +29,7 @@ using System.Threading.Tasks;
 namespace Oetools.Runner.Cli.Core {
     
     internal static class ErrorHandler {
-        
+        /*
         /// <summary>
         /// Log a piece of information
         /// returns false if the error already occurred during the session, true otherwise
@@ -107,6 +107,7 @@ namespace Oetools.Runner.Cli.Core {
         }
 
         #endregion
+        */
     }
 
     #region ExceptionInfo
@@ -118,7 +119,6 @@ namespace Oetools.Runner.Cli.Core {
         public string OriginVersion { get; set; }
         public string OriginMethod { get; set; }
         public int OriginLine { get; set; }
-        public string ReceptionTime { get; set; }
         public string Message { get; set; }
         public string FullException { get; set; }
     }

@@ -24,6 +24,7 @@ using Oetools.HtmlExport.Config;
 using Oetools.Packager.Core;
 using Oetools.Packager.Core.Config;
 using Oetools.Runner.Cli.Config.v1;
+using Oetools.Utilities.Archive;
 using Oetools.Utilities.Archive.Compression;
 using Oetools.Utilities.Lib;
 
@@ -35,7 +36,7 @@ namespace Oetools.Runner.Cli.Test {
         [TestMethod]
         public void EnsureXmlCompressionLevelHasEquivalent() {
             typeof(XmlCompressionLevel).ForEach<XmlCompressionLevel>((name, value) => {
-                Assert.IsTrue(Enum.TryParse(typeof(CompressionLevel), name, out _));
+                Assert.IsTrue(Enum.TryParse(typeof(CompressionLvl), name, out _));
             });
         }
 

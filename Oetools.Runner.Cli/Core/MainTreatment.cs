@@ -18,18 +18,8 @@
 // ========================================================================
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.VisualBasic.CompilerServices;
-using Oetools.HtmlExport.Config;
-using Oetools.Packager.Core;
-using Oetools.Packager.Core.Config;
-
 namespace Oetools.Runner.Cli.Core {
-
+    /*
     internal class MainTreatment : ProgressTreatment {
 
         #region Override
@@ -313,5 +303,109 @@ namespace Oetools.Runner.Cli.Core {
         }
 
         #endregion
+        
+        private string CreateDirectory(string dir) {
+            Utils.CreateDirectory(dir);
+            return dir;
+        }
+
+        internal string FolderTemp {
+            get { return CreateDirectory(Path.Combine(!String.IsNullOrEmpty(OverloadFolderTemp) ? OverloadFolderTemp : Path.Combine(Path.GetTempPath(), "AblDeployer"), Path.GetRandomFileName())); }
+        }
+
+        internal string FilesPatternCompilable {
+            get { return !String.IsNullOrEmpty(OverloadFilesPatternCompilable) ? OverloadFilesPatternCompilable : "*.p,*.w,*.t,*.cls"; }
+        }
+
+        
+        /// <summary>
+        ///     Returns the database connection string (complete with .pf + extra)
+        /// </summary>
+        internal string ConnectionString {
+            get {
+                var connectionString = new StringBuilder();
+                if (File.Exists(PfPath)) {
+                    Utils.ForEachLine(PfPath, new byte[0], (nb, line) => {
+                        var commentPos = line.IndexOf("#", StringComparison.CurrentCultureIgnoreCase);
+                        if (commentPos == 0)
+                            return;
+                        if (commentPos > 0)
+                            line = line.Substring(0, commentPos);
+                        line = line.Trim();
+                        if (!String.IsNullOrEmpty(line)) {
+                            connectionString.Append(" ");
+                            connectionString.Append(line);
+                        }
+                    });
+                    connectionString.Append(" ");
+                }
+
+                connectionString.Append(ExtraPf.Trim());
+                return connectionString.ToString().Replace("\n", " ").Replace("\r", "").Trim();
+            }
+        }
+
+        private List<string> _currentProPathDirList;
+
+        /// <summary>
+        ///     List the existing directories as they are listed in the .ini file + in the custom ProPath field,
+        ///     this returns an exhaustive list of EXISTING folders and .pl files and ensure each item is present only once
+        ///     It also take into account the relative path, using the BaseLocalPath (or currentFileFolder)
+        /// </summary>
+        internal List<string> GetProPathDirList {
+            get {
+                if (_currentProPathDirList == null) {
+                    var ini = new IniReader(IniPath);
+                    var completeProPath = ini.GetValue("PROPATH", "");
+                    completeProPath = (completeProPath + "," + ExtraProPath).Trim(',');
+
+                    var uniqueDirList = new HashSet<string>();
+                    foreach (var path in completeProPath.Split(',', '\n', ';').Select(path => path.Trim()).Where(path => !String.IsNullOrEmpty(path))) {
+                        var thisPath = path;
+                        // need to take into account relative paths
+                        if (!Path.IsPathRooted(thisPath))
+                            try {
+                                if (thisPath.Contains("%"))
+                                    thisPath = Environment.ExpandEnvironmentVariables(thisPath);
+                                thisPath = Path.GetFullPath(Path.Combine(SourceDirectory, thisPath));
+                            } catch (Exception) {
+                                //
+                            }
+
+                        if (Directory.Exists(thisPath) || File.Exists(thisPath))
+                            if (!uniqueDirList.Contains(thisPath))
+                                uniqueDirList.Add(thisPath);
+                    }
+
+                    // if the user didn't set a propath, add every folder of the source directory in the propath (don't add hidden folders though)
+                    if (uniqueDirList.Count == 0)
+                        try {
+                            foreach (var folder in Utils.EnumerateFolders(SourceDirectory, "*", SearchOption.AllDirectories))
+                                if (!uniqueDirList.Contains(folder))
+                                    uniqueDirList.Add(folder);
+                        } catch (Exception) {
+                            //
+                        }
+
+                    // add the source directory
+                    if (!uniqueDirList.Contains(SourceDirectory))
+                        uniqueDirList.Add(SourceDirectory);
+
+                    _currentProPathDirList = uniqueDirList.ToList();
+                }
+
+                return _currentProPathDirList;
+            }
+        }
+
+        /// <summary>
+        ///     Use this method to know if the CONNECT define for the current environment connects the database in
+        ///     single user mode (returns false if not or if no database connection is set)
+        /// </summary>
+        /// <returns></returns>
+        internal bool IsDatabaseSingleUser {
+            get { return ConnectionString.RegexMatch(@"\s-1", RegexOptions.Singleline); }
+        }
     }
+    */
 }
