@@ -404,7 +404,7 @@ namespace Oetools.Runner.Cli.Core {
         /// </summary>
         /// <returns></returns>
         internal bool IsDatabaseSingleUser {
-            get { return ConnectionString.RegexMatch(@"\s-1", RegexOptions.Singleline); }
+            get { return ConnectionString.RegexMatch(@"\s-1($|\s)", RegexOptions.Singleline); }
         }
     }
     */

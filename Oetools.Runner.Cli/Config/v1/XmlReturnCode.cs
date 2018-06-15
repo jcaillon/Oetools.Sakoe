@@ -28,7 +28,11 @@ namespace Oetools.Runner.Cli.Config.v1 {
         [XmlEnum("NoSet")]
         NoSet,
         [XmlEnum("Error")]
-        Error,
+        DeploymentError,
+        [XmlEnum("Error")]
+        CompilationError,
+        [XmlEnum("Error")]
+        CompilationErrorOnMaxUser,
         [XmlEnum("Ok")]
         Ok,
         [XmlEnum("Canceled")]
