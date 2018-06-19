@@ -37,9 +37,9 @@ namespace Oetools.HtmlExport.Html {
                 return toDeploy.To.ToHtmlLink(null, true);
             }
             if (toDeploy is FileToDeployDeleteInProlib) {
-                sb.Append(toDeploy.To.ToHtmlLink(((FileToDeployInPack)toDeploy).RelativePathInPack));
+                sb.Append(toDeploy.To.ToHtmlLink(((FileToDeployInPack)toDeploy).RelativePathInArchive));
                 sb.Append("<span style='padding-left: 8px; padding-right: 8px;'>dans</span>");
-                sb.Append(((FileToDeployInPack)toDeploy).PackPath.ToHtmlLink(null, true));
+                sb.Append(((FileToDeployInPack)toDeploy).ArchivePath.ToHtmlLink(null, true));
                 return sb.ToString();
             }
             if (toDeploy is FileToDeployCopyFolder) {

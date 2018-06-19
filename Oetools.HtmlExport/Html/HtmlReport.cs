@@ -13,6 +13,7 @@ using Oetools.HtmlExport.Resources.Images;
 using Oetools.Packager.Core;
 using Oetools.Packager.Core.Config;
 using Oetools.Utilities.Lib;
+using Oetools.Utilities.Lib.Extension;
 
 namespace Oetools.HtmlExport.Html {
 

@@ -22,6 +22,7 @@ using System;
 using System.IO;
 using System.Text;
 using Oetools.Utilities.Lib;
+using Oetools.Utilities.Lib.Extension;
 
 namespace Oetools.HtmlExport.Lib {
     public static class Extensions {

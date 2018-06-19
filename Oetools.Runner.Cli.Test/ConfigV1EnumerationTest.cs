@@ -25,8 +25,7 @@ using Oetools.Packager.Core;
 using Oetools.Packager.Core.Config;
 using Oetools.Runner.Cli.Config.v1;
 using Oetools.Utilities.Archive;
-using Oetools.Utilities.Archive.Compression;
-using Oetools.Utilities.Lib;
+using Oetools.Utilities.Lib.Extension;
 
 namespace Oetools.Runner.Cli.Test {
     

@@ -24,6 +24,7 @@ using System.Text;
 using csdeployer.Lib;
 using Oetools.HtmlExport.Lib;
 using Oetools.Utilities.Lib;
+using Oetools.Utilities.Lib.Extension;
 
 namespace Oetools.HtmlExport.Html {
     public static class Helper {
