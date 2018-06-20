@@ -15,8 +15,9 @@ namespace Oetools.Runner.Cli.Command {
     )]
     [VersionOptionFromMember("--version|-version", MemberName = nameof(GetVersion), Description = "Show version information")]
     [HelpOption("-?|-h|--help", Description = "Show help information", Inherited = true)]
-    [Subcommand("add", typeof(DeployCommand))]
-    [Subcommand("commit", typeof(CommitCommand))]
+    [Subcommand("deploy", typeof(DeployCommand))]
+    [Subcommand("db", typeof(DatabaseCommand))]
+    [Subcommand("prolint", typeof(ProlintCommand))]
     internal class MainCommand : BaseCommand{
         
         private int OnExecute(CommandLineApplication app, IConsole console) {

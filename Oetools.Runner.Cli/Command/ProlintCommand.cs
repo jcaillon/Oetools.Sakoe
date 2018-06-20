@@ -11,7 +11,7 @@ namespace Oetools.Runner.Cli.Command {
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         ThrowOnUnexpectedArgument = false
     )]
-    internal class CommitCommand : BaseCommand {
+    internal class ProlintCommand : BaseCommand {
         [Option("-m")]
         public string Message { get; set; }
 
