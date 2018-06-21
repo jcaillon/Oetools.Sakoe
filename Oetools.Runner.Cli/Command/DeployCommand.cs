@@ -28,7 +28,7 @@ namespace Oetools.Runner.Cli.Command {
         // This will automatically be set before OnExecute is invoked
         private MainCommand Parent { get; set; }
 
-        protected int OnExecute(CommandLineApplication app, IConsole console) {
+        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             CreateHashFiles();
             //return base.OnExecute(app, console);
             return 1;

@@ -27,7 +27,7 @@ namespace Oetools.Runner.Cli.Command {
         
         public string[] RemainingArgs { get; set; }
 
-        protected int OnExecute(CommandLineApplication app, IConsole console) {
+        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             
             const string prompt = @"Which example would you like to run?
 1 - Fake Git

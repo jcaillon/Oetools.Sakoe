@@ -11,22 +11,19 @@ namespace Oetools.Runner.Cli.Command {
         Description = "TODO : short description of this CLI",
         ExtendedHelpText = "TODO : extended help for this CLI",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
-        ThrowOnUnexpectedArgument = false
+        ThrowOnUnexpectedArgument = false,
+        ResponseFileHandling = ResponseFileHandling.ParseArgsAsSpaceSeparated
     )]
-    [VersionOptionFromMember("--version|-version", MemberName = nameof(GetVersion), Description = "Show version information")]
+    [VersionOptionFromMember("-version|--version", MemberName = nameof(GetVersion), Description = "Show version information")]
     [HelpOption("-?|-h|--help", Description = "Show help information", Inherited = true)]
     [Subcommand("deploy", typeof(DeployCommand))]
     [Subcommand("db", typeof(DatabaseCommand))]
     [Subcommand("prolint", typeof(ProlintCommand))]
-    internal class MainCommand : BaseCommand{
+    internal class MainCommand : BaseCommand {
         
-        private int OnExecute(CommandLineApplication app, IConsole console) {
+        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             // this shows help even if the --help option isn't specified
-            app.ShowRootCommandFullNameAndVersion();
-            console.ForegroundColor = ConsoleColor.Red;
-            console.Error.WriteLine("errr");
-            console.ResetColor();
-            app.ShowHint();
+            app.ShowHelp();
             return 1;
         }
 
