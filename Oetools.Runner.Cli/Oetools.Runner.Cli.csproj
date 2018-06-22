@@ -16,9 +16,6 @@
     <ProjectReference Include="..\Oetools.Packager\Oetools.Utilities\Oetools.Utilities\Oetools.Utilities.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Config\v2" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="ShellProgressBar\ShellProgressBar.csproj" />
   </ItemGroup>
 </Project>

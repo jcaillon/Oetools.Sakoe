@@ -19,6 +19,9 @@ namespace Oetools.Runner.Cli.Command {
     [Subcommand("deploy", typeof(DeployCommand))]
     [Subcommand("db", typeof(DatabaseCommand))]
     [Subcommand("prolint", typeof(ProlintCommand))]
+    [Subcommand("project", typeof(ProjectCommand))]
+    [Subcommand("build", typeof(BuildCommand))]
+    [Subcommand("package", typeof(PackageCommand))]
     internal class MainCommand : BaseCommand {
         
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {

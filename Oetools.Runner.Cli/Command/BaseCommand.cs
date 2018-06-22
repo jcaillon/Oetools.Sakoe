@@ -21,7 +21,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using McMaster.Extensions.CommandLineUtils;
+using Oetools.Runner.Cli.Lib;
 using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge;
 
@@ -64,6 +66,12 @@ namespace Oetools.Runner.Cli.Command {
             return 1;
         }
 
+        /// <summary>
+        /// The method to override for each command
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="console"></param>
+        /// <returns></returns>
         protected virtual int ExecuteCommand(CommandLineApplication app, IConsole console) {
             console.ForegroundColor = ConsoleColor.Red;
             console.Error.WriteLine("**Command not implemented!");
@@ -110,6 +118,11 @@ namespace Oetools.Runner.Cli.Command {
             Console.ResetColor();
         }
 
+        /// <summary>
+        /// Returns the DLC PATH
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         protected string GetDlcPath() {
             var dlcPath = ProUtilities.GetDlcPath();
             if (string.IsNullOrEmpty(dlcPath) || !Directory.Exists(dlcPath)) {
@@ -132,6 +145,22 @@ namespace Oetools.Runner.Cli.Command {
             enumValue = outEnumvalue;
             validValuesList = outValidValuesList;
             return found;
+        }
+
+        /// <summary>
+        /// Returns the path of the unique project file in the current directory (if any)
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="CommandException"></exception>
+        protected string GetCurrentProjectFilePath() {
+            var list = Directory.EnumerateFiles(Directory.GetCurrentDirectory(), $"{OeConstants.OeProjectExtension}*", SearchOption.TopDirectoryOnly).ToList();
+            if (list.Count == 0) {
+                throw new CommandException($"No project file ({OeConstants.OeProjectExtension}) found in the current folder {Directory.GetCurrentDirectory()}");
+            }
+            if (list.Count > 1) {
+                throw new CommandException($"Ambigous project, found {list.Count} project files in the current folder, specify the project file to use in the command line");
+            }
+            return list.First();
         }
         
     }
