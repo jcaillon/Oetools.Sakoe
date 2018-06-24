@@ -1,5 +1,7 @@
 # Oetools.Runner.Cli
 
+[![Build status](https://ci.appveyor.com/api/projects/status/2oyd83vvvlj1tvin?svg=true)](https://ci.appveyor.com/project/jcaillon/oetools-runner)
+
 ## About
 
 todo

@@ -18,4 +18,6 @@
   <ItemGroup>
     <Content Include="ShellProgressBar\ShellProgressBar.csproj" />
   </ItemGroup>
+  <Import Project="Oetools.Runner.Cli.EmbedResources.target" />
+  <Import Project="Oetools.Runner.Cli.CopyOutput.target" />
 </Project>

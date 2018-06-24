@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+ 
+  <Target Name="AddEmbeddedDependencies2" AfterTargets="CoreBuild">
+    <Copy
+      SourceFiles="@(IntermediateAssembly);@(_DebugSymbolsIntermediatePath)"
+      DestinationFolder="..\bin\$(Configuration)\$(Platform)\$(TargetFramework)"
+      OverwriteReadOnlyFiles="true"
+      SkipUnchangedFiles="false">
+    </Copy>
+    <Message Importance="high" Text="[INFO] Copying output .exe/.dll : %0A  @(IntermediateAssembly->'bin\$(Configuration)\$(Platform)\$(TargetFramework)\%(Filename)%(Extension)', '%0A   ')"/>
+    <Message Importance="high" Text="[INFO] Copying output .pdb : %0A  @(_DebugSymbolsIntermediatePath->'bin\$(Configuration)\$(Platform)\$(TargetFramework)\%(Filename)%(Extension)', '%0A   ')"/>
+  </Target>
+
+</Project>

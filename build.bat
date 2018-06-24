@@ -1,1 +1,2 @@
-msbuild /t:Restore,Rebuild Oetools.Runner.Cli /p:targetFrameworks="net461;netcoreapp2.0" /p:VersionPrefix=1.0.1 /p:VersionSuffix= /p:FileVersion=1.0.1.789 /p:ProductVersion=1.0.1 /p:Configuration=Release /p:IncludeSymbols=true /verbosity:minimal
+REM https://github.com/Microsoft/msbuild/wiki/MSBuild-Tips-&-Tricks
+msbuild.cmd Oetools.Runner.Cli /p:targetFrameworks="net461;netcoreapp2.0" /p:VersionPrefix=1.0.1 /p:VersionSuffix= /p:FileVersion=1.0.1.789 /p:ProductVersion=1.0.1 /p:Configuration=Release /p:Platform="Any CPU" /p:IncludeSymbols=true /verbosity:minimal /t:Restore,Rebuild /m
