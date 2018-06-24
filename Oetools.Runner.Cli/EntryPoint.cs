@@ -20,15 +20,19 @@
 
 #endregion
 
-using McMaster.Extensions.CommandLineUtils;
+using System;
 using Oetools.Runner.Cli.Command;
+using Oetools.Runner.Cli.Lib;
 
 namespace Oetools.Runner.Cli {
     
     /// <summary>
     /// Main entry point for this CLI program
     /// </summary>
-    internal class EntryPoint {
-        public static int Main(string[] args) => CommandLineApplication.Execute<MainCommand>(args);
+    public static class EntryPoint {
+        public static int Main(string[] args) {
+            AppDomain.CurrentDomain.AssemblyResolve += AssemblyLoader.AssemblyResolver;
+            return MainCommand.ExecuteMainCommand(args);
+        } 
     }
 }

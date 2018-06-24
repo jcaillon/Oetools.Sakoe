@@ -31,5 +31,7 @@ namespace Oetools.Runner.Cli.Command {
         }
 
         private static string GetVersion() => typeof(MainCommand).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+
+        public static int ExecuteMainCommand(string[] args) => CommandLineApplication.Execute<MainCommand>(args);
     }
 }
