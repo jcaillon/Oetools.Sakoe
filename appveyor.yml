@@ -4,8 +4,10 @@ install:
 - cmd: git submodule update --init --recursive
 build_script:
 - cmd: build.bat
+test_script:
+- cmd: runtests.bat
 artifacts:
-- &1302144259 path: bin\Release\Any CPU\net461\*
+- &1302144259 path: bin\Any CPU\net461\*
   &949611523 name: net461
-- path: bin\Release\Any CPU\netcoreapp2.0\*
+- path: bin\Any CPU\netcoreapp2.0\*
   name: netcoreapp2.0
