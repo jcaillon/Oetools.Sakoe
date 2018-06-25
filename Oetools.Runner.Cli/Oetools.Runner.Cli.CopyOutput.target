@@ -1,15 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  
-  <Target Name="AddEmbeddedDependencies2" AfterTargets="CoreBuild">
+  <!-- Setting properties -->
+  <PropertyGroup>
+    <ReleaseArtifactName>clitoe</ReleaseArtifactName>
+  </PropertyGroup>
+
+
+  <Target Name="CopyOutput" AfterTargets="CoreBuild" Condition=" '$(Configuration)'=='Release' AND '$(TargetFramework)'!='netcoreapp2.0' ">
     <Copy
       SourceFiles="@(IntermediateAssembly);@(_DebugSymbolsIntermediatePath)"
-      DestinationFolder="..\bin\$(Configuration)\$(Platform)\$(TargetFramework)"
+      DestinationFiles="@(IntermediateAssembly->'..\bin\$(Platform)\$(TargetFramework)\$(ReleaseArtifactName)%(Extension)');@(_DebugSymbolsIntermediatePath->'..\bin\$(Platform)\$(TargetFramework)\$(ReleaseArtifactName)%(Extension)')"
       OverwriteReadOnlyFiles="true"
       SkipUnchangedFiles="false">
     </Copy>
     <Message Importance="high" Text="[INFO] Copying output .exe/.dll : %0A  @(IntermediateAssembly->'bin\$(Configuration)\$(Platform)\$(TargetFramework)\%(Filename)%(Extension)', '%0A   ')"/>
     <Message Importance="high" Text="[INFO] Copying output .pdb : %0A  @(_DebugSymbolsIntermediatePath->'bin\$(Configuration)\$(Platform)\$(TargetFramework)\%(Filename)%(Extension)', '%0A   ')"/>
+  </Target>
+
+  <Target Name="CopyOutputNetstandard" AfterTargets="CoreBuild" Condition=" '$(Configuration)'=='Release' AND '$(TargetFramework)'=='netcoreapp2.0' AND '$(PublishDir)'!='' ">
+    <ItemGroup>
+      <OutputFiles Include="$(PublishDir)\$(TargetName).runtimeconfig.json"></OutputFiles>
+    </ItemGroup>
+    <ItemGroup>
+      <OutputFiles2 Include="$(PublishDir)\$(TargetName).runtimeconfig.json"></OutputFiles2>
+    </ItemGroup>
+    <Copy 
+      SourceFiles="@(OutputFiles)"
+      DestinationFiles="@(OutputFiles->'..\bin\$(Platform)\$(TargetFramework)\$(ReleaseArtifactName)%(Extension)')"
+      OverwriteReadOnlyFiles="true"
+      SkipUnchangedFiles="false">
+    </Copy>
+    <Copy 
+      SourceFiles="@(OutputFiles2)"
+      DestinationFiles="@(OutputFiles2->'..\bin\$(Platform)\$(TargetFramework)\$(ReleaseArtifactName).runtimeconfig%(Extension)')"
+      OverwriteReadOnlyFiles="true"
+      SkipUnchangedFiles="false">
+    </Copy>
+    <Message Importance="high" Text="[INFO] Copying output : %0A  @(OutputFiles->'bin\$(Configuration)\$(Platform)\$(TargetFramework)\%(Filename)%(Extension)', '%0A   ')"/>
   </Target>
 
 </Project>

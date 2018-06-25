@@ -21,7 +21,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Oetools.HtmlExport.Resources.Images {
+namespace Oetools.HtmlExport.Resources {
     
     public static class ImagesResource {
         
@@ -31,7 +31,7 @@ namespace Oetools.HtmlExport.Resources.Images {
         /// <param name="fileName"></param>
         /// <returns></returns>
         private static byte[] GetImageFromResources(string fileName) {
-            return Resources.GetBytesFromResource($"{nameof(Oetools)}.{nameof(HtmlExport)}.{nameof(Resources)}.{nameof(Images)}.{fileName}");
+            return Resources.GetBytesFromResource($"{nameof(Oetools)}.{nameof(HtmlExport)}.{nameof(Resources)}.Images.{fileName}");
         }
 
         private static Dictionary<string, string> _imagesAsBase64String = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);

@@ -20,11 +20,11 @@
 
 using System.Text;
 
-namespace Oetools.HtmlExport.Resources.Css {
+namespace Oetools.HtmlExport.Resources {
     public static class CssResources {
         
         private static byte[] GetCssFromResources(string fileName) {
-            return Resources.GetBytesFromResource($"{nameof(Oetools)}.{nameof(HtmlExport)}.{nameof(Resources)}.{nameof(Css)}.{fileName}");
+            return Resources.GetBytesFromResource($"{nameof(Oetools)}.{nameof(HtmlExport)}.{nameof(Resources)}.Css.{fileName}");
         }
 
         public static string GetCssAsStringFromResources(string fileName) {
