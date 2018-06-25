@@ -20,7 +20,8 @@
 
   <Target Name="CopyOutputNetstandard" AfterTargets="CoreBuild" Condition=" '$(Configuration)'=='Release' AND '$(TargetFramework)'=='netcoreapp2.0' AND '$(PublishDir)'!='' ">
     <ItemGroup>
-      <OutputFiles Include="$(PublishDir)\$(TargetName).runtimeconfig.json"></OutputFiles>
+      <OutputFiles Include="$(PublishDir)\$(TargetName).dll"></OutputFiles>
+      <OutputFiles Include="$(PublishDir)\$(TargetName).pdb"></OutputFiles>
     </ItemGroup>
     <ItemGroup>
       <OutputFiles2 Include="$(PublishDir)\$(TargetName).runtimeconfig.json"></OutputFiles2>
