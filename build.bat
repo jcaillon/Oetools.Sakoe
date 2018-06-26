@@ -14,7 +14,7 @@ echo =========================================
 REM https://github.com/Microsoft/msbuild/wiki/MSBuild-Tips-&-Tricks
 REM dotnet publish Oetools.Runner.Cli\Oetools.Runner.Cli.csproj --framework netcoreapp2.0 --configuration Release /p:Version="1.0.1" /p:Platform="Any CPU" /p:IncludeSymbols=true /verbosity:minimal /m /bl:dotnet.binlog
 
-set "COMMON_PARAM=Oetools.Runner.Cli\Oetools.Runner.Cli.csproj /p:Version="%VERSION_TO_BUILD%" /p:Configuration=Release /p:Platform="Any CPU" /p:IncludeSymbols=true /verbosity:minimal /m /nologo"
+set "COMMON_PARAM=Oetools.Runner.Cli\Oetools.Runner.Cli.csproj /p:Version="%VERSION_TO_BUILD%" /p:Configuration=Release /p:Platform="Any CPU" /p:IncludeSymbols=true /verbosity:minimal /m /nologo /p:ZipRelease=true"
 
 call msbuild.cmd %COMMON_PARAM% /p:targetFramework="netcoreapp2.0" /t:Restore,Publish /m /bl:netcoreapp.binlog
 if %errorlevel% neq 0 exit %errorlevel%

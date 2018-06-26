@@ -4,6 +4,10 @@
     <ProjectReference Include="..\Oetools.Packager\Oetools.Utilities\Oetools.Utilities\Oetools.Utilities.csproj" />
   </ItemGroup>
   <PropertyGroup>
+    <AssemblyTitle>Oetools.HtmlExport</AssemblyTitle>
+    <Product>Oetools.HtmlExport</Product>
+    <Company>LeCavalierCasta</Company>
+    <Copyright>Copyright (c) 2018 - Julien Caillon - GNU General Public License v3</Copyright>
     <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' ">net461;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net461' ">

@@ -8,6 +8,7 @@
       <ReferencedAssemblies Include="@(ReferenceCopyLocalPaths)" />
       <ReferencedAssemblies Include="@(RuntimeCopyLocalItems)" />
     </ItemGroup>
+    <Message Importance="high" Text="[INFO] RuntimeCopyLocalItems : %0A  @(RuntimeCopyLocalItems, '%0A  ')"/>
     <Copy
       SourceFiles="@(ReferencedAssemblies)"
       DestinationFolder="$(ProjectDir)Resources\Dependencies"

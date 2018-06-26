@@ -1,9 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <AssemblyName>clitoe</AssemblyName>
+    <AssemblyTitle>clitoe - Command Line Interface Tool for OpenEdge</AssemblyTitle>
+    <Product>clitoe</Product>
+    <Company>LeCavalierCasta</Company>
+    <Copyright>Copyright (c) 2018 - Julien Caillon - GNU General Public License v3</Copyright>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' ">net461;netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(TargetFrameworks)'=='' ">net461;netcoreapp2.0</TargetFrameworks>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net461' ">
+  <PropertyGroup Condition=" '$(TargetFramework)'=='net461' ">
     <!--<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>-->
     <DefineConstants>$(DefineConstants);NET461;WINDOWSONLYBUILD</DefineConstants>
   </PropertyGroup>
@@ -20,5 +25,5 @@
   </ItemGroup>
   <Import Project="Oetools.Runner.Cli.EmbedResources.target" />
   <Import Project="Oetools.Runner.Cli.CopyOutput.target" />
-  <Import Project="Oetools.Runner.Cli.ZipRelease.target" />
+  <Import Condition=" '$(ZipRelease)'=='true' " Project="Oetools.Runner.Cli.ZipRelease.target" />
 </Project>
