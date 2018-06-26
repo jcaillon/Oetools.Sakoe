@@ -7,7 +7,25 @@ build_script:
 test_script:
 - cmd: runtests.bat
 artifacts:
-- &1302144259 path: bin\Any CPU\net461\*
-  &949611523 name: net461
-- path: bin\Any CPU\netcoreapp2.0\*
-  name: netcoreapp2.0
+- path: bin\*.zip
+  name: zip
+deploy:
+- provider: GitHub
+  tag: $(APPVEYOR_REPO_TAG_NAME)
+  release: $(APPVEYOR_REPO_TAG_NAME)
+  description: todo
+  auth_token:
+    secure: xE+f8rczPCfechI3U6gncyX2HWWVXN96l6RQ+XlVrWo+0YKf32phrXSzQ6WYEGEs
+  artifact: zip
+  draft: true
+  prerelease: true
+  on:
+    branch: master
+    APPVEYOR_REPO_TAG: true
+notifications:
+- provider: Email
+  to:
+  - greenzest@gmail.com
+  on_build_success: false
+  on_build_failure: false
+  on_build_status_changed: true

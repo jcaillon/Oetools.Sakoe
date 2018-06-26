@@ -20,4 +20,5 @@
   </ItemGroup>
   <Import Project="Oetools.Runner.Cli.EmbedResources.target" />
   <Import Project="Oetools.Runner.Cli.CopyOutput.target" />
+  <Import Project="Oetools.Runner.Cli.ZipRelease.target" />
 </Project>
