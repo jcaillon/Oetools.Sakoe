@@ -19,7 +19,7 @@ deploy:
   release: $(APPVEYOR_REPO_TAG_NAME)
   description: todo
   auth_token:
-    secure: xE+f8rczPCfechI3U6gncyX2HWWVXN96l6RQ+XlVrWo+0YKf32phrXSzQ6WYEGEs
+    secure: UMsRAWiMijF3zclrkN5k9Je1RZN8G6GRu/6U+nxSLtATgBsRKYSnaUAh42qao6rn
   artifact: zip
   draft: true
   prerelease: true
