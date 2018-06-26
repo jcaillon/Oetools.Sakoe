@@ -4,9 +4,12 @@
   <!-- embedded dll dependencies -->
   <!-- http://source.roslyn.io/#MSBuildFiles/C/ProgramFiles(x86)/MicrosoftVisualStudio/2017/Enterprise/MSBuild/15.0/Bin_/Microsoft.Common.CurrentVersion.targets,2043 -->
   <Target Name="AddEmbeddedDependencies" AfterTargets="ResolveAssemblyReferences">
-    
+    <ItemGroup>
+      <ReferencedAssemblies Include="@(ReferenceCopyLocalPaths)" />
+      <ReferencedAssemblies Include="@(RuntimeCopyLocalItems)" />
+    </ItemGroup>
     <Copy
-      SourceFiles="@(ReferenceCopyLocalPaths)"
+      SourceFiles="@(ReferencedAssemblies)"
       DestinationFolder="$(ProjectDir)Resources\Dependencies"
       OverwriteReadOnlyFiles="true"
       SkipUnchangedFiles="false">
@@ -23,7 +26,8 @@
       Include="@(DependenciesDll ->'%(Relativedir)%(filename)%(extension)')" 
       Condition="('%(DependenciesDll.Extension)' == '.dll' Or '%(DependenciesDll.Extension)' == '.pdb')">-->
     </ItemGroup>
-    <Message Importance="high" Text="[INFO] Embedding resources : %0A  @(ReferenceCopyLocalPaths, '%0A  ')"/>
+    <Message Importance="high" Text="[INFO] Embedding resources : %0A  @(ReferencedAssemblies, '%0A  ')"/>
+    
   </Target>
 
 </Project>

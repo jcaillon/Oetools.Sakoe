@@ -16,7 +16,7 @@ REM dotnet publish Oetools.Runner.Cli\Oetools.Runner.Cli.csproj --framework netc
 
 set "COMMON_PARAM=Oetools.Runner.Cli\Oetools.Runner.Cli.csproj /p:Version="%VERSION_TO_BUILD%" /p:Configuration=Release /p:Platform="Any CPU" /p:IncludeSymbols=true /verbosity:minimal /m /nologo"
 
-call msbuild.cmd %COMMON_PARAM% /p:targetFramework="netcoreapp2.0" /t:Restore,Publish /m /bl:netcoreapp.binlog /p:CopyBuildOutputToPublishDirectory=true /p:CopyOutputSymbolsToPublishDirectory=true
+call msbuild.cmd %COMMON_PARAM% /p:targetFramework="netcoreapp2.0" /t:Restore,Publish /m /bl:netcoreapp.binlog
 if %errorlevel% neq 0 exit %errorlevel%
 
 call msbuild.cmd %COMMON_PARAM% /p:targetFramework="net461" /t:Restore,Rebuild /bl:net461.binlog
