@@ -9,6 +9,10 @@ test_script:
 artifacts:
 - path: bin\*.zip
   name: zip
+- path: netcoreapp.binlog
+  name: netcoreapp.binlog
+- path: net461.binlog
+  name: net461.binlog
 deploy:
 - provider: GitHub
   tag: $(APPVEYOR_REPO_TAG_NAME)
