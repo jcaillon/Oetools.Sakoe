@@ -24,10 +24,10 @@
     </PropertyGroup>
   </Target>
 
-  <Target Name="CopyOutputNetstandard" AfterTargets="CoreBuild" Condition=" '$(Configuration)'=='Release' AND '$(TargetFramework)'=='netcoreapp2.0' AND '$(PublishDir)'!='' ">
+  <Target Name="CopyOutputNetstandard" AfterTargets="CoreBuild" Condition=" '$(Configuration)'=='Release' AND '$(TargetFramework)'=='netcoreapp2.0' ">
     <ItemGroup>
-      <OutputFiles Include="$(PublishDir)\$(TargetName).dll"></OutputFiles>
-      <OutputFiles Include="$(PublishDir)\$(TargetName).pdb"></OutputFiles>
+      <OutputFiles Include="$(OutputPath)$(TargetName).dll"></OutputFiles>
+      <OutputFiles Include="$(OutputPath)$(TargetName).pdb"></OutputFiles>
     </ItemGroup>
     <Copy 
       SourceFiles="@(OutputFiles)"
@@ -36,7 +36,7 @@
       SkipUnchangedFiles="false">
     </Copy>
     <ItemGroup>
-      <OutputFiles2 Include="$(PublishDir)\$(TargetName).runtimeconfig.json"></OutputFiles2>
+      <OutputFiles2 Include="$(OutputPath)$(TargetName).runtimeconfig.json"></OutputFiles2>
     </ItemGroup>
     <Copy 
       SourceFiles="@(OutputFiles2)"
