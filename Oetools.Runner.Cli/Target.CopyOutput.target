@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+ 
+  <!-- Setting default properties -->
+  <PropertyGroup Condition=" '$(ReleaseBinPath)'=='' ">
+    <ReleaseBinPath>$(ProjectDir)bin\$(Platform)\$(TargetFramework)</ReleaseBinPath>
+  </PropertyGroup>
+
+
+  <!-- Copy the output files to the target directory -->
+  <Target Name="CopyOutput" AfterTargets="CoreBuild" Condition=" '$(Configuration)'=='Release' ">
+
+    <!-- list the outputfiles which are : .exe/.dll,.pdb and eventually .runtimeconfig.json -->
+    <ItemGroup>
+      <OutputFiles Include="@(IntermediateAssembly)"></OutputFiles>
+      <OutputFiles Include="@(_DebugSymbolsIntermediatePath)"></OutputFiles>      
+      <OutputFiles Include="$(OutputPath)$(TargetName).runtimeconfig.json" Condition="Exists('$(OutputPath)$(TargetName).runtimeconfig.json')"></OutputFiles>
+    </ItemGroup>
+
+    <!-- copy the files -->
+    <Copy 
+      SourceFiles="@(OutputFiles)"
+      Condition="Exists('%(Fullpath)')"
+      DestinationFolder="$(ReleaseBinPath)"
+      OverwriteReadOnlyFiles="true"
+      SkipUnchangedFiles="false">
+    </Copy>
+
+    <Message Importance="high" Text="=========================="/>
+    <Message Importance="high" Text="[INFO] Copying output : %0A   @(OutputFiles->'%(Fullpath)', '%0A   ')"/>
+    <Message Importance="high" Text="   -> copied in $([System.IO.Path]::GetFullPath('$(ReleaseBinPath)'))"/>
+
+    <PropertyGroup>
+      <CopyOutputDone>true</CopyOutputDone>
+    </PropertyGroup>
+  </Target>
+
+</Project>

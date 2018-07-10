@@ -22,12 +22,13 @@ using System.IO;
 using System.Reflection;
 
 namespace Oetools.Runner.Cli.Resources {
-    internal static class Resources {
-        public static byte[] GetBytesFromResource(string resourcePath) {
+    public static class ResourcesManager {
+        internal static byte[] GetBytesFromResource(string resourcePath) {
             using (Stream resFilestream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourcePath)) {
                 if (resFilestream == null) {
                     return null;
                 }
+
                 var output = new byte[resFilestream.Length];
                 resFilestream.Read(output, 0, output.Length);
                 return output;

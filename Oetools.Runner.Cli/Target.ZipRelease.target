@@ -1,27 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  
-  <!-- Setting properties -->
-  <PropertyGroup>
-    <ReleaseZipDirectory>..\bin</ReleaseZipDirectory>
+  <!-- Setting default properties -->
+  <PropertyGroup Condition=" '$(ReleaseZipDirectory)'=='' ">
+    <ReleaseZipDirectory>$(ProjectDir)..\bin</ReleaseZipDirectory>
+    <ReleaseZipFilesToZip>*</ReleaseZipFilesToZip>
     <ReleaseZipNameSuffix Condition=" '$(TargetFramework)'=='netcoreapp2.0' ">-dotnetcore2.0</ReleaseZipNameSuffix>
-    <ReleaseZipName>$(ReleaseArtifactName)$(ReleaseZipNameSuffix).zip</ReleaseZipName>
+    <ReleaseZipName>$(AssemblyName)$(ReleaseZipNameSuffix).zip</ReleaseZipName>
   </PropertyGroup>
 
-  <Target Name="ZipRelease" AfterTargets="CopyOutputNetFramework;CopyOutputNetstandard" Condition=" '$(CopyOutputDone)'=='true' ">
+
+  <!-- Zip the files copied in the target -->
+  <Target Name="ZipRelease" AfterTargets="CopyOutputTarget" Condition=" '$(CopyOutputDone)'=='true' ">
+    
+    <!-- list all the files to zip (use the output of the Target.CopyOutput.target if possible) -->
     <ItemGroup>
-      <ZipFiles Include="$(ReleaseBinPath)\*" />
+      <ZipFiles Condition=" '@(OutputFiles)'=='' " Include="$(ReleaseBinPath)\$(ReleaseZipFilesToZip)" Exclude="$(ReleaseBinPath)\*.zip" />
+      <ZipFiles Condition=" '@(OutputFiles)'!='' " Include="@(OutputFiles)" />
     </ItemGroup>
-    <MakeDir Directories="$(ReleaseDirectory)"/>
+
+    <!-- create output directory -->
+    <MakeDir Directories="$(ReleaseZipDirectory)"/>
+
+    <!-- zip 'em! -->
     <Zip
       InputFileNames="@(ZipFiles)"
       OutputFileName="$(ReleaseZipDirectory)\$(ReleaseZipName)"
       OverwriteExistingFile="true" />
-    <Message Importance="high" Text="[INFO] Zipping %0A  @(ZipFiles, '%0A  ') %0A  -> into $(ReleaseZipDirectory)\$(ReleaseZipName)"/>
+
+    <Message Importance="high" Text="=========================="/>
+    <Message Importance="high" Text="[INFO] Zipping %0A   @(ZipFiles->'%(Fullpath)', '%0A   ')"/>
+    <Message Importance="high" Text="   -> into $([System.IO.Path]::GetFullPath('$(ReleaseZipDirectory)\$(ReleaseZipName)'))"/>
+
   </Target>
 
 
-  <!-- defines the Zip task -->
+  <!-- The ZIP task -->
   <UsingTask TaskName="Zip" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
     <ParameterGroup>
       <InputFileNames ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />

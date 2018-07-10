@@ -1,15 +1,63 @@
 @if not defined _echo echo off
 setlocal enabledelayedexpansion
 
-echo ========================================
-echo ========= STARTING DOTNET TEST =========
-echo ========================================
+REM [works for gitlab and appveyor]
+REM https://docs.gitlab.com/ee/ci/variables/
+REM https://www.appveyor.com/docs/environment-variables/
+if "%CI_COMMIT_SHA%"=="" set CI_COMMIT_SHA=%APPVEYOR_REPO_COMMIT%
 
-dotnet test -v q Oetools.Packager\Oetools.Packager.Test\Oetools.Packager.Test.csproj
-if %errorlevel% neq 0 exit %errorlevel%
+REM @@@@@@@@@@@@@@
+REM Are we on a CI build? 
+set IS_CI_BUILD=false
+if not "%CI_COMMIT_SHA%"=="" set IS_CI_BUILD=true
 
-dotnet test -v q Oetools.Runner.Cli.Test\Oetools.Runner.Cli.Test.csproj
-if %errorlevel% neq 0 exit %errorlevel%
+REM @@@@@@@@@@@@@@
+set MSBUILD_VERBOSITY=q
+if "%IS_CI_BUILD%"=="true" set MSBUILD_VERBOSITY=n
 
-dotnet test -v q Oetools.Packager\Oetools.Utilities\Oetools.Utilities.Test\Oetools.Utilities.Test.csproj 
-if %errorlevel% neq 0 exit %errorlevel%
+echo.=========================
+echo.[%time:~0,8% INFO] RUNNING ALL DOTNET TESTS
+echo.[%time:~0,8% INFO] VERBOSITY : %MSBUILD_VERBOSITY%
+echo.
+
+for /f "delims=" %%G in ('dir /s /b *.Test.csproj') do (
+	echo.=========================
+	echo.[%time:~0,8% INFO] RUNNING %%G
+	echo.
+	dotnet test -v %MSBUILD_VERBOSITY% %%G
+	if %errorlevel% neq 0 goto ENDINERROR
+)
+
+:DONE
+echo.
+echo.=========================
+echo.[%time:~0,8% INFO] DONE
+
+if "%IS_CI_BUILD%"=="false" (
+	pause
+)
+
+
+REM @@@@@@@@@@@@@@
+REM End of script
+exit /b 0
+
+
+REM =================================================================================
+REM 								SUBROUTINES - LABELS
+REM =================================================================================
+
+
+REM - -------------------------------------
+REM Ending in error
+REM - -------------------------------------
+:ENDINERROR
+
+echo.=========================
+echo.[%time:~0,8% ERRO] ERROR!!! ERRORLEVEL = %errorlevel%
+
+if "%IS_CI_BUILD%"=="false" (
+	pause
+)
+
+exit /b 1

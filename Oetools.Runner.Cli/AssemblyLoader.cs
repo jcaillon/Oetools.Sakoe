@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Oetools.Runner.Cli.Core;
-using Oetools.Runner.Cli.Resources.Dependencies;
+using System.Linq;
 
-namespace Oetools.Runner.Cli.Lib {
+namespace Oetools.Runner.Cli {
     internal static class AssemblyLoader {
         /// <summary>
         /// Called when the resolution of an assembly fails, gives us the opportunity to feed the required asssembly
@@ -28,18 +23,34 @@ namespace Oetools.Runner.Cli.Lib {
             if (commaIdx > 0) {
                 var assName = args.Name.Substring(0, commaIdx);
 
-                return Assembly.Load(DependenciesResources.GetDependencyFromResources($"{assName}.dll"));
+                return Assembly.Load(GetDependencyFromResources($"{assName}.dll"));
             }
 
             var assemblyName = new AssemblyName(args.Name).Name;
-            var dllBytes = DependenciesResources.GetDependencyFromResources($"{assemblyName}.dll");
-            var pdbBytes = DependenciesResources.GetDependencyFromResources($"{assemblyName}.pdb");
+            var dllBytes = GetDependencyFromResources($"{assemblyName}.dll");
+            var pdbBytes = GetDependencyFromResources($"{assemblyName}.pdb");
 
             if (dllBytes == null) {
                 return null;
             }
 
             return pdbBytes != null ? Assembly.Load(dllBytes, pdbBytes) : Assembly.Load(dllBytes);
+        }
+        
+        private static byte[] GetBytesFromResource(string resourcePath) {
+            using (Stream resFilestream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourcePath)) {
+                if (resFilestream == null) {
+                    return null;
+                }
+
+                var output = new byte[resFilestream.Length];
+                resFilestream.Read(output, 0, output.Length);
+                return output;
+            }
+        }
+
+        private static byte[] GetDependencyFromResources(string fileName) {
+            return GetBytesFromResource($"{nameof(Oetools)}.{nameof(Runner)}.{nameof(Cli)}.{fileName}");
         }
     }
 }

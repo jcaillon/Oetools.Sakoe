@@ -29,6 +29,9 @@ namespace Oetools.Runner.Cli {
     /// <summary>
     /// Main entry point for this CLI program
     /// </summary>
+    /// <remarks>
+    /// we can't reference a lib in this class if we want the assembly loader to work correctly
+    /// </remarks>
     public static class EntryPoint {
         public static int Main(string[] args) {
             AppDomain.CurrentDomain.AssemblyResolve += AssemblyLoader.AssemblyResolver;

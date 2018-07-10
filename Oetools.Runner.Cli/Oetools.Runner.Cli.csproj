@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <AssemblyName>clitoe</AssemblyName>
-    <AssemblyTitle>clitoe - Command Line Interface Tool for OpenEdge</AssemblyTitle>
-    <Product>clitoe</Product>
+    <AssemblyName>sakoe</AssemblyName>
+    <AssemblyTitle>sakoe - Swiss Army Knife for OpenEdge</AssemblyTitle>
+    <Product>sakoe</Product>
     <Company>LeCavalierCasta</Company>
     <Copyright>Copyright (c) 2018 - Julien Caillon - GNU General Public License v3</Copyright>
     <OutputType>Exe</OutputType>
@@ -20,10 +20,24 @@
     <ProjectReference Include="..\Oetools.Packager\Oetools.Packager\Oetools.Packager.csproj" />
     <ProjectReference Include="..\Oetools.Packager\Oetools.Utilities\Oetools.Utilities\Oetools.Utilities.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="ShellProgressBar\ShellProgressBar.csproj" />
-  </ItemGroup>
-  <Import Project="Oetools.Runner.Cli.EmbedResources.target" />
-  <Import Project="Oetools.Runner.Cli.CopyOutput.target" />
-  <Import Condition=" '$(ZipRelease)'=='true' " Project="Oetools.Runner.Cli.ZipRelease.target" />
+  <!-- Extra targets -->
+  <!-- Dependencies -->
+  <PropertyGroup>
+    <EmbedResourcesDirectory>$(ProjectDir)Resources\Dependencies</EmbedResourcesDirectory>
+  </PropertyGroup>
+  <Import Project="Target.EmbedDependencies.target" />
+  <!-- CopyOutput -->
+  <PropertyGroup>
+    <ReleaseBinPath>$(ProjectDir)..\bin\$(Platform)\$(TargetFramework)</ReleaseBinPath>
+    <!-- <ReleaseBinPath>$(ProjectDir)..\..\bin</ReleaseBinPath>
+    <AssemblyName Condition=" '$(Platform)'=='x64' ">$(AssemblyName)x64</AssemblyName>
+    <AssemblyName Condition=" '$(TargetFramework)'=='netcoreapp2.0' ">$(AssemblyName).netcore</AssemblyName> -->
+  </PropertyGroup>
+  <Import Project="Target.CopyOutput.target" />
+  <!-- ZipRelease -->
+  <PropertyGroup>
+    <ReleaseZipDirectory>$(ReleaseBinPath)</ReleaseZipDirectory>
+    <ReleaseZipName>$(AssemblyName).zip</ReleaseZipName>
+  </PropertyGroup>
+  <Import Condition=" '$(ZipRelease)'=='true' " Project="Target.ZipRelease.target" />
 </Project>
