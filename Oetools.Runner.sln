@@ -1,4 +1,4 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
@@ -7,9 +7,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Oetools.Utilities", "Oetools.Utilities", "{F96E9980-FE60-48C1-84DD-CDB2BC20B629}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{88BF140B-288F-4CD9-A6F0-0BBAD9FCC77A}"
-	ProjectSection(SolutionItems) = preProject
-		README.txt = README.txt
-	EndProjectSection
+ProjectSection(SolutionItems) = preProject
+	build.bat = build.bat
+	README.md = README.md
+	runtests.bat = runtests.bat
+EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Oetools.Runner.Cli", "Oetools.Runner.Cli\Oetools.Runner.Cli.csproj", "{FFB81763-530F-4355-A234-BCE711A49102}"
 EndProject

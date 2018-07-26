@@ -35,20 +35,21 @@
       SkipUnchangedFiles="false">
     </Copy>
 
-    <!-- remove duplicates, ResourcesToEmbed will contain the final list of files to embed -->
+    <!-- remove duplicates, ResourcesToEmbedFiltered will contain the final list of files to embed -->
     <RemoveDuplicates Inputs="@(ReferencedAssemblies->'$(EmbedResourcesDirectory)\%(Filename)%(Extension)')">  
-      <Output TaskParameter="Filtered" ItemName="ResourcesToEmbed"/>  
+      <Output TaskParameter="Filtered" ItemName="ResourcesToEmbedFiltered"/>  
     </RemoveDuplicates>
 
-    <!-- actually embed the resources -->
-    <ItemGroup>
-      <EmbeddedResource Include="@(ResourcesToEmbed)">
-        <LogicalName>$(RootNamespace).%(Filename)%(Extension)</LogicalName>
-      </EmbeddedResource>
+    <!-- actually embed the resources, ResourcesToEmbed will contain the final list of files to embed -->
+    <ItemGroup>      
+    <ResourcesToEmbed Include="@(ResourcesToEmbedFiltered->'$(EmbedResourcesDirectory)\%(Filename)%(Extension)')" KeepMetadata="LogicalName" />
+    <EmbeddedResource Include="@(ResourcesToEmbed)">
+      <LogicalName>$(RootNamespace).%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
     </ItemGroup>
     
     <Message Importance="high" Text="=========================="/>
-    <Message Importance="high" Text="[INFO] Embedding resources : %0A  @(ResourcesToEmbed->'%(Filename)%(Extension)', '%0A  ')"/>
+    <Message Importance="high" Text="[INFO] Embedding resources : %0A  @(ResourcesToEmbed, '%0A  ')"/>
     <Message Importance="high" Text="   -> copied in $([System.IO.Path]::GetFullPath('$(EmbedResourcesDirectory)'))"/>
     
   </Target>

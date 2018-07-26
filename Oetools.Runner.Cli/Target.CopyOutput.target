@@ -8,7 +8,16 @@
 
 
   <!-- Copy the output files to the target directory -->
-  <Target Name="CopyOutput" AfterTargets="CoreBuild" Condition=" '$(Configuration)'=='Release' ">
+  <Target Name="CopyOutput" AfterTargets="CoreBuild">
+    
+    <!-- copy the files to the output path -->
+    <Copy 
+      SourceFiles="@(OutputFiles)"
+      Condition=" '@(OutputFiles)'!='' AND '$(OutputPath)'!='' AND Exists('%(Fullpath)') "
+      DestinationFolder="$(OutputPath)"
+      OverwriteReadOnlyFiles="true"
+      SkipUnchangedFiles="false">
+    </Copy>
 
     <!-- list the outputfiles which are : .exe/.dll,.pdb and eventually .runtimeconfig.json -->
     <ItemGroup>
@@ -17,7 +26,7 @@
       <OutputFiles Include="$(OutputPath)$(TargetName).runtimeconfig.json" Condition="Exists('$(OutputPath)$(TargetName).runtimeconfig.json')"></OutputFiles>
     </ItemGroup>
 
-    <!-- copy the files -->
+    <!-- copy the files to the release path -->
     <Copy 
       SourceFiles="@(OutputFiles)"
       Condition="Exists('%(Fullpath)')"
