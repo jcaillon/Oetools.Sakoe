@@ -1,29 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup Label="Compute ReleaseDirectoryName">
+    <ReleaseDirectoryName>$(AssemblyName)</ReleaseDirectoryName>
+    <ReleaseDirectoryName Condition=" '$(Platform)'=='x64' ">$(ReleaseDirectoryName)_x64</ReleaseDirectoryName>
+    <ReleaseDirectoryName Condition="$(TargetFramework.Contains('netstandard')) OR $(TargetFramework.Contains('netcoreapp'))">$(ReleaseDirectoryName)_core</ReleaseDirectoryName>
+  </PropertyGroup>
+
  
+  <!-- ============================================================= -->
   <!-- Setting default properties -->
-  <PropertyGroup Condition=" '$(ReleaseBinPath)'=='' ">
-    <ReleaseBinPath>$(ProjectDir)bin\$(Platform)\$(TargetFramework)</ReleaseBinPath>
+  <PropertyGroup Label="Default properties">
+    <!-- the folder in which to copy the output files -->
+    <ReleaseBinPath Condition=" '$(ReleaseBinPath)'=='' ">$(ProjectDir)bin\$(ReleaseDirectoryName)\</ReleaseBinPath>
+    <!-- true if the output folder should be zipped afterward -->
+    <ZipCopiedOutput Condition=" '$(ZipCopiedOutput)'=='' ">false</ZipCopiedOutput>
+    <!-- default path of the output .zip path -->
+    <ZipPath Condition=" '$(ZipPath)'=='' ">$(ReleaseBinPath)..\$([System.IO.Path]::GetFileName('$([System.IO.Path]::GetDirectoryName('$(ReleaseBinPath)'))')).zip</ZipPath>
   </PropertyGroup>
 
 
-  <!-- Copy the output files to the target directory -->
-  <Target Name="CopyOutput" AfterTargets="CoreBuild">
-    
-    <!-- copy the files to the output path -->
-    <Copy 
-      SourceFiles="@(OutputFiles)"
-      Condition=" '@(OutputFiles)'!='' AND '$(OutputPath)'!='' AND Exists('%(Fullpath)') "
-      DestinationFolder="$(OutputPath)"
-      OverwriteReadOnlyFiles="true"
-      SkipUnchangedFiles="false">
-    </Copy>
+  <!-- ============================================================= -->
+  <!-- CleanReleaseBinPath : clean the output dir before copying any files in it-->
+  <Target 
+    Name="CleanReleaseBinPath" 
+    AfterTargets="BeforeBuild">
+    <RemoveDir Directories="$(ReleaseBinPath)" />
+  </Target>
 
-    <!-- list the outputfiles which are : .exe/.dll,.pdb and eventually .runtimeconfig.json -->
+
+  <!-- ============================================================= -->
+  <!-- .net FRAMEWORK : Copy the output files to the target directory -->
+  <Target 
+    Name="CopyOutputNETFramework" 
+    AfterTargets="CoreBuild" 
+    Condition="'$(TargetFrameworkIdentifier)'=='.NETFramework'">
+    
+    <!-- list the outputfiles which are : .exe/.dll,.pdb -->
     <ItemGroup>
       <OutputFiles Include="@(IntermediateAssembly)"></OutputFiles>
-      <OutputFiles Include="@(_DebugSymbolsIntermediatePath)"></OutputFiles>      
-      <OutputFiles Include="$(OutputPath)$(TargetName).runtimeconfig.json" Condition="Exists('$(OutputPath)$(TargetName).runtimeconfig.json')"></OutputFiles>
+      <OutputFiles Include="@(_DebugSymbolsIntermediatePath)"></OutputFiles>
+      <OutputFiles Include="@(None->'%(FullPath)')" Condition=" '%(None.CopyToOutputDirectory)'=='Always' OR '%(None.CopyToPublishDirectory)'=='Always' "/>
+      <OutputFiles Include="@(Content->'%(FullPath)')" Condition=" '%(Content.CopyToOutputDirectory)'=='Always' OR '%(Content.CopyToPublishDirectory)'=='Always' "/>
     </ItemGroup>
 
     <!-- copy the files to the release path -->
@@ -38,10 +56,131 @@
     <Message Importance="high" Text="=========================="/>
     <Message Importance="high" Text="[INFO] Copying output : %0A   @(OutputFiles->'%(Fullpath)', '%0A   ')"/>
     <Message Importance="high" Text="   -> copied in $([System.IO.Path]::GetFullPath('$(ReleaseBinPath)'))"/>
-
-    <PropertyGroup>
-      <CopyOutputDone>true</CopyOutputDone>
-    </PropertyGroup>
   </Target>
+
+  <Target 
+    Name="ZipNETFramework" 
+    AfterTargets="CopyOutputNETFramework" 
+    Condition=" '$(TargetFrameworkIdentifier)'=='.NETFramework' AND '$(ZipCopiedOutput)'=='true' ">
+
+    <!-- list all the files to zip (use the output of the Target.CopyOutput.target if possible) -->
+    <ItemGroup>
+      <ZipFiles Include="$(ReleaseBinPath)*" />
+    </ItemGroup>   
+
+    <!-- create output directory -->
+    <MakeDir Directories="$([System.IO.Path]::GetDirectoryName('$(ZipPath)'))"/>
+
+    <!-- zip 'em! -->
+    <Zip
+      InputFileNames="@(ZipFiles)"
+      OutputFileName="$(ZipPath)"
+      FolderPath="$(ReleaseBinPath)"
+      OverwriteExistingFile="true" />
+
+    <Message Importance="high" Text="=========================="/>
+    <Message Importance="high" Text="[INFO] Zipping %0A   @(ZipFiles->'%(Fullpath)', '%0A   ')"/>
+    <Message Importance="high" Text="   -> into $([System.IO.Path]::GetFullPath('$(ZipPath)'))"/>
+  </Target>
+
+
+  <!-- ============================================================= -->
+  <!-- .net CORE : Case of a dotnet core application, we want to change the publish directory instead -->
+  <PropertyGroup Condition="$(TargetFramework.Contains('netstandard')) OR $(TargetFramework.Contains('netcoreapp'))">
+    <PublishDir>$(ReleaseBinPath)</PublishDir>
+  </PropertyGroup>
+
+  <Target 
+    Name="CopyOutputNETCore" 
+    AfterTargets="Publish"
+    Condition="'$(TargetFrameworkIdentifier)'!='.NETFramework'">
+
+    <ItemGroup>
+      <OutputFiles Include="$(ReleaseBinPath)*"></OutputFiles>
+    </ItemGroup>
+      
+    <Message Importance="high" Text="=========================="/>
+    <Message Importance="high" Text="[INFO] Publishing netcore files : %0A   @(OutputFiles->'%(Fullpath)', '%0A   ')"/>
+    <Message Importance="high" Text="   -> copied in $([System.IO.Path]::GetFullPath('$(ReleaseBinPath)'))"/>
+  </Target>  
+
+  <Target 
+    Name="ZipNETCore" 
+    AfterTargets="CopyOutputNETCore" 
+    Condition=" '$(TargetFrameworkIdentifier)'!='.NETFramework' AND '$(ZipCopiedOutput)'=='true' ">
+
+    <!-- list all the files to zip -->
+    <!--     
+    <ItemGroup>
+      <ZipFilesPublished Include="$(PublishDepsFilePath)" />
+      <ZipFilesPublished Include="$(PublishRuntimeConfigFilePath)" />
+      <ZipFilesPublished Include="@(_ResolvedFileToPublishAlways->'$(ReleaseBinPath)%(RelativePath)')" />
+    </ItemGroup> 
+    -->
+    <ItemGroup>
+      <ZipFilesPublished Include="$(ReleaseBinPath)*" />
+    </ItemGroup>
+
+    <!-- create output directory -->
+    <MakeDir Directories="$([System.IO.Path]::GetDirectoryName('$(ZipPath)'))"/>
+
+    <!-- zip 'em! -->
+    <Zip
+      InputFileNames="@(ZipFilesPublished)"
+      OutputFileName="$(ZipPath)"
+      FolderPath="$(ReleaseBinPath)"
+      OverwriteExistingFile="true" />
+
+    <Message Importance="high" Text="=========================="/>
+    <Message Importance="high" Text="[INFO] Zipping published %0A   @(ZipFilesPublished->'%(Fullpath)', '%0A   ')"/>
+    <Message Importance="high" Text="   -> into $([System.IO.Path]::GetFullPath('$(ZipPath)'))"/>
+  </Target>
+
+
+  <!-- ============================================================= -->
+  <!-- The ZIP task -->
+  <UsingTask TaskName="Zip" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
+    <ParameterGroup>
+      <InputFileNames ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <FolderPath ParameterType="System.String" Required="true" />
+      <OutputFileName ParameterType="System.String" Required="true" />
+      <OverwriteExistingFile ParameterType="System.Boolean" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Reference Include="System.IO.Compression" />
+      <Using Namespace="System.IO.Compression" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+        const int BufferSize = 64 * 1024;
+ 
+        var buffer = new byte[BufferSize];
+        var fileMode = OverwriteExistingFile ? FileMode.Create : FileMode.CreateNew;
+ 
+        using (var outputFileStream = new FileStream(OutputFileName, fileMode))
+        {
+          using (var archive = new ZipArchive(outputFileStream, ZipArchiveMode.Create))
+          {
+            foreach (var inputFileName in InputFileNames.Select(f => f.ItemSpec))
+            {
+              var archiveEntry = archive.CreateEntry(inputFileName.Contains(FolderPath) ? inputFileName.Replace(FolderPath, "") : Path.GetFileName(inputFileName));
+ 
+              using (var fs = new FileStream(inputFileName, FileMode.Open))
+              {
+                using (var zipStream = archiveEntry.Open())
+                {
+                  int bytesRead = -1;
+                  while ((bytesRead = fs.Read(buffer, 0, BufferSize)) > 0)
+                  {
+                    zipStream.Write(buffer, 0, bytesRead);
+                  }
+                }
+              }
+            }
+          }
+        }        
+      ]]>
+      </Code>
+    </Task>
+  </UsingTask>
 
 </Project>

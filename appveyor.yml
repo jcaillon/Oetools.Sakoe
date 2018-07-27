@@ -1,35 +1,118 @@
-version: 1.0.{build}
+#---------------------------------#
+#      general configuration      #
+#---------------------------------#
+
+# version format
+version: 1.0.{build}-{branch}
+
+# branches to build
+branches:
+  # whitelist
+  only:
+    - master
+
+  # blacklist
+  except:
+    - gh-pages
+
+# Skipping commits with particular message or from specific user
+skip_commits:
+  message: /[Ww][Ii][Pp].*/      # Regex for matching commit message
+#  author: John                  # Commit author's username, name, email or regexp maching one of these.
+
+# Maximum number of concurrent jobs for the project
+max_jobs: 1
+
+# Build worker image (VM template)
 image: Visual Studio 2017
+
+# fetch repository as zip archive
+shallow_clone: false                 # default is "false"
+
+# environment variables
+#environment:
+#  my_var1: value1
+#  my_var2: value2
+  # this is how to set encrypted variable. Go to "Encrypt data" page in account menu to encrypt data.
+#  my_secure_var1:
+#    secure: FW3tJ3fMncxvs58/ifSP7w==
+
 install:
-- cmd: git submodule update --init --recursive
+  - cmd: git submodule update --init --recursive
+
+#---------------------------------#
+#       build configuration       #
+#---------------------------------#
+
 build_script:
-- cmd: build.bat
+  - cmd: build.bat
+
+#---------------------------------#
+#       tests configuration       #
+#---------------------------------#
+
 test_script:
-- cmd: runtests.bat
+  - cmd: runtests.bat
+
+#---------------------------------#
+#      artifacts configuration    #
+#---------------------------------#
+
 artifacts:
-- path: bin\*.zip
-  name: zip
-- path: netcoreapp.binlog
-  name: netcoreapp.binlog
-- path: net461.binlog
-  name: net461.binlog
+  # pushing a single file with environment variable in path and "Deployment name" specified
+  - path: '**\*.zip'
+    name: zip
+
+  # pushing entire folder as a zip archive
+  - path: '**\*.binlog'
+    name: binlog
+
+  # pushing all *.nupkg files in build directory recursively
+  - path: '**\*.nupkg'
+    name: nupkg
+
+#---------------------------------#
+#     deployment configuration    #
+#---------------------------------#
+
+before_deploy:
+  - ps: ${env:RELEASE_DESCRIPTION} = (Get-Content -LiteralPath .docs\ReleaseNotes.md -Encoding UTF8) -join "`n";
+
 deploy:
-- provider: GitHub
-  tag: $(APPVEYOR_REPO_TAG_NAME)
-  release: $(APPVEYOR_REPO_TAG_NAME)
-  description: $(APPVEYOR_REPO_COMMIT_MESSAGE)
-  auth_token:
-    secure: UMsRAWiMijF3zclrkN5k9Je1RZN8G6GRu/6U+nxSLtATgBsRKYSnaUAh42qao6rn
-  artifact: zip
-  draft: true
-  prerelease: true
-  on:
-    branch: master
-    APPVEYOR_REPO_TAG: true
+#  - provider: NuGet
+#    # generate at https://www.nuget.org/account/apikeys
+#    # encrypt at https://ci.appveyor.com/tools/encrypt
+#    api_key:
+#      secure: 1HSNRkoAKGkg6seM4hZtRbdOAtLw+kOhyfiMEYQahX6CZ6q0qVycZXGxjMUl8HOy
+#    artifact: nupkg
+#    on:
+#      branch: master
+#      APPVEYOR_REPO_TAG: true
+
+  - provider: GitHub
+    tag: $(APPVEYOR_REPO_TAG_NAME)
+    release: $(APPVEYOR_REPO_TAG_NAME)
+    description: $(RELEASE_DESCRIPTION)
+    # generate at https://github.com/settings/tokens (scope : public_repo)
+    # encrypt at https://ci.appveyor.com/tools/encrypt
+    auth_token:
+      secure: zDL5COwBGVuS+6EFFXUnIuvhmOi63DNyHAIb+0rO5JOe0rA1wHAe9Y8R+9HARS4D
+    artifact: zip
+    draft: true
+    prerelease: true
+    on:
+      branch: master
+      APPVEYOR_REPO_TAG: true
+
+#---------------------------------#
+#         notifications           #
+#---------------------------------#
+
 notifications:
-- provider: Email
-  to:
-  - greenzest@gmail.com
-  on_build_success: false
-  on_build_failure: false
-  on_build_status_changed: true
+  # Email
+  - provider: Email
+    to:
+    - greenzest@gmail.com
+    on_build_success: false
+    on_build_failure: true
+    on_build_status_changed: true

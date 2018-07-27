@@ -12,7 +12,7 @@ set IS_CI_BUILD=false
 if not "%CI_COMMIT_SHA%"=="" set IS_CI_BUILD=true
 
 REM @@@@@@@@@@@@@@
-set MSBUILD_VERBOSITY=q
+set MSBUILD_VERBOSITY=n
 if "%IS_CI_BUILD%"=="true" set MSBUILD_VERBOSITY=n
 
 echo.=========================
@@ -20,10 +20,11 @@ echo.[%time:~0,8% INFO] RUNNING ALL DOTNET TESTS
 echo.[%time:~0,8% INFO] VERBOSITY : %MSBUILD_VERBOSITY%
 echo.
 
-for /f "delims=" %%G in ('dir /s /b *.Test.csproj') do (
+for /f "delims=" %%G in ('dir /s /b *Test.csproj') do (
 	echo.=========================
 	echo.[%time:~0,8% INFO] RUNNING %%G
 	echo.
+	rem dotnet test --no-build -v %MSBUILD_VERBOSITY% %%G
 	dotnet test -v %MSBUILD_VERBOSITY% %%G
 	if %errorlevel% neq 0 goto ENDINERROR
 )
@@ -31,7 +32,7 @@ for /f "delims=" %%G in ('dir /s /b *.Test.csproj') do (
 :DONE
 echo.
 echo.=========================
-echo.[%time:~0,8% INFO] DONE
+echo.[%time:~0,8% INFO] TESTS DONE
 
 if "%IS_CI_BUILD%"=="false" (
 	pause
@@ -54,7 +55,7 @@ REM - -------------------------------------
 :ENDINERROR
 
 echo.=========================
-echo.[%time:~0,8% ERRO] ERROR!!! ERRORLEVEL = %errorlevel%
+echo.[%time:~0,8% ERRO] TESTS ENDED IN ERROR, ERRORLEVEL = %errorlevel%
 
 if "%IS_CI_BUILD%"=="false" (
 	pause

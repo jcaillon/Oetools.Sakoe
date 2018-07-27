@@ -1,20 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  
-  <!-- http://source.roslyn.io/#MSBuildFiles/C/ProgramFiles(x86)/MicrosoftVisualStudio/2017/Enterprise/MSBuild/15.0/Bin_/Microsoft.Common.CurrentVersion.targets,2043 -->
-
-  <!-- well known meta data like %(Fullname) -->
-  <!-- https://msdn.microsoft.com/fr-fr/library/ms164313.aspx -->
-
-
   <!-- Setting default properties -->
-  <PropertyGroup Condition=" '$(EmbedResourcesDirectory)'=='' ">
-    <EmbedResourcesDirectory>$(ProjectDir)Resources\Dependencies</EmbedResourcesDirectory>
+  <PropertyGroup Label="Default properties">
+    <EmbedResourcesDirectory Condition=" '$(EmbedResourcesDirectory)'=='' ">$(ProjectDir)Resources\Dependencies\</EmbedResourcesDirectory>
   </PropertyGroup>
 
-
-  <!-- embed dll dependencies -->
-  <Target Name="EmbedDependencies" AfterTargets="ResolveAssemblyReferences">
+  <!-- embed dll dependencies (it only works for .netframework as .netcore also might need libraries present in the runtime folder and depending on the runtime environment...) -->
+  <Target 
+    Name="EmbedDependencies" 
+    AfterTargets="ResolveAssemblyReferences" 
+    Condition="'$(TargetFrameworkIdentifier)'=='.NETFramework'">
 
     <!-- list all the files referenced in this project (which are not part of the framework and need to be published with the final build) -->
     <ItemGroup>
@@ -36,13 +32,13 @@
     </Copy>
 
     <!-- remove duplicates, ResourcesToEmbedFiltered will contain the final list of files to embed -->
-    <RemoveDuplicates Inputs="@(ReferencedAssemblies->'$(EmbedResourcesDirectory)\%(Filename)%(Extension)')">  
+    <RemoveDuplicates Inputs="@(ReferencedAssemblies->'$(EmbedResourcesDirectory)%(Filename)%(Extension)')">  
       <Output TaskParameter="Filtered" ItemName="ResourcesToEmbedFiltered"/>  
     </RemoveDuplicates>
 
     <!-- actually embed the resources, ResourcesToEmbed will contain the final list of files to embed -->
     <ItemGroup>      
-    <ResourcesToEmbed Include="@(ResourcesToEmbedFiltered->'$(EmbedResourcesDirectory)\%(Filename)%(Extension)')" KeepMetadata="LogicalName" />
+    <ResourcesToEmbed Include="@(ResourcesToEmbedFiltered->'$(EmbedResourcesDirectory)%(Filename)%(Extension)')" KeepMetadata="LogicalName" />
     <EmbeddedResource Include="@(ResourcesToEmbed)">
       <LogicalName>$(RootNamespace).%(Filename)%(Extension)</LogicalName>
     </EmbeddedResource>
