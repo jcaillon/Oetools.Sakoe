@@ -14,7 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{88
 		runtests.bat = runtests.bat
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Oetools.Runner.Cli", "Oetools.Runner.Cli\Oetools.Runner.Cli.csproj", "{FFB81763-530F-4355-A234-BCE711A49102}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Oetools.Sakoe", "Oetools.Sakoe\Oetools.Sakoe.csproj", "{FFB81763-530F-4355-A234-BCE711A49102}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Oetools.Packager", "Oetools.Packager\Oetools.Packager\Oetools.Packager.csproj", "{B8485339-A572-491D-8BD6-86BB5DE9B74B}"
 EndProject
@@ -24,7 +24,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Oetools.Packager.Test", "Oe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Oetools.Utilities.Test", "Oetools.Packager\Oetools.Utilities\Oetools.Utilities.Test\Oetools.Utilities.Test.csproj", "{43A5D2ED-B550-4381-BB5C-A1E569A9A47D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Oetools.Runner.Cli.Test", "Oetools.Runner.Cli.Test\Oetools.Runner.Cli.Test.csproj", "{2B26AD29-0096-426A-8D70-C10D2DECC33D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Oetools.Sakoe.Test", "Oetools.Sakoe.Test\Oetools.Sakoe.Test.csproj", "{2B26AD29-0096-426A-8D70-C10D2DECC33D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oetools.HtmlExport", "Oetools.HtmlExport\Oetools.HtmlExport.csproj", "{F85DD7FB-4C2E-44EB-A799-F4D681F57246}"
 EndProject

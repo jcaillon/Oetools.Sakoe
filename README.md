@@ -1,4 +1,4 @@
-# Oetools.Runner.Cli
+# Oetools.Sakoe
 
 [![Build status](https://ci.appveyor.com/api/projects/status/2oyd83vvvlj1tvin?svg=true)](https://ci.appveyor.com/project/jcaillon/oetools-runner)
 
@@ -14,7 +14,7 @@ todo
 
 ```
 dotnet build
-dotnet Oetools.Runner.Cli\bin\Debug\netcoreapp2.0\Oetools.Runner.Cli.dll
+dotnet Oetools.Sakoe\bin\Debug\netcoreapp2.0\Oetools.Sakoe.dll
 dotnet run
 dotnet test
 ```

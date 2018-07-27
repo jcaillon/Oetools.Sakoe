@@ -3,7 +3,7 @@ setlocal enabledelayedexpansion
 
 REM on CI, the version built will be replaced by the tag name instead of taking the version from csproj
 REM if PROJECT_PATH is empty, we use the solution
-if "%PROJECT_PATH%"=="" set "PROJECT_PATH=Oetools.Runner.Cli\Oetools.Runner.Cli.csproj"
+if "%PROJECT_PATH%"=="" set "PROJECT_PATH=Oetools.Sakoe\Oetools.Sakoe.csproj"
 if "%CUSTOM_BUILD_PARAMS%"=="" set "CUSTOM_BUILD_PARAMS=/p:ZipCopiedOutput=true"
 REM set below to false if you don't want to change the target framework on build
 if "%CHANGE_DEFAULT_TARGETFRAMEWORK%"=="" set "CHANGE_DEFAULT_TARGETFRAMEWORK=true"

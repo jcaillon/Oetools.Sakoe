@@ -76,7 +76,7 @@ artifacts:
 #---------------------------------#
 
 before_deploy:
-  - ps: ${env:RELEASE_DESCRIPTION} = (Get-Content -LiteralPath .docs\ReleaseNotes.md -Encoding UTF8) -join "`n";
+  - ps: ${env:RELEASE_DESCRIPTION} = (Get-Content -LiteralPath .github\RELEASE_NOTES.md -Encoding UTF8) -join "`n";
 
 deploy:
 #  - provider: NuGet
