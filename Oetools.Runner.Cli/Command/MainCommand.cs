@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using McMaster.Extensions.CommandLineUtils;
+using Oetools.Runner.Cli.Command.Oe;
 
 namespace Oetools.Runner.Cli.Command {
     
@@ -8,8 +9,8 @@ namespace Oetools.Runner.Cli.Command {
     /// The main command of the application, called when the user passes no arguments/commands
     /// </summary>
     [Command(
-        Description = "TODO : short description of this CLI",
-        ExtendedHelpText = "TODO : extended help for this CLI",
+        Description = "============\nTODO : short description of this CLI",
+        ExtendedHelpText = "\nTODO : extended help for this CLI\n============",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         ThrowOnUnexpectedArgument = false,
         ResponseFileHandling = ResponseFileHandling.ParseArgsAsSpaceSeparated
@@ -24,12 +25,6 @@ namespace Oetools.Runner.Cli.Command {
     [Subcommand("package", typeof(PackageCommand))]
     internal class MainCommand : BaseCommand {
         
-        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            // this shows help even if the --help option isn't specified
-            app.ShowHelp();
-            return 1;
-        }
-
         private static string GetVersion() => typeof(MainCommand).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 
         public static int ExecuteMainCommand(string[] args) => CommandLineApplication.Execute<MainCommand>(args);

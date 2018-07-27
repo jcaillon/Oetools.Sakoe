@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using McMaster.Extensions.CommandLineUtils;
 
-namespace Oetools.Runner.Cli.Command {
+namespace Oetools.Runner.Cli.Command.Oe {
     
     
     [Command(
@@ -11,7 +11,7 @@ namespace Oetools.Runner.Cli.Command {
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         ThrowOnUnexpectedArgument = false
     )]
-    internal class ProlintCommand : BaseCommand {
+    internal class ProlintCommand : OeBaseCommand {
         [Option("-m")]
         public string Message { get; set; }
 

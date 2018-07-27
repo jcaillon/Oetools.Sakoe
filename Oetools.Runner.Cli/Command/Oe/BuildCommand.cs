@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Runner.Cli.Lib;
 
-namespace Oetools.Runner.Cli.Command {
+namespace Oetools.Runner.Cli.Command.Oe {
     
     [Command(
         Description = "TODO",
@@ -11,7 +11,7 @@ namespace Oetools.Runner.Cli.Command {
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         ThrowOnUnexpectedArgument = false
     )]
-    internal class BuildCommand : BaseCommand {
+    internal class BuildCommand : OeBaseCommand {
         
         [Required]
         [LegalFilePath]
@@ -40,7 +40,7 @@ namespace Oetools.Runner.Cli.Command {
         protected bool ForceFullRebuild { get; set; }
         
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            WriteWarning("Build");
+            WriteWarn("Build");
             app.ShowHint();
             return 1;
         }

@@ -35,6 +35,8 @@ namespace Oetools.Runner.Cli.Command {
     public abstract class BaseCommand {
         
         private const string VerboseTemplate = "-vb|--verbose";
+
+        protected virtual string UseVerboseMessage => $"Get more details on this error by adding the verbose option : {VerboseTemplate}";
         
         [Option(VerboseTemplate, "Execute the command using a verbose log/error output", CommandOptionType.NoValue)]
         // ReSharper disable once UnassignedGetOnlyAutoProperty
@@ -43,29 +45,33 @@ namespace Oetools.Runner.Cli.Command {
 
         protected IConsole Console { get; private set; }
         
+        protected virtual void ExecutePreCommand(CommandLineApplication app, IConsole console) { }
+
+        protected virtual void ExecutePostCommand(CommandLineApplication app, IConsole console) { }
+        
         // ReSharper disable once UnusedMember.Global
         protected int OnExecute(CommandLineApplication app, IConsole console) {
             Console = console;
             try {
+                ExecutePreCommand(app, console);
                 var returnCode = ExecuteCommand(app, console);
+                ExecutePostCommand(app, console);
                 if (returnCode.Equals(0)) {
-                    WriteSuccess("OK");
+                    WriteOk("OK");
+                } else {
+                    WriteWarn($"EXIT CODE {returnCode}");
                 }
                 return returnCode;
             } catch (Exception e) {
-                console.ForegroundColor = ConsoleColor.Red;
-                console.Error.WriteLine("----------------------------");
-                console.Error.WriteLine($"**{(IsVerbose ? e.ToString() : e.Message)}");
-                console.Error.WriteLine("----------------------------");
+                WriteError($"**{e.Message}", e);
                 if (!IsVerbose) {
-                    console.Error.WriteLine($"Get more details on this error by adding the verbose option : {VerboseTemplate}");
+                    WriteInfo(UseVerboseMessage);
                 }
-                console.Error.WriteLine("**ERROR");
-                console.ResetColor();
             }
-            return 1;
+            WriteFatal("ERROR");
+            return 9;
         }
-
+        
         /// <summary>
         /// The method to override for each command
         /// </summary>
@@ -73,62 +79,69 @@ namespace Oetools.Runner.Cli.Command {
         /// <param name="console"></param>
         /// <returns></returns>
         protected virtual int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            console.ForegroundColor = ConsoleColor.Red;
-            console.Error.WriteLine("**Command not implemented!");
-            console.ResetColor();
-            app.ShowHint();
+            app.ShowHelp();
+            WriteWarn("You must provide a command");
             return 1;
         }
+        
+        protected void WriteDebug(string message, Exception e = null) {
+            Log(LogLvl.Debug, message, e);
+        }
 
-        protected void WriteInformationHeader(string message) {
-            if (!IsVerbose) {
+        protected void WriteInfo(string message, Exception e = null) {
+            Log(LogLvl.Info, message, e);
+        }
+
+        protected void WriteOk(string message, Exception e = null) {
+            Log(LogLvl.Ok, message, e);
+        }
+
+        protected void WriteWarn(string message, Exception e = null) {
+            Log(LogLvl.Warn, message, e);
+        }
+
+        protected void WriteError(string message, Exception e = null) {
+            Log(LogLvl.Error, message, e);
+        }
+
+        protected void WriteFatal(string message, Exception e = null) {
+            Log(LogLvl.Fatal, message, e);
+        }
+        
+        private void Log(LogLvl level, string message, Exception e = null) {
+            if (level <= LogLvl.Debug && !IsVerbose) {
                 return;
             }
-            
-            Console.ForegroundColor = ConsoleColor.DarkCyan;
-            Console.Error.WriteLine(message);
-            Console.ResetColor();
-        }
 
-        protected void WriteInformationBody(string message) {
-            if (!IsVerbose) {
-                return;
+            switch (level) {
+                case LogLvl.Debug:
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    break;
+                case LogLvl.Info:
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    break;
+                case LogLvl.Ok:
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    break;
+                case LogLvl.Warn:
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    break;
+                case LogLvl.Error:
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    break;
+                case LogLvl.Fatal:
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(level), level, null);
             }
-            
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.Error.WriteLine(message);
-            Console.ResetColor();
-        }
 
-        protected void WriteWarning(string message) {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.Error.WriteLine(message);
-            Console.ResetColor();
-        }
-
-        protected void WriteError(string message) {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Error.WriteLine($"**{message}");
-            Console.ResetColor();
-        }
-
-        protected void WriteSuccess(string message) {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Error.WriteLine(message);
-            Console.ResetColor();
-        }
-
-        /// <summary>
-        /// Returns the DLC PATH
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="Exception"></exception>
-        protected string GetDlcPath() {
-            var dlcPath = ProUtilities.GetDlcPath();
-            if (string.IsNullOrEmpty(dlcPath) || !Directory.Exists(dlcPath)) {
-                throw new Exception("DLC folder not found, you must set the environment variable DLC to locate your openedge installation folder");
+            Console.WriteLine($"{level.ToString().ToUpper().PadRight(5, ' ')} [{DateTime.Now:dd.MM.yy HH:mm:ss}] {message}");
+            if (e != null) {
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine(e.ToString());
             }
-            return dlcPath;
+            Console.ResetColor();
         }
 
         protected bool TryGetEnumValue<T>(string stringValue, out long enumValue, out List<string> validValuesList) {
@@ -147,20 +160,13 @@ namespace Oetools.Runner.Cli.Command {
             return found;
         }
 
-        /// <summary>
-        /// Returns the path of the unique project file in the current directory (if any)
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="CommandException"></exception>
-        protected string GetCurrentProjectFilePath() {
-            var list = Directory.EnumerateFiles(Directory.GetCurrentDirectory(), $"{OeConstants.OeProjectExtension}*", SearchOption.TopDirectoryOnly).ToList();
-            if (list.Count == 0) {
-                throw new CommandException($"No project file ({OeConstants.OeProjectExtension}) found in the current folder {Directory.GetCurrentDirectory()}");
-            }
-            if (list.Count > 1) {
-                throw new CommandException($"Ambigous project, found {list.Count} project files in the current folder, specify the project file to use in the command line");
-            }
-            return list.First();
+        private enum LogLvl {
+            Debug,
+            Info,
+            Ok,
+            Warn,
+            Error,
+            Fatal
         }
         
     }

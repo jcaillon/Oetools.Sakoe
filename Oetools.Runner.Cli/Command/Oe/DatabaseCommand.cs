@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.IO;
 using System.Linq;
-using System.Net;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge;
 
-namespace Oetools.Runner.Cli.Command {
+namespace Oetools.Runner.Cli.Command.Oe {
     
     
     [Command(
@@ -24,14 +22,7 @@ namespace Oetools.Runner.Cli.Command {
     [Subcommand("kill", typeof(KillAllDatabaseCommand))]
     [Subcommand("delete", typeof(DeleteDatabaseCommand))]
     [Subcommand("repair", typeof(RepairDatabaseCommand))]
-    internal class DatabaseCommand : BaseCommand {
-        
-        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            WriteWarning("You must provide a command");
-            app.ShowHint();
-            return 1;
-        }
-
+    internal class DatabaseCommand : OeBaseCommand {
     }
     
     [Command(
@@ -40,7 +31,7 @@ namespace Oetools.Runner.Cli.Command {
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         ThrowOnUnexpectedArgument = false
     )]
-    internal class RepairDatabaseCommand : BaseCommand {
+    internal class RepairDatabaseCommand : OeBaseCommand {
         
         [Required]
         [LegalFilePath]
@@ -66,7 +57,7 @@ namespace Oetools.Runner.Cli.Command {
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         ThrowOnUnexpectedArgument = false
     )]
-    internal class DeleteDatabaseCommand : BaseCommand {
+    internal class DeleteDatabaseCommand : OeBaseCommand {
         
         [Required]
         [LegalFilePath]
@@ -92,7 +83,7 @@ namespace Oetools.Runner.Cli.Command {
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         ThrowOnUnexpectedArgument = false
     )]
-    internal class StopDatabaseCommand : BaseCommand {
+    internal class StopDatabaseCommand : OeBaseCommand {
         
         [Required]
         [LegalFilePath]
@@ -109,11 +100,11 @@ namespace Oetools.Runner.Cli.Command {
             var dbAdministrator = new DatabaseAdministrator(GetDlcPath());
                         
             if (RemainingArgs != null) {
-                WriteInformationHeader($"Extra parameters : {string.Join(" ", RemainingArgs)}");
+                WriteInfo($"Extra parameters : {string.Join(" ", RemainingArgs)}");
             }
            
             dbAdministrator.Proshut(TargetDatabasePath, string.Join(" ", RemainingArgs));
-            WriteInformationBody(dbAdministrator.LastOperationStandardOutput);
+            WriteDebug(dbAdministrator.LastOperationStandardOutput);
             
             return 0;
         }
@@ -122,7 +113,7 @@ namespace Oetools.Runner.Cli.Command {
     [Command(
         Description = "Kill all the _mprosrv process"
     )]
-    internal class KillAllDatabaseCommand : BaseCommand {
+    internal class KillAllDatabaseCommand : OeBaseCommand {
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             DatabaseOperator.KillAllMproSrv();
             return 0;
@@ -135,7 +126,7 @@ namespace Oetools.Runner.Cli.Command {
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         ThrowOnUnexpectedArgument = false
     )]
-    internal class StartDatabaseCommand : BaseCommand {
+    internal class StartDatabaseCommand : OeBaseCommand {
         
         [Required]
         [LegalFilePath]
@@ -164,7 +155,7 @@ namespace Oetools.Runner.Cli.Command {
             var dbAdministrator = new DatabaseAdministrator(GetDlcPath());
                        
             if (RemainingArgs != null) {
-                WriteInformationHeader($"Extra parameters for proserve : {string.Join(" ", RemainingArgs)}");
+                WriteInfo($"Extra parameters for proserve : {string.Join(" ", RemainingArgs)}");
             }
            
             // service or port
@@ -185,10 +176,10 @@ namespace Oetools.Runner.Cli.Command {
             ServiceName = ServiceName ?? (Port.HasValue && Port.value > 0 ? Port.value : (NextPortAvailable.HasValue ? DatabaseOperator.GetNextAvailablePort(NextPortAvailable.value) : DatabaseOperator.GetNextAvailablePort())).ToString();
             
             var options = dbAdministrator.ProServe(TargetDatabasePath, ServiceName, NbUsers.value > 0 ? (int?) NbUsers.value : null, string.Join(" ", RemainingArgs));
-            WriteInformationHeader($"Proserve with options : {options.Quoter()}");
+            WriteInfo($"Proserve with options : {options.Quoter()}");
             
-            WriteSuccess($"Database started successfully, connection string :");
-            WriteSuccess($"{DatabaseAdministrator.GetConnectionString(TargetDatabasePath, ServiceName)}");
+            WriteOk($"Database started successfully, connection string :");
+            WriteOk($"{DatabaseAdministrator.GetConnectionString(TargetDatabasePath, ServiceName)}");
             
             return 0;
         }
@@ -200,7 +191,7 @@ namespace Oetools.Runner.Cli.Command {
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         ThrowOnUnexpectedArgument = false
     )]
-    internal class CreateDatabaseCommand : BaseCommand {
+    internal class CreateDatabaseCommand : OeBaseCommand {
         
         [Required]
         [LegalFilePath]
@@ -257,31 +248,31 @@ namespace Oetools.Runner.Cli.Command {
             bool stAutoGenerated = false;
             if (!string.IsNullOrEmpty(SchemaDefinitionFilePath)) {
                 if (string.IsNullOrEmpty(StuctureFilePath)) {
-                    WriteInformationHeader("Generating structure file (.st) from schema definition file (.df)");
+                    WriteInfo("Generating structure file (.st) from schema definition file (.df)");
                     StuctureFilePath = dbAdministrator.GenerateStructureFileFromDf(TargetDatabasePath, SchemaDefinitionFilePath);
-                    WriteInformationBody($"File generated : {StuctureFilePath}");
-                    WriteInformationBody(dbAdministrator.LastOperationStandardOutput);
+                    WriteDebug($"File generated : {StuctureFilePath}");
+                    WriteDebug(dbAdministrator.LastOperationStandardOutput);
                     stAutoGenerated = true;
                 }
             }
             
             // copy structure file to target
             if (!string.IsNullOrEmpty(StuctureFilePath)) {
-                WriteInformationHeader("Copying source structure file (.st) to target database folder");
+                WriteInfo("Copying source structure file (.st) to target database folder");
                 dbAdministrator.CopyStructureFile(TargetDatabasePath, StuctureFilePath);
             }
             
             // prostct create
             if (!string.IsNullOrEmpty(StuctureFilePath)) {
-                WriteInformationHeader($"Create database structure from structure file (.st) using {blockSize} blocksize");
+                WriteInfo($"Create database structure from structure file (.st) using {blockSize} blocksize");
                 dbAdministrator.ProstrctCreate(TargetDatabasePath, StuctureFilePath, blockSize);
-                WriteInformationBody(dbAdministrator.LastOperationStandardOutput);
+                WriteDebug(dbAdministrator.LastOperationStandardOutput);
             }
             
             // procopy empty
-            WriteInformationHeader($"Procopy the empty database from the dlc folder corresponding to a {blockSize} blocksize");
+            WriteInfo($"Procopy the empty database from the dlc folder corresponding to a {blockSize} blocksize");
             dbAdministrator.Procopy(TargetDatabasePath, blockSize, Codepage, NewInstance, RelativePath);
-            WriteInformationBody(dbAdministrator.LastOperationStandardOutput);
+            WriteDebug(dbAdministrator.LastOperationStandardOutput);
 
             if (!dbAdministrator.DatabaseExists(TargetDatabasePath)) {
                 throw new CommandException("The database does not exist for unknown reasons");
@@ -289,16 +280,16 @@ namespace Oetools.Runner.Cli.Command {
             
             // Load .df
             if (!string.IsNullOrEmpty(SchemaDefinitionFilePath)) {
-                WriteInformationHeader($"Loading the schema definition from {SchemaDefinitionFilePath}");
+                WriteInfo($"Loading the schema definition from {SchemaDefinitionFilePath}");
                 dbAdministrator.LoadDf(TargetDatabasePath, SchemaDefinitionFilePath);
-                WriteInformationBody(dbAdministrator.LastOperationStandardOutput);
+                WriteDebug(dbAdministrator.LastOperationStandardOutput);
             }
 
             if (stAutoGenerated) {
-                WriteWarning("The database physical structure (described in .st) has been generated automatically, this database should not be used in production");
+                WriteWarn("The database physical structure (described in .st) has been generated automatically, this database should not be used in production");
             }
 
-            WriteSuccess($"Database created successfully : {TargetDatabasePath.Quoter()}");
+            WriteOk($"Database created successfully : {TargetDatabasePath.Quoter()}");
             return 0;
         }
     }

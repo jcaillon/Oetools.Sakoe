@@ -1,18 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.IO;
-using System.Linq;
-using System.Net;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Runner.Cli.Config.v2;
 using Oetools.Runner.Cli.Lib;
-using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
-using Oetools.Utilities.Openedge;
 
-namespace Oetools.Runner.Cli.Command {
-    
+namespace Oetools.Runner.Cli.Command.Oe {
     
     [Command(
         Description = "TODO",
@@ -21,15 +14,8 @@ namespace Oetools.Runner.Cli.Command {
         ThrowOnUnexpectedArgument = false
     )]
     [Subcommand("new", typeof(NewProjectCommand))]
-    internal class ProjectCommand : BaseCommand {
-        
-        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            WriteWarning("You must provide a command");
-            app.ShowHint();
-            return 1;
-        }
-
-    }
+    internal class ProjectCommand : OeBaseCommand {
+   }
     
     [Command(
         Description = "TODO",
@@ -37,7 +23,7 @@ namespace Oetools.Runner.Cli.Command {
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         ThrowOnUnexpectedArgument = false
     )]
-    internal class NewProjectCommand : BaseCommand {
+    internal class NewProjectCommand : OeBaseCommand {
         
         [LegalFilePath]
         [Argument(0, Name = "Project file path", Description = "The path to the project file to create (without extension)")]

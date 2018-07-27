@@ -4,7 +4,10 @@ using System.Reflection;
 using System.Linq;
 
 namespace Oetools.Runner.Cli {
-    internal static class AssemblyLoader {
+        internal static class AssemblyLoader {
+
+        private static string _executingAssemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+        
         /// <summary>
         /// Called when the resolution of an assembly fails, gives us the opportunity to feed the required asssembly
         /// to the program
@@ -50,7 +53,7 @@ namespace Oetools.Runner.Cli {
         }
 
         private static byte[] GetDependencyFromResources(string fileName) {
-            return GetBytesFromResource($"{nameof(Oetools)}.{nameof(Runner)}.{nameof(Cli)}.{fileName}");
+            return GetBytesFromResource($"{_executingAssemblyName}.{fileName}");
         }
     }
 }

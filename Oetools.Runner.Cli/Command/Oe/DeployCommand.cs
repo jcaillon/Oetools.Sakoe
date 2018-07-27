@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Threading;
 using McMaster.Extensions.CommandLineUtils;
 using ShellProgressBar;
 
-namespace Oetools.Runner.Cli.Command {
+namespace Oetools.Runner.Cli.Command.Oe {
     
     [Command(
         Description = "TODO : deploy help text",
@@ -13,7 +11,7 @@ namespace Oetools.Runner.Cli.Command {
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         ThrowOnUnexpectedArgument = false
     )]
-    internal class DeployCommand : BaseCommand {
+    internal class DeployCommand : OeBaseCommand {
         
         [Argument(0)]
         [LegalFilePath]

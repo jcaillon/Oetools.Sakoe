@@ -40,7 +40,7 @@
     <ItemGroup>      
     <ResourcesToEmbed Include="@(ResourcesToEmbedFiltered->'$(EmbedResourcesDirectory)%(Filename)%(Extension)')" KeepMetadata="LogicalName" />
     <EmbeddedResource Include="@(ResourcesToEmbed)">
-      <LogicalName>$(RootNamespace).%(Filename)%(Extension)</LogicalName>
+      <LogicalName>$(AssemblyName).%(Filename)%(Extension)</LogicalName>
     </EmbeddedResource>
     </ItemGroup>
     
