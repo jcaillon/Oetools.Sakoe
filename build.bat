@@ -197,11 +197,15 @@ for /f "usebackq delims=" %%I in (`where msbuild.exe 2^>nul`) do (
 )
 
 @REM Find the latest MSBuild that supports our projects
-for /f "usebackq delims=" %%I in ('"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -version "[15.0,)" -latest -prerelease -products * -requires Microsoft.Component.MSBuild Microsoft.VisualStudio.Component.Roslyn.Compiler Microsoft.VisualStudio.Component.VC.140 -property InstallationPath') do (
-    for /f "usebackq delims=" %%J in (`where /r "%%I\MSBuild" msbuild.exe 2^>nul ^| sort /r`) do (
-        "%%J" %*
-        exit /b !ERRORLEVEL!
-    )
+pushd "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer"
+for /f "usebackq delims=" %%I in (`vswhere.exe -version "[15.0,)" -latest -prerelease -products * -requires Microsoft.Component.MSBuild -property InstallationPath`) do (
+	set "MSBUILD_INSTALLPATH=%%I\MSBuild"
+)
+popd
+
+for /f "usebackq delims=" %%J in (`where /r "%MSBUILD_INSTALLPATH%" msbuild.exe 2^>nul ^| sort /r`) do (
+    "%%J" %*
+    exit /b !ERRORLEVEL!
 )
 
 echo.=========================
