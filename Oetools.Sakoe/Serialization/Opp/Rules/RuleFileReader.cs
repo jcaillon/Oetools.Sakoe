@@ -25,7 +25,7 @@ using Oetools.Packager.Core;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
 
-namespace Oetools.Sakoe.Config.v1.Rules {
+namespace Oetools.Sakoe.Serialization.Opp.Rules {
     
     public static class RuleFileReader {
     

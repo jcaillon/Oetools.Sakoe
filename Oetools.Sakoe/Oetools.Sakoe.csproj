@@ -31,7 +31,7 @@
     <PackageProjectUrl>https://github.com/jcaillon/Oetools.Runner</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/jcaillon/Oetools.Runner.git</RepositoryUrl>
-    <PackageIconUrl>https://raw.githubusercontent.com/jcaillon/Oetools.Runner/master/docs/logo.png</PackageIconUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/jcaillon/Oetools.Runner/master/docs/images/logo.png</PackageIconUrl>
     <PackageReleaseNotes>
     </PackageReleaseNotes>
     <PackageTags>openedge sakoe progress 4GL abl</PackageTags>

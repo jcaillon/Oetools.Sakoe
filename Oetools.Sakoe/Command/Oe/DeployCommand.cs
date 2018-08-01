@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 using McMaster.Extensions.CommandLineUtils;
-using ShellProgressBar;
+using Oetools.Sakoe.ShellProgressBar;
 
 namespace Oetools.Sakoe.Command.Oe {
     

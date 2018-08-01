@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Oetools.Sakoe.Config.v1 {
+namespace Oetools.Sakoe.Serialization.Opp {
     
     [Serializable]
     public class XmlFileDeployedCompiled : XmlFileDeployed {

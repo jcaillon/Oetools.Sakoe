@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Xml.Serialization;
 
-namespace Oetools.Sakoe.Config.v1 {
+namespace Oetools.Sakoe.Serialization.Opp {
     
     [Serializable]
     [XmlInclude(typeof(XmlFileDeployed))]

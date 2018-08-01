@@ -1,7 +1,7 @@
 ﻿#region header
 // ========================================================================
 // Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
-// This file (XmlReturnCode.cs) is part of Oetools.Sakoe.
+// This file (XmlCompressionLevel.cs) is part of Oetools.Sakoe.
 // 
 // Oetools.Sakoe is a free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,21 +21,17 @@
 using System;
 using System.Xml.Serialization;
 
-namespace Oetools.Sakoe.Config.v1 {
+namespace Oetools.Sakoe.Serialization.Opp {
     
     [Serializable]
-    public enum XmlReturnCode {
-        [XmlEnum("NoSet")]
-        NoSet,
-        [XmlEnum("Error")]
-        DeploymentError,
-        [XmlEnum("Error")]
-        CompilationError,
-        [XmlEnum("Error")]
-        CompilationErrorOnMaxUser,
-        [XmlEnum("Ok")]
-        Ok,
-        [XmlEnum("Canceled")]
-        Canceled
+    public enum XmlCompressionLevel {
+        [XmlEnum("None")]
+        None,
+        [XmlEnum("Min")]
+        Min,
+        [XmlEnum("Normal")]
+        Normal,
+        [XmlEnum("Max")]
+        Max
     }
 }

@@ -23,7 +23,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
 
-namespace Oetools.Sakoe.Config.v1 {
+namespace Oetools.Sakoe.Serialization.Opp {
     
     [Serializable]
     [XmlRoot("Config")]

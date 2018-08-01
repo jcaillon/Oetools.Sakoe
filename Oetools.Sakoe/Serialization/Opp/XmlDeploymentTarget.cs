@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Oetools.Sakoe.Config.v1 {
+namespace Oetools.Sakoe.Serialization.Opp {
     
     [Serializable]
     public class XmlDeploymentTarget {

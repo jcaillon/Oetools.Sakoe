@@ -1,6 +1,6 @@
 using System;
 
-namespace ShellProgressBar
+namespace Oetools.Sakoe.ShellProgressBar
 {
 	/// <summary>
 	/// Control the behaviour of your progressbar

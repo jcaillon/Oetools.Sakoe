@@ -17,28 +17,38 @@ namespace Oetools.Sakoe.Command.Oe {
         [LegalFilePath]
         [Argument(0, Name = "Project file path", Description = "Path to the project file (" + OeConstants.OeProjectExtension + " extension is optional)")]
         protected string ProjectFilePath { get; set; }
-                
-        [Option("-c|--configname", "The name of the configuration to use for the build, found in " + OeConstants.OeProjectExtension + " file", CommandOptionType.SingleValue)]
+
+        [Required]
+        [Option("-o|--output-directory", "", CommandOptionType.SingleValue)]
+        protected string OutputDirectory { get; set; }
+
+        [Option("-c|--config-name", "The name of the configuration to use for the build, found in " + OeConstants.OeProjectExtension + " file", CommandOptionType.SingleValue)]
         protected string ConfigurationName { get; set; }
-                
-        [Option("-r|--report", "", CommandOptionType.SingleValue)]
+
+        [Option("-r|--report-path", "", CommandOptionType.SingleValue)]
         protected string ReportPath { get; set; }
         
-        [Option("-tf|--targetfolder", "Override the target folder specified in the project file", CommandOptionType.SingleValue)]
+        [Option("-tf|--target-folder", "Override the target folder specified in the project file", CommandOptionType.SingleValue)]
         protected string TargetFolder { get; set; }
         
-        [Option("-ho|--historyoutput", "", CommandOptionType.SingleValue)]
+        [Option("-ho|--history-output", "", CommandOptionType.SingleValue)]
         protected string DeploymentHistoryOutputPath { get; set; }
         
-        [Option("-hi|--historyinput", "", CommandOptionType.SingleValue)]
-        protected string DeploymentHistoryInputPath { get; set; }
+        [Option("-hi|--history-input", "", CommandOptionType.SingleValue)]
+        protected string DeploymentHistoryInputPath { get; set; }        
         
-        [Option("-tm|--testmode", "", CommandOptionType.NoValue)]
+        [Option("-tm|--test-mode", "", CommandOptionType.NoValue)]
         protected bool TestMode { get; set; }
         
-        [Option("-fr|--forcerebuild", "", CommandOptionType.NoValue)]
+        [Option("-fr|--force-rebuild", "", CommandOptionType.NoValue)]
         protected bool ForceFullRebuild { get; set; }
-        
+                
+        /// <summary>
+        /// It defaults to the output directory
+        /// </summary>
+        [Option("-rd|--reference-directory", "", CommandOptionType.SingleValue)]
+        protected string ReferenceDirectory { get; set; }
+       
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             WriteWarn("Build");
             app.ShowHint();

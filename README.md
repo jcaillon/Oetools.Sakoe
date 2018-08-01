@@ -1,9 +1,9 @@
 # Oetools.Sakoe
 
 [![Build status](https://ci.appveyor.com/api/projects/status/67ij0nnuwduac2cn?svg=true)](https://ci.appveyor.com/project/jcaillon/oetools-sakoe)
-<!-- [![Coverity status](https://scan.coverity.com/projects/15362/badge.svg)](https://scan.coverity.com/projects/oetools-runner) -->
 [![GitHub release](https://img.shields.io/github/release/jcaillon/Oetools.Sakoe.svg)](https://github.com/jcaillon/Oetools.Sakoe3P/releases/latest)
 [![Total downloads](https://img.shields.io/github/downloads/jcaillon/Oetools.Sakoe/total.svg)](https://github.com/jcaillon/Oetools.Sakoe/releases)
+<!-- [![Coverity status](https://scan.coverity.com/projects/15362/badge.svg)](https://scan.coverity.com/projects/oetools-runner) -->
 
 [![GPLv3 licence](https://img.shields.io/badge/License-GPLv3-74A5C2.svg)](https://github.com/jcaillon/Oetools.Sakoe/blob/master/LICENSE)
 [![.net 4.6.1+ required](https://img.shields.io/badge/Requires%20.NET-4.6.1+-C8597A.svg)](http://go.microsoft.com/fwlink/?LinkId=671743)

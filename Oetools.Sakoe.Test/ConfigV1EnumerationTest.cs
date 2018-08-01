@@ -23,7 +23,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Oetools.HtmlExport.Config;
 using Oetools.Packager.Core;
 using Oetools.Packager.Core.Config;
-using Oetools.Sakoe.Config.v1;
+using Oetools.Sakoe.Serialization.Opp;
 using Oetools.Utilities.Archive;
 using Oetools.Utilities.Lib.Extension;
 

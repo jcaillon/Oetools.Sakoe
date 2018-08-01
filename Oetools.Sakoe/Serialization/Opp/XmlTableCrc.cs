@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Oetools.Sakoe.Config.v1 {
+namespace Oetools.Sakoe.Serialization.Opp {
     
     /// <summary>
     ///     This class represent the tables that were referenced in a given .r code file

@@ -1,8 +1,7 @@
 ﻿#region header
-
 // ========================================================================
 // Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
-// This file (XmlDeploymentAction.cs) is part of Oetools.Sakoe.
+// This file (XmlErrorLevel.cs) is part of Oetools.Sakoe.
 // 
 // Oetools.Sakoe is a free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,23 +16,30 @@
 // You should have received a copy of the GNU General Public License
 // along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
-
 #endregion
 
 using System;
 using System.Xml.Serialization;
 
-namespace Oetools.Sakoe.Config.v1 {
+namespace Oetools.Sakoe.Serialization.Opp {
     
+    /// <summary>
+    ///     Describes the error level, the num is also used for MARKERS in scintilla
+    ///     and thus must start at 0
+    /// </summary>
     [Serializable]
-    public enum XmlDeploymentAction {
-        [XmlEnum("Added")]
-        Added,
-        [XmlEnum("Replaced")]
-        Replaced,
-        [XmlEnum("Deleted")]
-        Deleted,
-        [XmlEnum("Existing")]
-        Existing
+    public enum XmlErrorLevel {
+        [XmlEnum("0")]
+        NoErrors = 0,
+        [XmlEnum("1")] 
+        Information,
+        [XmlEnum("2")]
+        Warning,
+        [XmlEnum("3")]
+        StrongWarning,
+        [XmlEnum("4")]
+        Error,
+        [XmlEnum("5")]
+        Critical
     }
 }

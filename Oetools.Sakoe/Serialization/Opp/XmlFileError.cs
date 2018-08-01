@@ -20,7 +20,7 @@
 
 using System;
 
-namespace Oetools.Sakoe.Config.v1 {
+namespace Oetools.Sakoe.Serialization.Opp {
 
     /// <summary>
     ///     Errors found for this file, either from compilation or from prolint

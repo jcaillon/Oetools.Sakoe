@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
 using McMaster.Extensions.CommandLineUtils;
-using Oetools.Sakoe.Config.v2;
 using Oetools.Sakoe.Lib;
+using Oetools.Sakoe.Serialization;
 using Oetools.Utilities.Lib.Extension;
 
 namespace Oetools.Sakoe.Command.Oe {

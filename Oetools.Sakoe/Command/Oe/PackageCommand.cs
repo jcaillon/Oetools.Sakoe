@@ -11,15 +11,14 @@ namespace Oetools.Sakoe.Command.Oe {
     )]
     internal class PackageCommand : BuildCommand {
         
-
-        [Option("-rf|--referencefolder", "", CommandOptionType.SingleValue)]
-        protected string ReferenceFolder { get; set; }
-        
         [Option("-ru|--referenceurl", "", CommandOptionType.SingleValue)]
         protected string PreviousPackageUrl { get; set; }
         
-        [Option("-pn|--packagename", "", CommandOptionType.SingleValue)]
-        protected string PackageName { get; set; }
+        /// <summary>
+        /// The version name to use for this generated webclient package
+        /// </summary>
+        [Option("-wcav|--webclient-app-version", "", CommandOptionType.SingleValue)]
+        protected string WebclientApplicationVersion { get; set; }
         
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             WriteWarn("Package");
