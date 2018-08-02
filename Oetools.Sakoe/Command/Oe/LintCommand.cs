@@ -11,7 +11,7 @@ namespace Oetools.Sakoe.Command.Oe {
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         ThrowOnUnexpectedArgument = false
     )]
-    internal class ProlintCommand : OeBaseCommand {
+    internal class LintCommand : OeBaseCommand {
         [Option("-m")]
         public string Message { get; set; }
 

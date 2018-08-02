@@ -46,7 +46,7 @@ namespace Oetools.Sakoe.Command.Oe {
             // to absolute path
             var projectPah = $"{ProjectFilePath.MakePathAbsolute()}{OeConstants.OeProjectExtension}";
             
-            XmlOeProject.Save(new XmlOeProject { Properties = new XmlOeProject.XmlOeProjectConfiguration(), WebclientProperties = new XmlOeProject.XmlOeProjectWebclientConfiguration() }, projectPah);
+            XmlOeProject.Save(new XmlOeProject { Properties = new XmlOeProjectProperties() }, projectPah);
             
             return 0;
         }

@@ -21,7 +21,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Serialization;
 using System.Xml.Serialization;
 
 namespace Oetools.Sakoe.Serialization {
@@ -164,33 +163,25 @@ namespace Oetools.Sakoe.Serialization {
         public class XmlOeTargetCopy : XmlOeTarget {
         }
         
-        [Serializable]
-        public class XmlOeTargetProlib : XmlOeTarget {
+        public abstract class XmlOeTargetPack : XmlOeTarget {
             /// <summary>
             /// Relative path of the pack in which this file is deployed (if any)
             /// </summary>
-            [XmlAttribute(AttributeName = "TargetProlibPath")]
-            public string TargetProlibPath { get; set; }
+            [XmlAttribute(AttributeName = "TargetPack")]
+            public string TargetPack { get; set; }
+        }
+        
+        [Serializable]
+        public class XmlOeTargetProlib : XmlOeTargetPack {
         }
 
         [Serializable]
-        public class XmlOeTargetZip : XmlOeTarget {
-            /// <summary>
-            /// Relative path of the pack in which this file is deployed (if any)
-            /// </summary>
-            [XmlAttribute(AttributeName = "TargetZipPath")]
-            public string TargetZipPath { get; set; }
+        public class XmlOeTargetZip : XmlOeTargetPack {
         }
 
         [Serializable]
-        public class XmlOeTargetCab : XmlOeTarget {
-            /// <summary>
-            /// Relative path of the pack in which this file is deployed (if any)
-            /// </summary>
-            [XmlAttribute(AttributeName = "TargetCabPath")]
-            public string TargetCabPath { get; set; }
+        public class XmlOeTargetCab : XmlOeTargetPack {
         }
-
 
         /// <summary>
         ///     This class represent the tables that were referenced in a given .r code file
@@ -204,35 +195,6 @@ namespace Oetools.Sakoe.Serialization {
             public string Crc { get; set; }
         }
         
-        /// <summary>
-        ///     Types of deploy, used during rules sorting
-        /// </summary>
-        [Serializable]
-        public enum XmlDeployType : byte {
-            [XmlEnum("None")]
-            None = 0,
-            [XmlEnum("Delete")]
-            Delete = 1,
-            [XmlEnum("DeleteFolder")]
-            DeleteFolder = 2,
-            [XmlEnum("DeleteInProlib")]
-            DeleteInProlib = 10,
-            [XmlEnum("Prolib")]
-            Prolib = 11,
-            [XmlEnum("Zip")]
-            Zip = 12,
-            [XmlEnum("Cab")]
-            Cab = 13,
-            [XmlEnum("Ftp")]
-            Ftp = 14,
-            [XmlEnum("CopyFolder")]
-            CopyFolder = 21,
-            [XmlEnum("Copy")]
-            Copy = 30,
-            [XmlEnum("Move")]
-            Move = 31
-        }
-
         public abstract class XmlCompilationProblem {
             
             /// <summary>

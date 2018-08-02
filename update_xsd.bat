@@ -6,7 +6,17 @@ if not "!ERRORLEVEL!"=="0" (
 	GOTO ENDINERROR
 )
 
-move /y "schema0.xsd" "docs\XmlOeProject.xsd"
+move /y "schema0.xsd" "docs\Project.xsd"
+if not "!ERRORLEVEL!"=="0" (
+	GOTO ENDINERROR
+)
+
+"C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.6.1 Tools\xsd.exe" -t:XmlOeBuildConfiguration "Oetools.Sakoe\bin\Any Cpu\Release\net461\sakoe.exe"
+if not "!ERRORLEVEL!"=="0" (
+	GOTO ENDINERROR
+)
+
+move /y "schema0.xsd" "docs\BuildConfiguration.xsd"
 if not "!ERRORLEVEL!"=="0" (
 	GOTO ENDINERROR
 )

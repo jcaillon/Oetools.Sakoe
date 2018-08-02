@@ -19,10 +19,9 @@ namespace Oetools.Sakoe.Command {
     [HelpOption("-?|-h|--help", Description = "Show help information", Inherited = true)]
     [Subcommand("deploy", typeof(DeployCommand))]
     [Subcommand("db", typeof(DatabaseCommand))]
-    [Subcommand("prolint", typeof(ProlintCommand))]
+    [Subcommand("lint", typeof(LintCommand))]
     [Subcommand("project", typeof(ProjectCommand))]
     [Subcommand("build", typeof(BuildCommand))]
-    [Subcommand("package", typeof(PackageCommand))]
     internal class MainCommand : BaseCommand {
         
         private static string GetVersion() => typeof(MainCommand).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;

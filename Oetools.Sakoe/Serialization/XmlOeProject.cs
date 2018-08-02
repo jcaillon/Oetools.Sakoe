@@ -53,22 +53,18 @@ namespace Oetools.Sakoe.Serialization {
         #endregion
         
         [XmlAttribute("noNamespaceSchemaLocation", Namespace = "http://www.w3.org/2001/XMLSchema-instance")]
-        public string SchemaLocation = "https://raw.githubusercontent.com/jcaillon/Oetools.Sakoe/master/docs/XmlOeProject.xsd";
+        public const string SchemaLocation = "https://raw.githubusercontent.com/jcaillon/Oetools.Sakoe/master/docs/Project.xsd";
 
         [XmlElement("Properties")]
-        public XmlOeProjectConfiguration Properties { get; set; }
-        
-        
-        [XmlElement("WebclientProperties")]
-        public XmlOeProjectWebclientConfiguration WebclientProperties { get; set; }
-
+        public XmlOeProjectProperties Properties { get; set; }
         
         [XmlArray("BuildConfigurations")]
         [XmlArrayItem("Build", typeof(XmlOeBuildConfiguration))]
         public List<XmlOeBuildConfiguration> BuildConfigurations { get; set; }
-        
+    }
+    
         [Serializable]
-        public class XmlOeProjectConfiguration {
+        public class XmlOeProjectProperties {
             
             [XmlArray("DatabaseDataDefinitionFiles")]
             [XmlArrayItem("DfPath", typeof(string))]
@@ -105,7 +101,6 @@ namespace Oetools.Sakoe.Serialization {
             [XmlArrayItem("Regex", typeof(string))]
             public List<string> PropathFilter { get; set; }
 
-
             [XmlElement(ElementName = "DlcDirectoryPath")]
             public string DlcDirectoryPath { get; set; }
 
@@ -129,68 +124,43 @@ namespace Oetools.Sakoe.Serialization {
         }
 
         [Serializable]
-        public class XmlOeProjectWebclientConfiguration {
-            
-            [XmlElement(ElementName = "VendorName")]
-            public string VendorName { get; set; }
-
-            [XmlElement(ElementName = "ApplicationName")]
-            public string ApplicationName { get; set; }
-
-            [XmlElement(ElementName = "StartupParameters")]
-            public string StartupParameters { get; set; }
-
-            /// <summary>
-            /// Will be used for both Prowcapp and Codebase by default, provide a custom prowcapp template to change this behavior
-            /// </summary>
-            
-            [XmlElement(ElementName = "LocatorUrl")]
-            public string LocatorUrl { get; set; }
-
-            /// <summary>
-            /// Valid oe version for this application
-            /// </summary>
-
-            [XmlElement(ElementName = "WebClientVersion")]
-            public string WebClientVersion { get; set; } = "11.7";
-
-            /// <summary>
-            /// The Directory path from which to create the webclient files (can be relative to the build output directory, the default value is ".")
-            /// </summary>
-
-            [XmlElement(ElementName = "WebclientRootDirectoryPath")]
-            public string WebclientRootDirectoryPath { get; set; } = ".";
-
-            /// <summary>
-            /// The output directory in which the .prowcapp and .cab + diffs/.cab files will be created (can be relative to the build output directory)
-            /// </summary>
-
-            [XmlElement(ElementName = "WebclientOutputDirectory")]
-            public string WebclientOutputDirectory { get; set; } = "webclient";
-
-            /// <summary>
-            /// Path to the model of the .prowcapp to use (can be left empty and the internal model will be used)
-            /// </summary>
-            
-            [XmlElement(ElementName = "ProwcappTemplateFilePath")]
-            public string ProwcappTemplateFilePath { get; set; }
-            
-        }
-
-        [Serializable]
+        [XmlRoot("BuildConfiguration")]
         public class XmlOeBuildConfiguration {
             
+            [XmlAttribute("noNamespaceSchemaLocation", Namespace = "http://www.w3.org/2001/XMLSchema-instance")]
+            public const string SchemaLocation = "https://raw.githubusercontent.com/jcaillon/Oetools.Sakoe/master/docs/BuildConfiguration.xsd";
+            
             [XmlAttribute("Name")]
-            public string Name { get; set; }
+            public string ConfigurationName { get; set; }
             
             [XmlElement(ElementName = "OutputDirectory")]
-            public string OutputDirectory { get; set; }
+            public string OutputDirectory { get; set; } = Path.Combine("<SOURCE_DIRECTORY>", "bin");
 
+            [XmlElement(ElementName = "ReportFilePath")]
+            public string ReportFilePath { get; set; } = Path.Combine("<SOURCE_DIRECTORY>", ".oe", "build", "latest.html");
+            
+            [XmlElement(ElementName = "BuildHistoryOutputFilePath")]
+            public string BuildHistoryOutputFilePath { get; set; } = Path.Combine("<SOURCE_DIRECTORY>", ".oe", "build", "latest.xml");
+            
+            [XmlElement(ElementName = "BuildHistoryInputFilePath")]
+            public string BuildHistoryInputFilePath { get; set; } = Path.Combine("<SOURCE_DIRECTORY>", ".oe", "build", "latest.xml");
+                                    
+            [XmlElement("CompilationOptions")]
+            public XmlOeCompilationOptions CompilationOptions { get; set; }
+            
+            [XmlElement("BuildOptions")]
+            public XmlOeBuildOptions BuildOptions { get; set; }
+            
+            /// <summary>
+            /// Allows to exclude path from being treated by either <see cref="SourceCompilationTasks"/> or <see cref="SourceFilesTasks"/>
+            /// </summary>
+            [XmlArray("SourcePathFilters")]
+            [XmlArrayItem("Filter", typeof(XmlOeSourceFilter))]
+            public List<XmlOeSourceFilter> SourcePathFilters { get; set; }
             
             [XmlArray("TaskVariables")]
-            [XmlArrayItem("Variable", typeof(XmlOeTaskVariables))]
-            public List<XmlOeTaskVariables> TaskVariables { get; set; }
-
+            [XmlArrayItem("Variable", typeof(XmlOeTaskVariable))]
+            public List<XmlOeTaskVariable> TaskVariables { get; set; }
             
             [XmlArray("SourceCompilationTasks")]
             [XmlArrayItem("Compile", typeof(XmlOeTaskCompile))]
@@ -201,7 +171,6 @@ namespace Oetools.Sakoe.Serialization {
             [XmlArrayItem("UploadFtp", typeof(XmlOeTaskFtp))]
             public List<XmlOeTask> SourceCompilationTasks { get; set; }
             
-            
             [XmlArray("SourceFilesTasks")]
             [XmlArrayItem("Copy", typeof(XmlOeTaskCopy))]
             [XmlArrayItem("Execute", typeof(XmlOeTaskExec))]
@@ -211,25 +180,12 @@ namespace Oetools.Sakoe.Serialization {
             [XmlArrayItem("UploadFtp", typeof(XmlOeTaskFtp))]
             public List<XmlOeTask> SourceFilesTasks { get; set; }
             
-            
             [XmlArray("OutputDeploymentTasks")]
             [XmlArrayItem("Step", typeof(XmlOeDeploymentStep))]
             public List<XmlOeDeploymentStep> OutputDeploymentTasks { get; set; }
             
-            
-            [XmlElement(ElementName = "BuildTasksFilePath")]
-            public string BuildTasksFilePath { get; set; }
-            
-            
-            [XmlElement("CompilationOptions")]
-            public XmlOeCompilation CompilationOptions { get; set; }
-
-            
-            [XmlElement("XmlOeBuildOptions")]
-            public XmlOeBuildOption XmlOeBuildOptions { get; set; }
-            
             [Serializable]
-            public class XmlOeCompilation {
+            public class XmlOeCompilationOptions {
 
                 [XmlElement(ElementName = "CompileWithDebugList")]
                 public bool CompileWithDebugList { get; set; }
@@ -260,13 +216,10 @@ namespace Oetools.Sakoe.Serialization {
             }
             
             [Serializable]
-            public class XmlOeBuildOption {
+            public class XmlOeBuildOptions {
                 
                 [XmlElement(ElementName = "ArchivesCompressionLevel")]
                 public XmlOeCompressionLevel ArchivesCompressionLevel { get; set; }
-                
-                [XmlElement(ElementName = "BuildHookFilePath")]
-                public string BuildHookFilePath { get; set; }
                 
                 /// <summary>
                 /// True if the tool should use a MD5 sum for each file to figure out if it has changed
@@ -279,13 +232,13 @@ namespace Oetools.Sakoe.Serialization {
                 /// </summary>
                 [XmlElement(ElementName = "CreatePackageInTempDir")]
                 public bool OutputBuildInTempDirectoryThenCopyAtTheEnd { get; set; }
+                
+                [Serializable]
+                public enum XmlOeCompressionLevel {
+                    [XmlEnum("None")] None,
+                    [XmlEnum("Max")] Max
+                }
 
-            }    
-
-            [Serializable]
-            public enum XmlOeCompressionLevel {
-                [XmlEnum("None")] None,
-                [XmlEnum("Max")] Max
             }
 
             [Serializable]
@@ -305,12 +258,14 @@ namespace Oetools.Sakoe.Serialization {
                 [XmlArrayItem("Zip", typeof(XmlOeTaskZip))]
                 [XmlArrayItem("Cab", typeof(XmlOeTaskCab))]
                 [XmlArrayItem("UploadFtp", typeof(XmlOeTaskFtp))]
+                [XmlArrayItem("Webclient", typeof(XmlOeTaskWebclient))]
                 public List<XmlOeTask> OutputDeploymentTasks { get; set; }
             }
+            
         }
         
         [Serializable]
-        public class XmlOeTaskVariables {
+        public class XmlOeTaskVariable {
             
             [XmlAttribute("Name")]
             public string Name { get; set; }
@@ -318,11 +273,18 @@ namespace Oetools.Sakoe.Serialization {
             [XmlText]
             public string Value { get; set; }
         }
+
+        [Serializable]
+        public class XmlOeSourceFilter {
+            
+            [XmlAttribute("Exclude")]
+            public string Exclude { get; set; }
+        }
         
         public abstract class XmlOeTask {
         }
         
-        public abstract class XmlOeTaskIncludeExclude : XmlOeTask {
+        public abstract class XmlOeTaskOnFile : XmlOeTask {
             
             [XmlAttribute("Include")]
             public string Include { get; set; }
@@ -331,21 +293,25 @@ namespace Oetools.Sakoe.Serialization {
             public string Exclude { get; set; }
         }
         
-        public abstract class XmlOeTaskIncludeExcludeTarget : XmlOeTaskIncludeExclude {
+        public abstract class XmlOeTaskOnFileWithTarget : XmlOeTaskOnFile {
             
             [XmlAttribute("Target")]
             public string Target { get; set; }
         }
 
-        public class XmlOeTaskCompile : XmlOeTaskIncludeExcludeTarget {
+        [Serializable]
+        public class XmlOeTaskCopy : XmlOeTaskOnFileWithTarget {
         }
 
-        public class XmlOeTaskCopy : XmlOeTaskIncludeExcludeTarget {
-        }
-
-        public class XmlOeTaskMove : XmlOeTaskIncludeExcludeTarget {
+        [Serializable]
+        public class XmlOeTaskCompile : XmlOeTaskCopy {
         }
         
+        [Serializable]
+        public class XmlOeTaskMove : XmlOeTaskOnFileWithTarget {
+        }
+        
+        [Serializable]
         public class XmlOeTaskExec : XmlOeTask {
             
             [XmlAttribute("ExecuablePath")]
@@ -372,14 +338,17 @@ namespace Oetools.Sakoe.Serialization {
             [XmlAttribute("WorkingDirectory")]
             public string WorkingDirectory { get; set; }
         }
-                
-        public class XmlOeTaskDelete : XmlOeTaskIncludeExclude {
+        
+        [Serializable]
+        public class XmlOeTaskDelete : XmlOeTaskOnFile {
         }
         
-        public class XmlOeTaskRemoveDir : XmlOeTaskIncludeExclude {
+        [Serializable]
+        public class XmlOeTaskRemoveDir : XmlOeTaskOnFile {
         }
 
-        public class XmlOeTaskDeleteInProlib : XmlOeTaskIncludeExclude {
+        [Serializable]
+        public class XmlOeTaskDeleteInProlib : XmlOeTaskOnFile {
             
             /// <summary>
             /// The relative file path pattern to delete inside the matched prolib file
@@ -388,30 +357,98 @@ namespace Oetools.Sakoe.Serialization {
             public string RelativeFilePatternToDelete { get; set; }
         }
         
-        public class XmlOeTaskProlib : XmlOeTaskIncludeExclude {
-            
-            [XmlAttribute("ProlibTarget")]
-            public string ProlibTarget { get; set; }
+        [Serializable]
+        public class XmlOeTaskProlib : XmlOeTaskOnFileWithTarget {
         }
         
-        public class XmlOeTaskZip : XmlOeTaskIncludeExclude {
-            
-            [XmlAttribute("ZipTarget")]
-            public string ZipTarget { get; set; }
+        [Serializable]
+        public class XmlOeTaskZip : XmlOeTaskOnFileWithTarget {
         }
         
-        public class XmlOeTaskCab : XmlOeTaskIncludeExclude {
-            
-            [XmlAttribute("ZipTarget")]
-            public string CabTarget { get; set; }
+        [Serializable]
+        public class XmlOeTaskCab : XmlOeTaskOnFileWithTarget {
         }
         
-        public class XmlOeTaskFtp : XmlOeTaskIncludeExclude {
-            
-            [XmlAttribute("ZipTarget")]
-            public string FtpTarget { get; set; }
+        [Serializable]
+        public class XmlOeTaskFtp : XmlOeTaskOnFileWithTarget {
         }
         
-    }
+        [Serializable]
+        public class XmlOeTaskWebclient : XmlOeTask {
+            
+            [XmlElement(ElementName = "VendorName")]
+            public string VendorName { get; set; }
+
+            [XmlElement(ElementName = "ApplicationName")]
+            public string ApplicationName { get; set; }
+
+            /// <summary>
+            /// defaults to ApplicationName + autoincremented webclient version
+            /// </summary>
+            [XmlElement(ElementName = "ApplicationVersion")]
+            public string ApplicationVersion { get; set; }
+
+            [XmlElement(ElementName = "StartupParameters")]
+            public string StartupParameters { get; set; }
+
+            /// <summary>
+            /// Will be used for both Prowcapp and Codebase by default, provide a custom prowcapp template to change this behavior
+            /// </summary>
+            [XmlElement(ElementName = "LocatorUrl")]
+            public string LocatorUrl { get; set; }
+
+            /// <summary>
+            /// Valid oe version for this application
+            /// </summary>
+            [XmlElement(ElementName = "WebClientVersion")]
+            public string WebClientVersion { get; set; } = "11.7";
+
+            /// <summary>
+            /// The Directory path from which to create the webclient files (can be relative to the build output directory, the default value is ".")
+            /// </summary>
+            [XmlElement(ElementName = "WebclientRootDirectoryPath")]
+            public string WebclientRootDirectoryPath { get; set; } = ".";
+
+            /// <summary>
+            /// The output directory in which the .prowcapp and .cab + diffs/.cab files will be created (can be relative to the build output directory)
+            /// </summary>
+            [XmlElement(ElementName = "WebclientOutputDirectory")]
+            public string WebclientOutputDirectory { get; set; } = "webclient";
+
+            /// <summary>
+            /// Path to the model of the .prowcapp to use (can be left empty and the internal model will be used)
+            /// </summary>
+            [XmlElement(ElementName = "ProwcappTemplateFilePath")]
+            public string ProwcappTemplateFilePath { get; set; }
+            
+            /// <summary>
+            /// If null, all the files in the root path will be added to a default component named as <see cref="ApplicationVersion"/>
+            /// </summary>
+            [XmlArray("Components")]
+            [XmlArrayItem("Component", typeof(string))]
+            public List<XmlOeWebclientComponent> Components { get; set; }
+
+            [Serializable]
+            public class XmlOeWebclientComponent {
+                
+                [XmlAttribute(AttributeName = "DownloadMode")]
+                public XmlOeWebclientComponentDownloadMode DownloadMode { get; set; }
+                            
+                [XmlArray("IncludedFiles")]
+                [XmlArrayItem("IncludePathPattern", typeof(string))]
+                public List<string> IncludedFiles { get; set; }
+                
+                [Serializable]
+                public enum XmlOeWebclientComponentDownloadMode {
+                    [XmlEnum("Eager")] 
+                    Eager,
+                    [XmlEnum("Lazy")] 
+                    Lazy
+                }
+            }
+
+        }
+        
+    
 
 }

@@ -32,38 +32,11 @@ namespace Oetools.Sakoe.Test {
     [TestClass]
     public class ConfigV1EnumerationTest {
 
-        [TestMethod]
-        public void EnsureXmlCompressionLevelHasEquivalent() {
-            typeof(XmlCompressionLevel).ForEach<XmlCompressionLevel>((name, value) => {
-                Assert.IsTrue(Enum.TryParse(typeof(CompressionLvl), name, out _));
-            });
-        }
-
+ 
         [TestMethod]
         public void EnsureXmlDeploymentActionLevelHasEquivalent() {
             typeof(XmlDeploymentAction).ForEach<XmlDeploymentAction>((name, value) => {
                 Assert.IsTrue(Enum.TryParse(typeof(DeploymentAction), name, out _));
-            });
-        }
-        
-        [TestMethod]
-        public void EnsureXmlDeployTypeLevelHasEquivalent() {
-            typeof(XmlDeployType).ForEach<XmlDeployType>((name, value) => {
-                Assert.IsTrue(Enum.TryParse(typeof(DeployType), name, out _));
-            });
-        }
-        
-        [TestMethod]
-        public void EnsureXmlErrorLevelLevelHasEquivalent() {
-            typeof(XmlErrorLevel).ForEach<XmlErrorLevel>((name, value) => {
-                Assert.IsTrue(Enum.TryParse(typeof(ErrorLevel), name, out _));
-            });
-        }
-        
-        [TestMethod]
-        public void EnsureXmlReturnCodeLevelHasEquivalent() {
-            typeof(XmlReturnCode).ForEach<XmlReturnCode>((name, value) => {
-                Assert.IsTrue(Enum.TryParse(typeof(ReturnCode), name, out _));
             });
         }
         

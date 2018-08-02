@@ -13,42 +13,53 @@ namespace Oetools.Sakoe.Command.Oe {
     )]
     internal class BuildCommand : OeBaseCommand {
         
-        [Required]
         [LegalFilePath]
-        [Argument(0, Name = "Project file path", Description = "Path to the project file (" + OeConstants.OeProjectExtension + " extension is optional)")]
+        [Argument(0, Name = "Project file path", Description = "Path to the project file (" + OeConstants.OeProjectExtension + " extension is optional), default to any " + OeConstants.OeProjectExtension + " file in the .oe folder if it exists")]
         protected string ProjectFilePath { get; set; }
-
-        [Required]
-        [Option("-o|--output-directory", "", CommandOptionType.SingleValue)]
-        protected string OutputDirectory { get; set; }
 
         [Option("-c|--config-name", "The name of the configuration to use for the build, found in " + OeConstants.OeProjectExtension + " file", CommandOptionType.SingleValue)]
         protected string ConfigurationName { get; set; }
-
-        [Option("-r|--report-path", "", CommandOptionType.SingleValue)]
-        protected string ReportPath { get; set; }
-        
-        [Option("-tf|--target-folder", "Override the target folder specified in the project file", CommandOptionType.SingleValue)]
-        protected string TargetFolder { get; set; }
-        
-        [Option("-ho|--history-output", "", CommandOptionType.SingleValue)]
-        protected string DeploymentHistoryOutputPath { get; set; }
-        
-        [Option("-hi|--history-input", "", CommandOptionType.SingleValue)]
-        protected string DeploymentHistoryInputPath { get; set; }        
         
         [Option("-tm|--test-mode", "", CommandOptionType.NoValue)]
         protected bool TestMode { get; set; }
-        
+
         [Option("-fr|--force-rebuild", "", CommandOptionType.NoValue)]
-        protected bool ForceFullRebuild { get; set; }
-                
+        protected bool ForceFullRebuild { get; set; }    
+        
         /// <summary>
-        /// It defaults to the output directory
+        /// It defaults to the output directory (TODO: put a http url instead)
         /// </summary>
         [Option("-rd|--reference-directory", "", CommandOptionType.SingleValue)]
         protected string ReferenceDirectory { get; set; }
-       
+        
+        [LegalFilePath]
+        [FileExists]
+        [Option("-cf|--config-file", "", CommandOptionType.SingleValue)]
+        protected string ConfigFilePath { get; set; }
+        
+        [LegalFilePath]
+        [Option("-sd|--source-directory", "Specify the source directory for the build, default to the current directory", CommandOptionType.SingleValue)]
+        protected string SourceDirectory { get; set; }
+        
+        // ----------- OVERRIDE ------------
+        
+        [LegalFilePath]
+        [Option("-o|--output-directory", "Specify the output directory for the build (overrides value in " + OeConstants.OeProjectExtension + ")", CommandOptionType.SingleValue)]
+        protected string OutputDirectory { get; set; }
+
+        [LegalFilePath]
+        [Option("-rp|--report-path", " (overrides value in " + OeConstants.OeProjectExtension + ")", CommandOptionType.SingleValue)]
+        protected string ReportFilePath { get; set; }
+        
+        [LegalFilePath]
+        [Option("-ho|--history-output", " (overrides value in " + OeConstants.OeProjectExtension + ")", CommandOptionType.SingleValue)]
+        protected string BuildHistoryOutputFilePath { get; set; }
+        
+        [LegalFilePath]
+        [FileExists]
+        [Option("-hi|--history-input", " (overrides value in " + OeConstants.OeProjectExtension + ")", CommandOptionType.SingleValue)]
+        protected string BuildHistoryInputFilePath { get; set; }    
+        
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             WriteWarn("Build");
             app.ShowHint();
