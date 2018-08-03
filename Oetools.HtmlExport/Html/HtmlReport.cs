@@ -11,6 +11,7 @@ using Oetools.HtmlExport.Lib;
 using Oetools.HtmlExport.Resources;
 using Oetools.Packager.Core;
 using Oetools.Packager.Core.Config;
+using Oetools.Packager.Core2.Execution;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
 
@@ -98,7 +99,7 @@ namespace Oetools.HtmlExport.Html {
             var outputHtml = html.ToString();
 
             outputHtml = new Regex("src=[\"'](.*?)[\"']", RegexOptions.Compiled)
-                .Replace(outputHtml, match => $"data:image/png;base64,{ImagesResource.GetImageBase64Encoded(match.Groups[1].Value)}");
+                .Replace(outputHtml, match => ImagesResource.GetHtmlEmbeddedImgSrcString(match.Groups[1].Value));
 
             outputHtml = new Regex("<a href=\"(.*?)[|\"]", RegexOptions.Compiled)
                 .Replace(outputHtml, "<a href=\"file:///$1\"");
@@ -216,14 +217,14 @@ namespace Oetools.HtmlExport.Html {
 
             // compilation errors
             foreach (var fileInError in result.ListFilesToCompile.Where(file => file.Errors != null)) {
-                bool hasError = fileInError.Errors.Exists(error => error.Level >= ErrorLevel.Error);
-                bool hasWarning = fileInError.Errors.Exists(error => error.Level < ErrorLevel.Error);
+                bool hasError = fileInError.Errors.Exists(error => error.Level >= CompilationErrorLevel.Error);
+                bool hasWarning = fileInError.Errors.Exists(error => error.Level < CompilationErrorLevel.Error);
 
                 if (hasError || hasWarning) {
                     // only add compilation errors
                     line.Clear();
                     line.Append("<div %ALTERNATE%style=\"background-repeat: no-repeat; background-image: url('" + (hasError ? "Error_25x25" : "Warning_25x25") + "'); padding-left: 35px; padding-top: 6px; padding-bottom: 6px;\">");
-                    line.Append(FormatCompilationResultForSingleFile(fileInError.SourcePath, fileInError, null));
+                    line.Append(FormatCompilationResultForSingleFile(fileInError.CompiledPath, fileInError, null));
                     line.Append("</div>");
                     listLinesCompilation.Add(new Tuple<int, string>(hasError ? 3 : 2, line.ToString()));
                 }
@@ -267,7 +268,7 @@ namespace Oetools.HtmlExport.Html {
             }
 
             // compilation
-            currentReport.Append(@"<div style='padding-top: 7px; padding-bottom: 7px;'>Nombre de fichiers à compiler : <b>" + result.TotalNumberOfFilesToCompile+ "</b>, répartition : " + GetNbFilesPerType(result.ListFilesToCompile.Select(compile => compile.SourcePath).ToList()).Aggregate("", (current, kpv) => current + (@"<img style='padding-right: 5px;' src='" + Helper.GetExtensionImage(kpv.Key.ToString(), true) + "' height='15px'><span style='padding-right: 12px;'>x" + kpv.Value + "</span>")) + "</div>");
+            currentReport.Append(@"<div style='padding-top: 7px; padding-bottom: 7px;'>Nombre de fichiers à compiler : <b>" + result.TotalNumberOfFilesToCompile+ "</b>, répartition : " + GetNbFilesPerType(result.ListFilesToCompile.Select(compile => compile.CompiledPath).ToList()).Aggregate("", (current, kpv) => current + (@"<img style='padding-right: 5px;' src='" + Helper.GetExtensionImage(kpv.Key.ToString(), true) + "' height='15px'><span style='padding-right: 12px;'>x" + kpv.Value + "</span>")) + "</div>");
 
             // compilation time
             currentReport.Append(@"<div><img style='padding-right: 20px;' src='Clock_15px' height='15px'>Temps de compilation total : <b>" + result.TotalCompilationTime.ConvertToHumanTime() + @"</b></div>");

@@ -3,7 +3,9 @@ using System.IO;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Lib;
 using Oetools.Sakoe.Serialization;
+using Oetools.Sakoe.Serialization.Project;
 using Oetools.Utilities.Lib.Extension;
+using Oetools.Utilities.Openedge;
 
 namespace Oetools.Sakoe.Command.Oe {
     

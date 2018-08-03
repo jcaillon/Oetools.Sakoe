@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Lib;
+using Oetools.Utilities.Openedge;
 
 namespace Oetools.Sakoe.Command.Oe {
     

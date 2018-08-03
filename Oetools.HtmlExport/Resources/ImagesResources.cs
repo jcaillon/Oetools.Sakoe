@@ -39,13 +39,17 @@ namespace Oetools.HtmlExport.Resources {
         /// <summary>
         /// Returns the given image as a string encoded in base 64
         /// </summary>
-        /// <param name="value"></param>
+        /// <param name="imageName"></param>
         /// <returns></returns>
-        public static string GetImageBase64Encoded(string value) {
-            if (!_imagesAsBase64String.ContainsKey(value)) {
-                _imagesAsBase64String.Add(value, Convert.ToBase64String(GetImageFromResources(value)));
+        public static string GetImageBase64Encoded(string imageName) {
+            if (!_imagesAsBase64String.ContainsKey(imageName)) {
+                _imagesAsBase64String.Add(imageName, Convert.ToBase64String(GetImageFromResources(imageName)));
             }
-            return _imagesAsBase64String[value];
+            return _imagesAsBase64String[imageName];
+        }
+
+        public static string GetHtmlEmbeddedImgSrcString(string imageName) {
+            return $"data:image/png;base64,{GetImageBase64Encoded(imageName)}";
         }
     }
 }

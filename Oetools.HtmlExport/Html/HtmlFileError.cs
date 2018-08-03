@@ -2,16 +2,17 @@
 using System.Text;
 using Oetools.HtmlExport.Lib;
 using Oetools.Packager.Core;
+using Oetools.Packager.Core2.Execution;
 
 namespace Oetools.HtmlExport.Html {
 
     internal static class HtmlFileError {
 
-        public static string Description(FileError error) {
+        public static string Description(CompilationError error) {
             var sb = new StringBuilder();
             sb.Append("<div>");
             sb.Append("<img height='15px' src='");
-            sb.Append(error.Level > ErrorLevel.StrongWarning ? "Error_25x25" : "Warning_25x25");
+            sb.Append(error.Level == CompilationErrorLevel.Warning ? "Warning_25x25" : "Error_25x25");
             sb.Append("'>");
             if (!error.CompiledFilePath.Equals(error.SourcePath)) {
                 sb.Append("in ");
