@@ -26,22 +26,22 @@ using System.Xml.Serialization;
 namespace Oetools.Sakoe.Serialization.History {
     
     [Serializable]
-    [XmlRoot("DeploymentHistory")]
-    public class XmlOeDeploymentHistory {     
+    [XmlRoot("BuildHistory")]
+    public class XmlOeBuildHistory {     
         
         #region static
 
-        internal static XmlOeDeploymentHistory Load(string path) {
-            XmlOeDeploymentHistory xml;
-            var serializer = new XmlSerializer(typeof(XmlOeDeploymentHistory));
+        public static XmlOeBuildHistory Load(string path) {
+            XmlOeBuildHistory xml;
+            var serializer = new XmlSerializer(typeof(XmlOeBuildHistory));
             using (var reader = new StreamReader(path)) {
-                xml = (XmlOeDeploymentHistory) serializer.Deserialize(reader);
+                xml = (XmlOeBuildHistory) serializer.Deserialize(reader);
             }
             return xml;
         }
 
-        internal static void Save(XmlOeDeploymentHistory xml, string path) {
-            var serializer = new XmlSerializer(typeof(XmlOeDeploymentHistory));
+        public static void Save(XmlOeBuildHistory xml, string path) {
+            var serializer = new XmlSerializer(typeof(XmlOeBuildHistory));
             using (TextWriter writer = new StreamWriter(path, false)) {
                 serializer.Serialize(writer, xml);
             }

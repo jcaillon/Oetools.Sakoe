@@ -34,7 +34,7 @@ namespace Oetools.Sakoe.Serialization.Project {
         public bool AddAllSourceDirectoriesToPropath { get; set; }
         
         /// <summary>
-        /// Adds the gui or tty (depending on the execution) folder as well as the contained .pl to the propath
+        /// Adds the gui or tty (depending on <see cref="UseCharacterModeExecutable"/>) folder as well as the contained .pl to the propath
         /// Also adds dlc and dlc/bin
         /// </summary>
         [XmlElement(ElementName = "AddDefaultOpenedgePropath")]

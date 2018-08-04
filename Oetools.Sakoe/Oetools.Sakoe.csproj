@@ -27,11 +27,11 @@
     <PackageId>$(Company).$(AssemblyName)</PackageId>
     <PackageVersion>$(Version)</PackageVersion>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageLicenseUrl>https://github.com/jcaillon/Oetools.Runner/blob/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/jcaillon/Oetools.Runner</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/jcaillon/Oetools.Sakoe/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/jcaillon/Oetools.Sakoe</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/jcaillon/Oetools.Runner.git</RepositoryUrl>
-    <PackageIconUrl>https://raw.githubusercontent.com/jcaillon/Oetools.Runner/master/docs/images/logo.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/jcaillon/Oetools.Sakoe.git</RepositoryUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/jcaillon/Oetools.Sakoe/master/docs/images/logo.png</PackageIconUrl>
     <PackageReleaseNotes>
     </PackageReleaseNotes>
     <PackageTags>openedge sakoe progress 4GL abl</PackageTags>
@@ -82,12 +82,16 @@
     </Otherwise>
   </Choose>
   <ItemGroup Label="ProjectReferences">
+    <ProjectReference Include="..\Oetools.Serialization\Oetools.Serialization.csproj" />
     <ProjectReference Include="..\Oetools.HtmlExport\Oetools.HtmlExport.csproj" />
     <ProjectReference Include="..\Oetools.Packager\Oetools.Packager\Oetools.Packager.csproj" />
     <ProjectReference Include="..\Oetools.Packager\Oetools.Utilities\Oetools.Utilities\Oetools.Utilities.csproj" />
   </ItemGroup>
   <ItemGroup Label="PackageReferences">
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Serialization" />
   </ItemGroup>
   <!-- Extra targets -->
   <Import Project="Target.*.target" />

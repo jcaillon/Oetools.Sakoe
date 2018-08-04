@@ -1,59 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:element name="Project" nillable="true" type="XmlOeProject" />
-  <xs:complexType name="XmlOeProject">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="1" name="Properties" type="XmlOeProjectProperties" />
-      <xs:element minOccurs="0" maxOccurs="1" name="BuildConfigurations" type="ArrayOfXmlOeBuildConfiguration" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="XmlOeProjectProperties">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="1" name="DatabaseDataDefinitionFiles" type="ArrayOfString" />
-      <xs:element minOccurs="0" maxOccurs="1" name="DatabaseConnectionExtraParameters" type="xs:string" />
-      <xs:element minOccurs="0" maxOccurs="1" name="DatabaseAliases" type="ArrayOfXmlOeDatabaseAlias" />
-      <xs:element minOccurs="0" maxOccurs="1" name="IniFilePath" type="xs:string" />
-      <xs:element minOccurs="1" maxOccurs="1" name="AddAllSourceDirectoriesToPropath" type="xs:boolean" />
-      <xs:element minOccurs="0" maxOccurs="1" name="PropathEntries" type="ArrayOfString1" />
-      <xs:element minOccurs="0" maxOccurs="1" name="PropathFilter" type="ArrayOfString2" />
-      <xs:element minOccurs="0" maxOccurs="1" name="DlcDirectoryPath" type="xs:string" />
-      <xs:element minOccurs="1" maxOccurs="1" name="UseCharacterModeExecutable" type="xs:boolean" />
-      <xs:element minOccurs="1" maxOccurs="1" name="NeverUseBatchModeOption" type="xs:boolean" />
-      <xs:element minOccurs="0" maxOccurs="1" name="ProgresCommandLineExtraParameters" type="xs:string" />
-      <xs:element minOccurs="0" maxOccurs="1" name="ProcedurePathToExecuteBeforeAnyProgressExecution" type="xs:string" />
-      <xs:element minOccurs="0" maxOccurs="1" name="ProcedurePathToExecuteAfterAnyProgressExecution" type="xs:string" />
-      <xs:element minOccurs="0" maxOccurs="1" name="TemporaryDirectory" type="xs:string" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="ArrayOfString">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="DfPath" nillable="true" type="xs:string" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="ArrayOfXmlOeDatabaseAlias">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="Alias" nillable="true" type="XmlOeDatabaseAlias" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="XmlOeDatabaseAlias">
-    <xs:attribute name="ProgresCommandLineExtraParameters" type="xs:string" />
-    <xs:attribute name="PreProgresExecutionProgramPath" type="xs:string" />
-  </xs:complexType>
-  <xs:complexType name="ArrayOfString1">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="Path" nillable="true" type="xs:string" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="ArrayOfString2">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="Regex" nillable="true" type="xs:string" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="ArrayOfXmlOeBuildConfiguration">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="Build" nillable="true" type="XmlOeBuildConfiguration" />
-    </xs:sequence>
-  </xs:complexType>
+  <xs:element name="BuildConfiguration" nillable="true" type="XmlOeBuildConfiguration" />
   <xs:complexType name="XmlOeBuildConfiguration">
     <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="1" name="OutputDirectory" type="xs:string" />
@@ -117,31 +64,22 @@
   </xs:complexType>
   <xs:complexType name="ArrayOfChoice1">
     <xs:choice minOccurs="0" maxOccurs="unbounded">
-      <xs:element minOccurs="1" maxOccurs="1" name="Prolib" nillable="true" type="XmlOeTaskProlib" />
-      <xs:element minOccurs="1" maxOccurs="1" name="UploadFtp" nillable="true" type="XmlOeTaskFtp" />
       <xs:element minOccurs="1" maxOccurs="1" name="Execute" nillable="true" type="XmlOeTaskExec" />
-      <xs:element minOccurs="1" maxOccurs="1" name="Zip" nillable="true" type="XmlOeTaskZip" />
-      <xs:element minOccurs="1" maxOccurs="1" name="Cab" nillable="true" type="XmlOeTaskCab" />
-      <xs:element minOccurs="1" maxOccurs="1" name="Compile" nillable="true" type="XmlOeTaskCompile" />
+      <xs:element minOccurs="1" maxOccurs="1" name="CompileInCab" nillable="true" type="XmlOeTaskCab" />
+      <xs:element minOccurs="1" maxOccurs="1" name="CompileInZip" nillable="true" type="XmlOeTaskZip" />
+      <xs:element minOccurs="1" maxOccurs="1" name="CompileUploadFtp" nillable="true" type="XmlOeTaskFtp" />
+      <xs:element minOccurs="1" maxOccurs="1" name="Compile" nillable="true" type="XmlOeTaskCopy" />
+      <xs:element minOccurs="1" maxOccurs="1" name="CompileInProlib" nillable="true" type="XmlOeTaskProlib" />
     </xs:choice>
   </xs:complexType>
-  <xs:complexType name="XmlOeTaskProlib">
-    <xs:complexContent mixed="false">
-      <xs:extension base="XmlOeTaskOnFileWithTarget" />
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:complexType name="XmlOeTaskOnFileWithTarget" abstract="true">
-    <xs:complexContent mixed="false">
-      <xs:extension base="XmlOeTaskOnFile">
-        <xs:attribute name="Target" type="xs:string" />
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:complexType name="XmlOeTaskOnFile" abstract="true">
+  <xs:complexType name="XmlOeTaskExec">
     <xs:complexContent mixed="false">
       <xs:extension base="XmlOeTask">
-        <xs:attribute name="Include" type="xs:string" />
-        <xs:attribute name="Exclude" type="xs:string" />
+        <xs:attribute name="ExecuablePath" type="xs:string" />
+        <xs:attribute name="Parameters" type="xs:string" />
+        <xs:attribute name="HiddenExecution" type="xs:boolean" use="required" />
+        <xs:attribute name="IgnoreExitCode" type="xs:boolean" use="required" />
+        <xs:attribute name="WorkingDirectory" type="xs:string" />
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -159,24 +97,21 @@
           <xs:element minOccurs="0" maxOccurs="1" name="WebclientRootDirectoryPath" type="xs:string" />
           <xs:element minOccurs="0" maxOccurs="1" name="WebclientOutputDirectory" type="xs:string" />
           <xs:element minOccurs="0" maxOccurs="1" name="ProwcappTemplateFilePath" type="xs:string" />
-          <xs:element minOccurs="0" maxOccurs="1" name="Components" type="ArrayOfString3" />
+          <xs:element minOccurs="0" maxOccurs="1" name="Components" type="ArrayOfString" />
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:complexType name="ArrayOfString3">
+  <xs:complexType name="ArrayOfString">
     <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="unbounded" name="Component" nillable="true" type="xs:string" />
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="XmlOeTaskExec">
+  <xs:complexType name="XmlOeTaskOnFile" abstract="true">
     <xs:complexContent mixed="false">
       <xs:extension base="XmlOeTask">
-        <xs:attribute name="ExecuablePath" type="xs:string" />
-        <xs:attribute name="Parameters" type="xs:string" />
-        <xs:attribute name="HiddenExecution" type="xs:boolean" use="required" />
-        <xs:attribute name="IgnoreExitCode" type="xs:boolean" use="required" />
-        <xs:attribute name="WorkingDirectory" type="xs:string" />
+        <xs:attribute name="Include" type="xs:string" />
+        <xs:attribute name="Exclude" type="xs:string" />
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -195,6 +130,13 @@
   <xs:complexType name="XmlOeTaskRemoveDir">
     <xs:complexContent mixed="false">
       <xs:extension base="XmlOeTaskOnFile" />
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="XmlOeTaskOnFileWithTarget" abstract="true">
+    <xs:complexContent mixed="false">
+      <xs:extension base="XmlOeTaskOnFile">
+        <xs:attribute name="Target" type="xs:string" />
+      </xs:extension>
     </xs:complexContent>
   </xs:complexType>
   <xs:complexType name="XmlOeTaskMove">
@@ -217,14 +159,14 @@
       <xs:extension base="XmlOeTaskOnFileWithTarget" />
     </xs:complexContent>
   </xs:complexType>
-  <xs:complexType name="XmlOeTaskCopy">
+  <xs:complexType name="XmlOeTaskProlib">
     <xs:complexContent mixed="false">
       <xs:extension base="XmlOeTaskOnFileWithTarget" />
     </xs:complexContent>
   </xs:complexType>
-  <xs:complexType name="XmlOeTaskCompile">
+  <xs:complexType name="XmlOeTaskCopy">
     <xs:complexContent mixed="false">
-      <xs:extension base="XmlOeTaskCopy" />
+      <xs:extension base="XmlOeTaskOnFileWithTarget" />
     </xs:complexContent>
   </xs:complexType>
   <xs:complexType name="ArrayOfChoice2">

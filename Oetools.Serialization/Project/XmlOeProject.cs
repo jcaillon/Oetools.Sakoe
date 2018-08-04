@@ -33,7 +33,7 @@ namespace Oetools.Sakoe.Serialization.Project {
         
         #region static
 
-        internal static XmlOeProject Load(string path) {
+        public static XmlOeProject Load(string path) {
             XmlOeProject interfaceXml;
             var serializer = new XmlSerializer(typeof(XmlOeProject));
             using (var reader = new StreamReader(path)) {
@@ -43,7 +43,7 @@ namespace Oetools.Sakoe.Serialization.Project {
             return interfaceXml;
         }
 
-        internal static void Save(XmlOeProject xml, string path) {
+        public static void Save(XmlOeProject xml, string path) {
             var serializer = new XmlSerializer(typeof(XmlOeProject));
             using (TextWriter writer = new StreamWriter(path, false)) {
                 serializer.Serialize(writer, xml);
@@ -53,7 +53,7 @@ namespace Oetools.Sakoe.Serialization.Project {
         #endregion
         
         [XmlAttribute("noNamespaceSchemaLocation", Namespace = "http://www.w3.org/2001/XMLSchema-instance")]
-        public const string SchemaLocation = "https://raw.githubusercontent.com/jcaillon/Oetools.Sakoe/master/docs/Project.xsd";
+        public const string SchemaLocation = "https://raw.githubusercontent.com/jcaillon/Oetools.Sakoe/master/Oetools.Serialization/Resources/Xsd/Project.xsd";
 
         [XmlElement("Properties")]
         public XmlOeProjectProperties Properties { get; set; }

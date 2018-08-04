@@ -4,12 +4,13 @@ using System.IO;
 using System.Xml.Serialization;
 
 namespace Oetools.Sakoe.Serialization.Project {
+    
     [Serializable]
     [XmlRoot("BuildConfiguration")]
     public class XmlOeBuildConfiguration {
             
         [XmlAttribute("noNamespaceSchemaLocation", Namespace = "http://www.w3.org/2001/XMLSchema-instance")]
-        public const string SchemaLocation = "https://raw.githubusercontent.com/jcaillon/Oetools.Sakoe/master/docs/BuildConfiguration.xsd";
+        public const string SchemaLocation = "https://raw.githubusercontent.com/jcaillon/Oetools.Sakoe/master/Oetools.Serialization/Resources/Xsd/BuildConfiguration.xsd";
             
         [XmlAttribute("Name")]
         public string ConfigurationName { get; set; }

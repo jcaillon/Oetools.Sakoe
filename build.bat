@@ -78,7 +78,7 @@ set ADD_RESTORE=false
 where nuget 1>nul 2>nul
 if "%ERRORLEVEL%"=="0" (
 	echo.[%time:~0,8% INFO] Nuget found
-	nuget restore %SOLUTION_NAME% -Recursive -NonInteractive
+	nuget restore %PROJECT_PATH% -Recursive -NonInteractive
 	if not "!ERRORLEVEL!"=="0" (
 		set ADD_RESTORE=true
 	)
