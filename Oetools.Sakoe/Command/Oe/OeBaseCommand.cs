@@ -34,7 +34,7 @@ namespace Oetools.Sakoe.Command.Oe {
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
         protected string GetDlcPath() {
-            var dlcPath = ProUtilities.GetDlcPath();
+            var dlcPath = ProUtilities.GetDlcPathFromEnv();
             if (string.IsNullOrEmpty(dlcPath) || !Directory.Exists(dlcPath)) {
                 throw new Exception("DLC folder not found, you must set the environment variable DLC to locate your openedge installation folder");
             }
