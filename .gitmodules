@@ -1,3 +1,3 @@
-[submodule "Oetools.Packager"]
-	path = Oetools.Packager
-	url = https://github.com/jcaillon/Oetools.Packager.git
+[submodule "Oetools.Builder"]
+	path = Oetools.Builder
+	url = https://github.com/jcaillon/Oetools.Builder.git

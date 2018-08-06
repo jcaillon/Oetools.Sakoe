@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using System.Text;
-using Oetools.Packager.Core;
+using Oetools.Builder.Core;
 
 namespace Oetools.HtmlExport.Html {
     

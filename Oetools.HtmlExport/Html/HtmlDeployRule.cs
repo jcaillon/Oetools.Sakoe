@@ -1,5 +1,5 @@
 ﻿using Oetools.HtmlExport.Lib;
-using Oetools.Packager.Core;
+using Oetools.Builder.Core;
 
 namespace Oetools.HtmlExport.Html {
 

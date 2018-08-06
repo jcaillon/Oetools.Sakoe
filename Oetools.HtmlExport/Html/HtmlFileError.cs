@@ -1,8 +1,8 @@
 ﻿using System.IO;
 using System.Text;
 using Oetools.HtmlExport.Lib;
-using Oetools.Packager.Core;
-using Oetools.Packager.Core2.Execution;
+using Oetools.Builder.Core;
+using Oetools.Builder.Core2.Execution;
 
 namespace Oetools.HtmlExport.Html {
 

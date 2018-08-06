@@ -24,7 +24,7 @@ build.bat
 
 ## Additionnal remarks
 
-*Why are the libraries like Oetools.Packager targetting explicitly net461 AND netstandard2.0?*
+*Why are the libraries like Oetools.Builder targetting explicitly net461 AND netstandard2.0?*
 
 This question is legit, according to this [net-implementation-support table](https://docs.microsoft.com/en-us/dotnet/standard/net-standard#net-implementation-support), we should be able to make our libraries target netstandard2.0 and that's it. Since our application is targetting v4.6.1 and since v4.6.1 implements netstandard2.0 we should be good. But nop! This is explained here :
 

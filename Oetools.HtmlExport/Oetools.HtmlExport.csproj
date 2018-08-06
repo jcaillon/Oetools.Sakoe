@@ -59,8 +59,8 @@
     </Otherwise>
   </Choose>
   <ItemGroup Label="ProjectReferences">
-    <ProjectReference Include="..\Oetools.Packager\Oetools.Packager\Oetools.Packager.csproj" />
-    <ProjectReference Include="..\Oetools.Packager\Oetools.Utilities\Oetools.Utilities\Oetools.Utilities.csproj" />
+    <ProjectReference Include="..\Oetools.Builder\Oetools.Builder\Oetools.Builder.csproj" />
+    <ProjectReference Include="..\Oetools.Builder\Oetools.Utilities\Oetools.Utilities\Oetools.Utilities.csproj" />
   </ItemGroup>
   <ItemGroup Label="PackageReferences">
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.4" />
