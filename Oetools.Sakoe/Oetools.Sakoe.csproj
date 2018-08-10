@@ -90,9 +90,6 @@
   <ItemGroup Label="PackageReferences">
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.4" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Serialization" />
-  </ItemGroup>
   <!-- Extra targets -->
   <Import Project="Target.*.target" />
 </Project>

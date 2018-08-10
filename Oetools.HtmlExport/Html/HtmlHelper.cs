@@ -21,7 +21,6 @@
 using System;
 using System.IO;
 using System.Text;
-using csdeployer.Lib;
 using Oetools.HtmlExport.Lib;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;

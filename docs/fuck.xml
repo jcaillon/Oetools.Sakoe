@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:noNamespaceSchemaLocation="XmlOeProject.xsd">
-  <WebclientProperties xsi:noNamespaceSchemaLocation="XmlOeProject.xsd">
-    <WebClientVersion>11.7</WebClientVersion>
-    <WebclientRootDirectoryPath>.</WebclientRootDirectoryPath>
-    <WebclientOutputDirectory>webclient</WebclientOutputDirectory>
-  </WebclientProperties>
-</Project>

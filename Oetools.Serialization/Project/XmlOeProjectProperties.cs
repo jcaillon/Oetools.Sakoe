@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace Oetools.Sakoe.Serialization.Project {
+    
     [Serializable]
     public class XmlOeProjectProperties {
             
-        [XmlArray("DatabaseDataDefinitionFiles")]
-        [XmlArrayItem("DfPath", typeof(string))]
-        public List<string> DatabaseDataDefinitionFiles { get; set; }
+        [XmlArray("ProjectDatabases")]
+        [XmlArrayItem("ProjectDatabase", typeof(XmlOeProjectDatabase))]
+        public List<XmlOeProjectDatabase> ProjectDatabases { get; set; }
             
         [XmlElement(ElementName = "DatabaseConnectionExtraParameters")]
         public string DatabaseConnectionExtraParameters { get; set; }
@@ -68,5 +69,16 @@ namespace Oetools.Sakoe.Serialization.Project {
 
         [XmlElement(ElementName = "TemporaryDirectory")]
         public string TemporaryDirectory { get; set; }
+    }
+    
+    [Serializable]
+    public class XmlOeProjectDatabase {
+      
+        [XmlAttribute(AttributeName = "LogicalName")]
+        public bool LogicalName { get; set; }
+            
+        [XmlAttribute(AttributeName = "DataDefinitionFilePath")]
+        public string DataDefinitionFilePath { get; set; }
+        
     }
 }
