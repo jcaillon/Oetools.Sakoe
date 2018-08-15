@@ -224,16 +224,12 @@ namespace Oetools.Sakoe.Command.Oe {
             using (var dbAdministrator = new DatabaseAdministrator(GetDlcPath())) {
 
                 // get blocksize
-                var blockSize = DatabaseBlockSize.S4096;
+                var blockSize = DatabaseBlockSize.DefaultForCurrentPlatform;
                 if (BlockSize.HasValue) {
                     if (!TryGetEnumValue<DatabaseBlockSize>($"{DatabaseBlockSize.S4096.ToString().Substring(0, 1)}{BlockSize.value}", out long blockSizeValue, out List<string> list)) {
                         throw new CommandException($"Invalid value for {nameof(BlockSize)}, valid values are : {string.Join(", ", list.Select(s => s.Substring(1)))}");
                     }
-
                     blockSize = (DatabaseBlockSize) blockSizeValue;
-                } else if (!Utils.IsRuntimeWindowsPlatform) {
-                    // default value for linux
-                    blockSize = DatabaseBlockSize.S8192;
                 }
 
                 // to absolute path

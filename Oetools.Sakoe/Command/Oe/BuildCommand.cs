@@ -27,16 +27,10 @@ namespace Oetools.Sakoe.Command.Oe {
         [Option("-fr|--force-rebuild", "", CommandOptionType.NoValue)]
         protected bool ForceFullRebuild { get; set; }    
         
-        /// <summary>
-        /// It defaults to the output directory (TODO: put a http url instead)
-        /// </summary>
-        [Option("-rd|--reference-directory", "", CommandOptionType.SingleValue)]
-        protected string ReferenceDirectory { get; set; }
-        
         [LegalFilePath]
         [FileExists]
-        [Option("-cf|--config-file", "", CommandOptionType.SingleValue)]
-        protected string ConfigFilePath { get; set; }
+        [Option("-cf|--extra-config-file", "", CommandOptionType.SingleValue)]
+        protected string ExtraConfigFilePath { get; set; }
         
         [LegalFilePath]
         [Option("-sd|--source-directory", "Specify the source directory for the build, default to the current directory", CommandOptionType.SingleValue)]
