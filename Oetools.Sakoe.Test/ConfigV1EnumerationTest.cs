@@ -20,11 +20,7 @@
 
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Oetools.HtmlExport.Config;
-using Oetools.Builder.Core;
-using Oetools.Builder.Core.Config;
-using Oetools.Sakoe.Serialization.Opp;
-using Oetools.Utilities.Archive;
+
 using Oetools.Utilities.Lib.Extension;
 
 namespace Oetools.Sakoe.Test {
@@ -35,9 +31,7 @@ namespace Oetools.Sakoe.Test {
  
         [TestMethod]
         public void EnsureXmlDeploymentActionLevelHasEquivalent() {
-            typeof(XmlDeploymentAction).ForEach<XmlDeploymentAction>((name, value) => {
-                Assert.IsTrue(Enum.TryParse(typeof(DeploymentAction), name, out _));
-            });
+
         }
         
     }

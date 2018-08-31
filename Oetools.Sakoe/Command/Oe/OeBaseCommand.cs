@@ -21,7 +21,7 @@
 using System;
 using System.IO;
 using System.Linq;
-using Oetools.Sakoe.Lib;
+using Oetools.Builder.Utilities;
 using Oetools.Utilities.Openedge;
 
 namespace Oetools.Sakoe.Command.Oe {
@@ -34,7 +34,7 @@ namespace Oetools.Sakoe.Command.Oe {
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
         protected string GetDlcPath() {
-            var dlcPath = ProUtilities.GetDlcPathFromEnv();
+            var dlcPath = UoeUtilities.GetDlcPathFromEnv();
             if (string.IsNullOrEmpty(dlcPath) || !Directory.Exists(dlcPath)) {
                 throw new Exception("DLC folder not found, you must set the environment variable DLC to locate your openedge installation folder");
             }
@@ -47,9 +47,9 @@ namespace Oetools.Sakoe.Command.Oe {
         /// <returns></returns>
         /// <exception cref="CommandException"></exception>
         protected string GetCurrentProjectFilePath() {
-            var list = Directory.EnumerateFiles(Directory.GetCurrentDirectory(), $"{OeConstants.OeProjectExtension}*", SearchOption.TopDirectoryOnly).ToList();
+            var list = Directory.EnumerateFiles(Directory.GetCurrentDirectory(), $"{OeBuilderConstants.OeProjectExtension}*", SearchOption.TopDirectoryOnly).ToList();
             if (list.Count == 0) {
-                throw new CommandException($"No project file ({OeConstants.OeProjectExtension}) found in the current folder {Directory.GetCurrentDirectory()}");
+                throw new CommandException($"No project file ({OeBuilderConstants.OeProjectExtension}) found in the current folder {Directory.GetCurrentDirectory()}");
             }
             if (list.Count > 1) {
                 throw new CommandException($"Ambigous project, found {list.Count} project files in the current folder, specify the project file to use in the command line");

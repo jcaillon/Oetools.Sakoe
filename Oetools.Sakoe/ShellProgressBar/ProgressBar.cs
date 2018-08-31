@@ -316,7 +316,6 @@ namespace Oetools.Sakoe.ShellProgressBar
 			catch
 			{
 			}
-			Console.WriteLine();
 			_isDisposed = true;
 			_timer?.Dispose();
 			_timer = null;

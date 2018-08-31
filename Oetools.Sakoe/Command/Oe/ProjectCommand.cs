@@ -1,11 +1,8 @@
 ﻿using System;
 using System.IO;
 using McMaster.Extensions.CommandLineUtils;
-using Oetools.Sakoe.Lib;
-using Oetools.Sakoe.Serialization;
-using Oetools.Sakoe.Serialization.Project;
-using Oetools.Utilities.Lib.Extension;
-using Oetools.Utilities.Openedge;
+using Oetools.Builder.Utilities;
+using Oetools.Utilities.Lib;
 
 namespace Oetools.Sakoe.Command.Oe {
     
@@ -33,11 +30,11 @@ namespace Oetools.Sakoe.Command.Oe {
         
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             
-            if (ProjectFilePath?.EndsWith(OeConstants.OeProjectExtension, StringComparison.CurrentCultureIgnoreCase) ?? false) {
-                if (ProjectFilePath.Equals(OeConstants.OeProjectExtension, StringComparison.CurrentCultureIgnoreCase)) {
+            if (ProjectFilePath?.EndsWith(OeBuilderConstants.OeProjectExtension, StringComparison.CurrentCultureIgnoreCase) ?? false) {
+                if (ProjectFilePath.Equals(OeBuilderConstants.OeProjectExtension, StringComparison.CurrentCultureIgnoreCase)) {
                     ProjectFilePath = null;
                 } else {
-                    ProjectFilePath = ProjectFilePath.Substring(0, ProjectFilePath.IndexOf(OeConstants.OeProjectExtension, StringComparison.CurrentCultureIgnoreCase) - 1);
+                    ProjectFilePath = ProjectFilePath.Substring(0, ProjectFilePath.IndexOf(OeBuilderConstants.OeProjectExtension, StringComparison.CurrentCultureIgnoreCase) - 1);
                 }
             }
             
@@ -46,9 +43,9 @@ namespace Oetools.Sakoe.Command.Oe {
             }
             
             // to absolute path
-            var projectPah = $"{ProjectFilePath.MakePathAbsolute()}{OeConstants.OeProjectExtension}";
+            var projectPah = $"{ProjectFilePath.MakePathAbsolute()}{OeBuilderConstants.OeProjectExtension}";
             
-            XmlOeProject.Save(new XmlOeProject { Properties = new XmlOeProjectProperties() }, projectPah);
+            //XmlOeProject.Save(new XmlOeProject { Properties = new XmlOeProjectProperties() }, projectPah);
             
             return 0;
         }

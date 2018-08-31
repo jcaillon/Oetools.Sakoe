@@ -1,7 +1,7 @@
 # Oetools.Sakoe
 
 [![Build status](https://ci.appveyor.com/api/projects/status/67ij0nnuwduac2cn?svg=true)](https://ci.appveyor.com/project/jcaillon/oetools-sakoe)
-[![GitHub release](https://img.shields.io/github/release/jcaillon/Oetools.Sakoe.svg)](https://github.com/jcaillon/Oetools.Sakoe3P/releases/latest)
+[![GitHub release](https://img.shields.io/github/release/jcaillon/Oetools.Sakoe.svg)](https://github.com/jcaillon/Oetools.Sakoe/releases/latest)
 [![Total downloads](https://img.shields.io/github/downloads/jcaillon/Oetools.Sakoe/total.svg)](https://github.com/jcaillon/Oetools.Sakoe/releases)
 <!-- [![Coverity status](https://scan.coverity.com/projects/15362/badge.svg)](https://scan.coverity.com/projects/oetools-runner) -->
 
@@ -15,6 +15,11 @@ Sakoe has a **[dedicated website](https://jcaillon.github.io/Oetools.Sakoe/)**, 
 ## Build information
 
 Details/help on [how to build this project](docs/BUILD.md)
+
+## Submodules
+
+- [Oetools.Utilities](https://github.com/jcaillon/Oetools.Utilities)
+- [Oetools.Builder](https://github.com/jcaillon/Oetools.Builder)
 
 ## Thanks
 

@@ -10,6 +10,5 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Oetools.Sakoe\Oetools.Sakoe.csproj" />
-    <ProjectReference Include="..\Oetools.Serialization\Oetools.Serialization.csproj" />
   </ItemGroup>
 </Project>

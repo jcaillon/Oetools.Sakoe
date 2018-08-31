@@ -20,12 +20,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using System.Runtime.CompilerServices;
 using McMaster.Extensions.CommandLineUtils;
-using Oetools.Sakoe.Lib;
+using Oetools.Builder.Utilities;
+using Oetools.Sakoe.Utilities;
 using Oetools.Utilities.Lib.Extension;
-using Oetools.Utilities.Openedge;
 
 namespace Oetools.Sakoe.Command {
     
@@ -39,11 +38,14 @@ namespace Oetools.Sakoe.Command {
         protected virtual string UseVerboseMessage => $"Get more details on this error by adding the verbose option : {VerboseTemplate}";
         
         [Option(VerboseTemplate, "Execute the command using a verbose log/error output", CommandOptionType.NoValue)]
+        
         // ReSharper disable once UnassignedGetOnlyAutoProperty
         // ReSharper disable once MemberCanBePrivate.Global
         protected bool IsVerbose { get; }
 
         protected IConsole Console { get; private set; }
+        
+        protected ILogger Log { get; private set; }
         
         protected virtual void ExecutePreCommand(CommandLineApplication app, IConsole console) { }
 
@@ -51,25 +53,30 @@ namespace Oetools.Sakoe.Command {
         
         // ReSharper disable once UnusedMember.Global
         protected int OnExecute(CommandLineApplication app, IConsole console) {
-            Console = console;
-            try {
-                ExecutePreCommand(app, console);
-                var returnCode = ExecuteCommand(app, console);
-                ExecutePostCommand(app, console);
-                if (returnCode.Equals(0)) {
-                    WriteOk("OK");
-                } else {
-                    WriteWarn($"EXIT CODE {returnCode}");
+            using (var logger = new ConsoleLogger(console, IsVerbose ? ConsoleLogger.LogLvl.Debug : ConsoleLogger.LogLvl.Info)) {
+                Console = console;
+                Log = logger;
+                try {
+                    ExecutePreCommand(app, console);
+                    var returnCode = ExecuteCommand(app, console);
+                    ExecutePostCommand(app, console);
+                    if (returnCode.Equals(0)) {
+                        Log.Success("OK");
+                    } else {
+                        Log.Warn($"EXIT CODE {returnCode}");
+                    }
+
+                    return returnCode;
+                } catch (Exception e) {
+                    Log.Error($"**{e.Message}", e);
+                    if (!IsVerbose) {
+                        Log.Info(UseVerboseMessage);
+                    }
                 }
-                return returnCode;
-            } catch (Exception e) {
-                WriteError($"**{e.Message}", e);
-                if (!IsVerbose) {
-                    WriteInfo(UseVerboseMessage);
-                }
+
+                Log.Fatal("ERROR");
+                return 9;
             }
-            WriteFatal("ERROR");
-            return 9;
         }
         
         /// <summary>
@@ -80,70 +87,10 @@ namespace Oetools.Sakoe.Command {
         /// <returns></returns>
         protected virtual int ExecuteCommand(CommandLineApplication app, IConsole console) {
             app.ShowHelp();
-            WriteWarn("You must provide a command");
+            Log.Warn("You must provide a command");
             return 1;
         }
         
-        protected void WriteDebug(string message, Exception e = null) {
-            Log(LogLvl.Debug, message, e);
-        }
-
-        protected void WriteInfo(string message, Exception e = null) {
-            Log(LogLvl.Info, message, e);
-        }
-
-        protected void WriteOk(string message, Exception e = null) {
-            Log(LogLvl.Ok, message, e);
-        }
-
-        protected void WriteWarn(string message, Exception e = null) {
-            Log(LogLvl.Warn, message, e);
-        }
-
-        protected void WriteError(string message, Exception e = null) {
-            Log(LogLvl.Error, message, e);
-        }
-
-        protected void WriteFatal(string message, Exception e = null) {
-            Log(LogLvl.Fatal, message, e);
-        }
-        
-        private void Log(LogLvl level, string message, Exception e = null) {
-            if (level <= LogLvl.Debug && !IsVerbose) {
-                return;
-            }
-
-            switch (level) {
-                case LogLvl.Debug:
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
-                    break;
-                case LogLvl.Info:
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    break;
-                case LogLvl.Ok:
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    break;
-                case LogLvl.Warn:
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    break;
-                case LogLvl.Error:
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
-                    break;
-                case LogLvl.Fatal:
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(level), level, null);
-            }
-
-            Console.WriteLine($"{level.ToString().ToUpper().PadRight(5, ' ')} [{DateTime.Now:dd.MM.yy HH:mm:ss}] {message}");
-            if (e != null) {
-                Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.WriteLine(e.ToString());
-            }
-            Console.ResetColor();
-        }
-
         protected bool TryGetEnumValue<T>(string stringValue, out long enumValue, out List<string> validValuesList) {
             bool found = false;
             var outValidValuesList = new List<string>();
@@ -158,15 +105,6 @@ namespace Oetools.Sakoe.Command {
             enumValue = outEnumvalue;
             validValuesList = outValidValuesList;
             return found;
-        }
-
-        private enum LogLvl {
-            Debug,
-            Info,
-            Ok,
-            Warn,
-            Error,
-            Fatal
         }
         
     }

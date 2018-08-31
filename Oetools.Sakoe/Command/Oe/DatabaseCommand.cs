@@ -44,7 +44,7 @@ namespace Oetools.Sakoe.Command.Oe {
             // to absolute path
             TargetDatabasePath = !string.IsNullOrEmpty(TargetDatabasePath) ? TargetDatabasePath.MakePathAbsolute() : null;
             
-            var dbOperator = new DatabaseOperator(GetDlcPath());
+            var dbOperator = new UoeDatabaseOperator(GetDlcPath());
                         
             dbOperator.ProstrctRepair(TargetDatabasePath);
            
@@ -70,7 +70,7 @@ namespace Oetools.Sakoe.Command.Oe {
             // to absolute path
             TargetDatabasePath = !string.IsNullOrEmpty(TargetDatabasePath) ? TargetDatabasePath.MakePathAbsolute() : null;
             
-            var dbOperator = new DatabaseOperator(GetDlcPath());
+            var dbOperator = new UoeDatabaseOperator(GetDlcPath());
                         
             dbOperator.Delete(TargetDatabasePath);
            
@@ -98,14 +98,14 @@ namespace Oetools.Sakoe.Command.Oe {
             // to absolute path
             TargetDatabasePath = !string.IsNullOrEmpty(TargetDatabasePath) ? TargetDatabasePath.MakePathAbsolute() : null;
             
-            var dbOperator = new DatabaseOperator(GetDlcPath());
+            var dbOperator = new UoeDatabaseOperator(GetDlcPath());
                         
             if (RemainingArgs != null) {
-                WriteInfo($"Extra parameters : {string.Join(" ", RemainingArgs)}");
+                Log.Info($"Extra parameters : {string.Join(" ", RemainingArgs)}");
             }
            
             dbOperator.Proshut(TargetDatabasePath, string.Join(" ", RemainingArgs));
-            WriteDebug(dbOperator.LastOperationOutput);
+            Log.Debug(dbOperator.LastOperationOutput);
             
             return 0;
         }
@@ -116,7 +116,7 @@ namespace Oetools.Sakoe.Command.Oe {
     )]
     internal class KillAllDatabaseCommand : OeBaseCommand {
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            DatabaseOperator.KillAllMproSrv();
+            UoeDatabaseOperator.KillAllMproSrv();
             return 0;
         }
     }
@@ -153,10 +153,10 @@ namespace Oetools.Sakoe.Command.Oe {
             // to absolute path
             TargetDatabasePath = !string.IsNullOrEmpty(TargetDatabasePath) ? TargetDatabasePath.MakePathAbsolute() : null;
             
-            var dbOperator = new DatabaseOperator(GetDlcPath());
+            var dbOperator = new UoeDatabaseOperator(GetDlcPath());
                        
             if (RemainingArgs != null) {
-                WriteInfo($"Extra parameters for proserve : {string.Join(" ", RemainingArgs)}");
+                Log.Info($"Extra parameters for proserve : {string.Join(" ", RemainingArgs)}");
             }
            
             // service or port
@@ -174,13 +174,13 @@ namespace Oetools.Sakoe.Command.Oe {
             }
             
             ServiceName = !string.IsNullOrEmpty(ServiceName) ? ServiceName : null;
-            ServiceName = ServiceName ?? (Port.HasValue && Port.value > 0 ? Port.value : (NextPortAvailable.HasValue ? DatabaseOperator.GetNextAvailablePort(NextPortAvailable.value) : DatabaseOperator.GetNextAvailablePort())).ToString();
+            ServiceName = ServiceName ?? (Port.HasValue && Port.value > 0 ? Port.value.ToString() : null);
             
-            var options = dbOperator.ProServe(TargetDatabasePath, ServiceName, NbUsers.value > 0 ? (int?) NbUsers.value : null, string.Join(" ", RemainingArgs));
-            WriteInfo($"Proserve with options : {options.PrettyQuote()}");
+            var options = dbOperator.ProServe(TargetDatabasePath, ServiceName, NbUsers.value > 0 ? (int?) NbUsers.value : null, RemainingArgs == null ? null : string.Join(" ", RemainingArgs));
+            Log.Info($"Proserve with options : {options.PrettyQuote()}");
             
-            WriteOk($"Database started successfully, connection string :");
-            WriteOk($"{DatabaseAdministrator.GetConnectionString(TargetDatabasePath, ServiceName)}");
+            Log.Success($"Database started successfully, connection string :");
+            Log.Success($"{UoeDatabaseOperator.GetMultiUserConnectionString(TargetDatabasePath, ServiceName)}");
             
             return 0;
         }
@@ -221,7 +221,7 @@ namespace Oetools.Sakoe.Command.Oe {
         
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
 
-            using (var dbAdministrator = new DatabaseAdministrator(GetDlcPath())) {
+            using (var dbAdministrator = new UoeDatabaseAdministrator(GetDlcPath())) {
 
                 // get blocksize
                 var blockSize = DatabaseBlockSize.DefaultForCurrentPlatform;
@@ -238,7 +238,7 @@ namespace Oetools.Sakoe.Command.Oe {
                 TargetDatabasePath = !string.IsNullOrEmpty(TargetDatabasePath) ? TargetDatabasePath.MakePathAbsolute() : null;
 
                 // exists?
-                if (dbAdministrator.DatabaseExists(TargetDatabasePath)) {
+                if (UoeDatabaseOperator.DatabaseExists(TargetDatabasePath)) {
                     throw new CommandException("The target database already exists, choose a new name or delete the existing database");
                 }
 
@@ -246,46 +246,46 @@ namespace Oetools.Sakoe.Command.Oe {
 
                 // copy structure file to target
                 if (!string.IsNullOrEmpty(StuctureFilePath)) {
-                    WriteInfo("Copying source structure file (.st) to target database folder");
+                    Log.Info("Copying source structure file (.st) to target database folder");
                     dbAdministrator.CopyStructureFile(TargetDatabasePath, StuctureFilePath);
                 } else if (!string.IsNullOrEmpty(SchemaDefinitionFilePath)) {
                     
                     // generate a structure file from df?
-                    WriteInfo("Generating structure file (.st) from schema definition file (.df)");
+                    Log.Info("Generating structure file (.st) from schema definition file (.df)");
                     StuctureFilePath = dbAdministrator.GenerateStructureFileFromDf(TargetDatabasePath, SchemaDefinitionFilePath);
-                    WriteDebug($"File generated : {StuctureFilePath}");
-                    WriteDebug(dbAdministrator.LastOperationOutput);
+                    Log.Debug($"File generated : {StuctureFilePath}");
+                    Log.Debug(dbAdministrator.LastOperationOutput);
                     stAutoGenerated = true;
                 }
 
                 // prostct create
                 if (!string.IsNullOrEmpty(StuctureFilePath)) {
-                    WriteInfo($"Create database structure from structure file (.st) using {blockSize} blocksize");
+                    Log.Info($"Create database structure from structure file (.st) using {blockSize} blocksize");
                     dbAdministrator.ProstrctCreate(TargetDatabasePath, StuctureFilePath, blockSize);
-                    WriteDebug(dbAdministrator.LastOperationOutput);
+                    Log.Debug(dbAdministrator.LastOperationOutput);
                 }
 
                 // procopy empty
-                WriteInfo($"Procopy the empty database from the dlc folder corresponding to a {blockSize} blocksize");
+                Log.Info($"Procopy the empty database from the dlc folder corresponding to a {blockSize} blocksize");
                 dbAdministrator.Procopy(TargetDatabasePath, blockSize, Codepage, NewInstance, RelativePath);
-                WriteDebug(dbAdministrator.LastOperationOutput);
+                Log.Debug(dbAdministrator.LastOperationOutput);
 
-                if (!dbAdministrator.DatabaseExists(TargetDatabasePath)) {
+                if (!UoeDatabaseOperator.DatabaseExists(TargetDatabasePath)) {
                     throw new CommandException("The database does not exist for unknown reasons");
                 }
 
                 // Load .df
                 if (!string.IsNullOrEmpty(SchemaDefinitionFilePath)) {
-                    WriteInfo($"Loading the schema definition from {SchemaDefinitionFilePath}");
+                    Log.Info($"Loading the schema definition from {SchemaDefinitionFilePath}");
                     dbAdministrator.LoadDf(TargetDatabasePath, SchemaDefinitionFilePath);
-                    WriteDebug(dbAdministrator.LastOperationOutput);
+                    Log.Debug(dbAdministrator.LastOperationOutput);
                 }
 
                 if (stAutoGenerated) {
-                    WriteWarn("The database physical structure (described in .st) has been generated automatically, this database should not be used in production");
+                    Log.Warn("The database physical structure (described in .st) has been generated automatically, this database should not be used in production");
                 }
 
-                WriteOk($"Database created successfully : {TargetDatabasePath.PrettyQuote()}");
+                Log.Success($"Database created successfully : {TargetDatabasePath.PrettyQuote()}");
 
             }
 

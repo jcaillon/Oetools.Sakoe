@@ -27,12 +27,51 @@ namespace Oetools.Sakoe.Command.Oe {
         private MainCommand Parent { get; set; }
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            CreateHashFiles();
+            Log.Info("info");
+            Log.Debug("this is a debug");
+            Log.Warn("this is a war 2");
+            Log.Error("this is a err 2");
+            Log.Fatal("this is a fat 2");
+            Log.Success("this is a ok 2");
+            
+            Log.Trace?.Write("test write trace");
+            
+            for (var i = 0; i <= 99; i++) {
+                Log.ReportProgress(100, i, $"Executing task {i}");
+                Thread.Sleep(10);
+            }
+            
+            Log.Success("cool end");
+            
+            for (var i = 0; i <= 100; i++) {
+                Log.ReportProgress(100, i, $"Executing task {i}");
+                Thread.Sleep(10);
+            }
+            
+            Log.Success("end 2");
+            
+            Log.ReportProgress(50, 1, "Init...");
+
+            Log.Info("info");
+            
+            Log.ReportProgress(50, 25, "half");
+            
+            Log.Info("info");
+
+            for (int j = 0; j < 15; j++) {
+                for (var i = 0; i <= 100; i++) {
+                    Log.ReportProgress(100, i, $"Executing {j} task {i}");
+                    Thread.Sleep(10);
+                }
+                Log.Success($"end of {j}");
+            }
+            
+            //CreateHashFiles();
             //return base.OnExecute(app, console);
             return 1;
         }
     
-        private static void CreateHashFiles() {
+        private void CreateHashFiles() {
             const int totalTicks = 10;
             var options = new ProgressBarOptions
             {
@@ -64,7 +103,7 @@ namespace Oetools.Sakoe.Command.Oe {
             }
         }
         
-        private static void TickToCompletion(IProgressBar pbar, int ticks, int sleep = 1750, Action childAction = null)
+        private void TickToCompletion(IProgressBar pbar, int ticks, int sleep = 1750, Action childAction = null)
         {
             var initialMessage = pbar.Message;
             for (var i = 0; i < ticks; i++) {

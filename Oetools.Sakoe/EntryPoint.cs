@@ -22,7 +22,6 @@
 
 using System;
 using Oetools.Sakoe.Command;
-using Oetools.Sakoe.Lib;
 
 namespace Oetools.Sakoe {
     

@@ -82,8 +82,6 @@
     </Otherwise>
   </Choose>
   <ItemGroup Label="ProjectReferences">
-    <ProjectReference Include="..\Oetools.Serialization\Oetools.Serialization.csproj" />
-    <ProjectReference Include="..\Oetools.HtmlExport\Oetools.HtmlExport.csproj" />
     <ProjectReference Include="..\Oetools.Builder\Oetools.Builder\Oetools.Builder.csproj" />
     <ProjectReference Include="..\Oetools.Builder\Oetools.Utilities\Oetools.Utilities\Oetools.Utilities.csproj" />
   </ItemGroup>
