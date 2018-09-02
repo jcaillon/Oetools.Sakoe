@@ -97,7 +97,11 @@ namespace Oetools.Sakoe.Utilities {
                 _progressBar = null;
             }
         }
-        
+
+        public void ReportGlobalProgress(int max, int current, string message) {
+            
+        }
+
         private void Log(LogLvl level, string message, Exception e = null) {
             _progressBar?.Dispose();
             _progressBar = null;

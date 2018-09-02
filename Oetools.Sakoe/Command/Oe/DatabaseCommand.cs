@@ -17,6 +17,7 @@ namespace Oetools.Sakoe.Command.Oe {
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         ThrowOnUnexpectedArgument = false
     )]
+    [Subcommand("project", typeof(DatabaseProjectCommand))]
     [Subcommand("create", typeof(CreateDatabaseCommand))]
     [Subcommand("start", typeof(StartDatabaseCommand))]
     [Subcommand("stop", typeof(StopDatabaseCommand))]
