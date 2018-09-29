@@ -17,9 +17,10 @@
 // along with Oetools.Builder. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 
-namespace Oetools.Builder.Opp {
+namespace Oetools.Sakoe.Opp {
     
     [Serializable]
     public class XmlDeploymentTarget {

@@ -44,7 +44,7 @@ namespace Oetools.Sakoe.Utilities {
                 Trace = this;
             }
             _progressBarOptions = new ProgressBarOptions {
-                ForegroundColor = ConsoleColor.Yellow,
+                ForegroundColor = ConsoleColor.Cyan,
                 ForegroundColorDone = ConsoleColor.DarkGray,
                 BackgroundColor = ConsoleColor.DarkGray,
                 BackgroundCharacter = '\u2593',
@@ -73,13 +73,18 @@ namespace Oetools.Sakoe.Utilities {
         }
 
         public void Success(string message, Exception e = null) {
-            Log(LogLvl.Ok, message, e);
+            Log(LogLvl.Done, message, e);
         }
 
         public void Debug(string message, Exception e = null) {
             Log(LogLvl.Debug, message, e);
         }
 
+        /// <summary>
+        /// Writes in debug level
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="e"></param>
         public void Write(string message, Exception e = null) {
             Log(LogLvl.Debug, message, e);
         }
@@ -99,7 +104,7 @@ namespace Oetools.Sakoe.Utilities {
         }
 
         public void ReportGlobalProgress(int max, int current, string message) {
-            
+            Log(LogLvl.Info, $"global progress : {message}");
         }
 
         private void Log(LogLvl level, string message, Exception e = null) {
@@ -117,7 +122,7 @@ namespace Oetools.Sakoe.Utilities {
                 case LogLvl.Info:
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     break;
-                case LogLvl.Ok:
+                case LogLvl.Done:
                     Console.ForegroundColor = ConsoleColor.Green;
                     break;
                 case LogLvl.Warn:
@@ -144,7 +149,7 @@ namespace Oetools.Sakoe.Utilities {
         public enum LogLvl {
             Debug,
             Info,
-            Ok,
+            Done,
             Warn,
             Error,
             Fatal

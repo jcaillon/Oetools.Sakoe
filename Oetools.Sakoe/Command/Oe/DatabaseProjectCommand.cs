@@ -18,7 +18,7 @@ namespace Oetools.Sakoe.Command.Oe {
     )]
     [Subcommand("connect", typeof(CreateDatabaseCommand))]
     [Subcommand("create", typeof(CreateDatabaseCommand))]
-    [Subcommand("create", typeof(CreateDatabaseCommand))]
+    [Subcommand("derp", typeof(CreateDatabaseCommand))]
     internal class DatabaseProjectCommand : OeBaseCommand {
     }
     

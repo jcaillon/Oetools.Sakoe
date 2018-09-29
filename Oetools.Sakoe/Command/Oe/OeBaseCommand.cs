@@ -22,6 +22,7 @@ using System;
 using System.IO;
 using System.Linq;
 using Oetools.Builder.Utilities;
+using Oetools.Sakoe.Command.Exceptions;
 using Oetools.Utilities.Openedge;
 
 namespace Oetools.Sakoe.Command.Oe {

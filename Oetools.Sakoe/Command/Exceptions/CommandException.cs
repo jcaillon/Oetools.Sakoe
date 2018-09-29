@@ -20,7 +20,7 @@
 
 using System;
 
-namespace Oetools.Sakoe.Command {
+namespace Oetools.Sakoe.Command.Exceptions {
     public class CommandException : Exception {
         public CommandException() { }
         public CommandException(string message) : base(message) { }

@@ -17,10 +17,11 @@
 // along with Oetools.Builder. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
 
-namespace Oetools.Builder.Opp {
+namespace Oetools.Sakoe.Opp {
     
     [Serializable]
     public class XmlFileDeployedCompiled : XmlFileDeployed {

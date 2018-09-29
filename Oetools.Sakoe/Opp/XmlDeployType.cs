@@ -17,10 +17,11 @@
 // along with Oetools.Builder. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Xml.Serialization;
 
-namespace Oetools.Builder.Opp {
+namespace Oetools.Sakoe.Opp {
     
     /// <summary>
     ///     Types of deploy, used during rules sorting
