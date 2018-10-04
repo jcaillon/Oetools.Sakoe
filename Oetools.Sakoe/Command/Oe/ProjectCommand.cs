@@ -47,6 +47,9 @@ namespace Oetools.Sakoe.Command.Oe {
             
             //XmlOeProject.Save(new XmlOeProject { Properties = new XmlOeProjectProperties() }, projectPah);
             
+            // .gitignore
+            //"############\n#  Sakoe   #\n############\n# never push the local directory\n.oe/local/\n# do not push the bin directory\nbin/"
+            
             return 0;
         }
     }
