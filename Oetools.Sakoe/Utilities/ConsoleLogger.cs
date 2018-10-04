@@ -37,9 +37,12 @@ namespace Oetools.Sakoe.Utilities {
 
         private IConsole _console;
 
-        public ConsoleLogger(IConsole console, LogLvl level = LogLvl.Info) {
+        private bool _isProgressBarOff;
+
+        public ConsoleLogger(IConsole console, LogLvl level, bool isProgressBarOff) {
             _console = console;
             _logLevel = level;
+            _isProgressBarOff = isProgressBarOff;
             if (_logLevel <= LogLvl.Debug) {
                 Trace = this;
             }
@@ -90,6 +93,15 @@ namespace Oetools.Sakoe.Utilities {
         }
 
         public void ReportProgress(int max, int current, string message) {
+            if (_isProgressBarOff) {
+                return;
+            }
+            if (_console.IsOutputRedirected) {
+                // cannot use the progress bar
+                Log(LogLvl.Debug, $"{Math.Round((decimal) current / max * 100, 2)}% : {message}");
+                return;
+            }
+            
             if (_progressBar == null) {
                 _progressBar = new ProgressBar(max, message, _progressBarOptions);
             }

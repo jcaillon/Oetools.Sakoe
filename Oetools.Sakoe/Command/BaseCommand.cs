@@ -38,12 +38,16 @@ namespace Oetools.Sakoe.Command {
         protected virtual string UseVerboseMessage => $"Get more details on this error by adding the verbose option : {VerboseTemplate}";
         
         [Option(VerboseTemplate, "Execute the command using a verbose log/error output", CommandOptionType.NoValue)]
-        
         // ReSharper disable once UnassignedGetOnlyAutoProperty
         // ReSharper disable once MemberCanBePrivate.Global
         protected bool IsVerbose { get; }
+        
+        [Option("-nopb|--no-progressbar", "Never display progress bars", CommandOptionType.NoValue)]
+        // ReSharper disable once UnassignedGetOnlyAutoProperty
+        // ReSharper disable once MemberCanBePrivate.Global
+        protected bool IsProgressBarOff { get; }
 
-        protected IConsole Console { get; private set; }
+        private IConsole Console { get; set; }
         
         protected ILogger Log { get; private set; }
         
@@ -53,7 +57,7 @@ namespace Oetools.Sakoe.Command {
         
         // ReSharper disable once UnusedMember.Global
         protected int OnExecute(CommandLineApplication app, IConsole console) {
-            using (var logger = new ConsoleLogger(console, IsVerbose ? ConsoleLogger.LogLvl.Debug : ConsoleLogger.LogLvl.Info)) {
+            using (var logger = new ConsoleLogger(console, IsVerbose ? ConsoleLogger.LogLvl.Debug : ConsoleLogger.LogLvl.Info, IsProgressBarOff)) {
                 Console = console;
                 Log = logger;
                 try {
