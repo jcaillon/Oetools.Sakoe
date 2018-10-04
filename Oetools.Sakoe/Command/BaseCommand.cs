@@ -20,6 +20,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder.Utilities;
@@ -46,6 +47,11 @@ namespace Oetools.Sakoe.Command {
         // ReSharper disable once UnassignedGetOnlyAutoProperty
         // ReSharper disable once MemberCanBePrivate.Global
         protected bool IsProgressBarOff { get; }
+        
+        [Option("-logo|--with-logo", "Always display the logo on start", CommandOptionType.NoValue)]
+        // ReSharper disable once UnassignedGetOnlyAutoProperty
+        // ReSharper disable once MemberCanBePrivate.Global
+        protected bool IsLogoOn { get; }
 
         private IConsole Console { get; set; }
         
@@ -61,6 +67,9 @@ namespace Oetools.Sakoe.Command {
                 Console = console;
                 Log = logger;
                 try {
+                    if (IsLogoOn) {
+                        DrawLogo(console);
+                    }
                     ExecutePreCommand(app, console);
                     var returnCode = ExecuteCommand(app, console);
                     ExecutePostCommand(app, console);
@@ -82,7 +91,7 @@ namespace Oetools.Sakoe.Command {
                 return 9;
             }
         }
-        
+
         /// <summary>
         /// The method to override for each command
         /// </summary>
@@ -109,6 +118,10 @@ namespace Oetools.Sakoe.Command {
             enumValue = outEnumvalue;
             validValuesList = outValidValuesList;
             return found;
+        }
+
+        private void DrawLogo(IConsole console) {
+            console.WriteLine($"SAKOE v{typeof(BaseCommand).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion} )xxxxx[;;;;;;;;;>");
         }
         
     }

@@ -42,14 +42,14 @@ namespace Oetools.Sakoe.Command.Oe {
             
             for (var i = 0; i <= 99; i++) {
                 Log.ReportProgress(100, i, $"Executing task {i}");
-                //Thread.Sleep(10);
+                Thread.Sleep(10);
             }
             
             Log.Success("cool end");
             
             for (var i = 0; i <= 100; i++) {
                 Log.ReportProgress(100, i, $"Executing task {i}");
-                //Thread.Sleep(10);
+                Thread.Sleep(10);
             }
             
             Log.Success("end 2");
@@ -65,7 +65,7 @@ namespace Oetools.Sakoe.Command.Oe {
             for (int j = 0; j < 15; j++) {
                 for (var i = 0; i <= 100; i++) {
                     Log.ReportProgress(100, i, $"Executing {j} task {i}");
-                    //Thread.Sleep(10);
+                    Thread.Sleep(10);
                 }
                 Log.Success($"end of {j}");
             }
