@@ -38,9 +38,7 @@ shallow_clone: false                 # default is "false"
 #    secure: FW3tJ3fMncxvs58/ifSP7w==
 
 install:
-  - cmd: >-
-    git submodule update --init --recursive
-    nuget sources add -Name myget-natemcmaster -Source https://www.myget.org/F/natemcmaster/api/v3/index.json
+  - cmd: git submodule update --init --recursive && nuget sources add -Name myget-natemcmaster -Source https://www.myget.org/F/natemcmaster/api/v3/index.json
 
 #---------------------------------#
 #       build configuration       #
