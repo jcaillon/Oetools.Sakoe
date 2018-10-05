@@ -6,10 +6,11 @@ namespace Oetools.Sakoe.Command.Oe {
     
     
     [Command(
+        "lint", "li",
         Description = "TODO : prolint",
         ExtendedHelpText = "TODO : prolint",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
-        ThrowOnUnexpectedArgument = false
+        AllowArgumentSeparator = true
     )]
     internal class LintCommand : OeBaseCommand {
         [Option("-m")]

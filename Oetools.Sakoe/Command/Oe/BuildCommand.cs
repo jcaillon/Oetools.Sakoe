@@ -5,10 +5,10 @@ using Oetools.Builder.Utilities;
 namespace Oetools.Sakoe.Command.Oe {
     
     [Command(
+        "build", "bu",
         Description = "TODO",
         ExtendedHelpText = "TODO",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
-        ThrowOnUnexpectedArgument = false
+        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
     internal class BuildCommand : OeBaseCommand {
         

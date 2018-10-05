@@ -13,26 +13,26 @@ namespace Oetools.Sakoe.Command.Oe {
     
     
     [Command(
+        "database", "db", "da",
         Description = "TODO : db",
         ExtendedHelpText = "TODO : db",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
-        ThrowOnUnexpectedArgument = false
+        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    [Subcommand("project", typeof(DatabaseProjectCommand))]
-    [Subcommand("create", typeof(CreateDatabaseCommand))]
-    [Subcommand("start", typeof(StartDatabaseCommand))]
-    [Subcommand("stop", typeof(StopDatabaseCommand))]
-    [Subcommand("kill", typeof(KillAllDatabaseCommand))]
-    [Subcommand("delete", typeof(DeleteDatabaseCommand))]
-    [Subcommand("repair", typeof(RepairDatabaseCommand))]
+    [Subcommand(typeof(DatabaseProjectCommand))]
+    [Subcommand(typeof(CreateDatabaseCommand))]
+    [Subcommand(typeof(StartDatabaseCommand))]
+    [Subcommand(typeof(StopDatabaseCommand))]
+    [Subcommand(typeof(KillAllDatabaseCommand))]
+    [Subcommand(typeof(DeleteDatabaseCommand))]
+    [Subcommand(typeof(RepairDatabaseCommand))]
     internal class DatabaseCommand : OeBaseCommand {
     }
     
     [Command(
+        "repair", "re",
         Description = "TODO : repair database",
         ExtendedHelpText = "TODO : database",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
-        ThrowOnUnexpectedArgument = false
+        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
     internal class RepairDatabaseCommand : OeBaseCommand {
         
@@ -55,10 +55,10 @@ namespace Oetools.Sakoe.Command.Oe {
     }
     
     [Command(
+        "delete", "de",
         Description = "TODO : delete database",
         ExtendedHelpText = "TODO : database",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
-        ThrowOnUnexpectedArgument = false
+        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
     internal class DeleteDatabaseCommand : OeBaseCommand {
         
@@ -81,10 +81,11 @@ namespace Oetools.Sakoe.Command.Oe {
     }
     
     [Command(
+        "stop", "sto", "proshut",
         Description = "TODO : stop database",
         ExtendedHelpText = "TODO : database",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
-        ThrowOnUnexpectedArgument = false
+        AllowArgumentSeparator = true
     )]
     internal class StopDatabaseCommand : OeBaseCommand {
         
@@ -114,6 +115,7 @@ namespace Oetools.Sakoe.Command.Oe {
     }
     
     [Command(
+        "kill", "ki",
         Description = "Kill all the _mprosrv process"
     )]
     internal class KillAllDatabaseCommand : OeBaseCommand {
@@ -124,10 +126,11 @@ namespace Oetools.Sakoe.Command.Oe {
     }
     
     [Command(
+        "start", "sta", "proserve",
         Description = "TODO : database proserve",
         ExtendedHelpText = "TODO : database proserve",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
-        ThrowOnUnexpectedArgument = false
+        AllowArgumentSeparator = true
     )]
     internal class StartDatabaseCommand : OeBaseCommand {
         
@@ -189,10 +192,10 @@ namespace Oetools.Sakoe.Command.Oe {
     }
     
     [Command(
+        "create", "cr",
         Description = "TODO : database creation",
         ExtendedHelpText = "TODO : database creation",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
-        ThrowOnUnexpectedArgument = false
+        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
     internal class CreateDatabaseCommand : OeBaseCommand {
         

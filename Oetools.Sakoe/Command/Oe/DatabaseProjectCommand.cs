@@ -11,22 +11,20 @@ using Oetools.Utilities.Openedge.Database;
 namespace Oetools.Sakoe.Command.Oe {
     
     [Command(
+        "project", "pr",
         Description = "TODO : db",
         ExtendedHelpText = "TODO : db",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
-        ThrowOnUnexpectedArgument = false
+        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    [Subcommand("connect", typeof(CreateDatabaseCommand))]
-    [Subcommand("create", typeof(CreateDatabaseCommand))]
-    [Subcommand("derp", typeof(CreateDatabaseCommand))]
+    [Subcommand(typeof(ConnectDatabaseProjectCommand))]
     internal class DatabaseProjectCommand : OeBaseCommand {
     }
     
     [Command(
+        "create", "cr",
         Description = "TODO : repair database",
         ExtendedHelpText = "TODO : database",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
-        ThrowOnUnexpectedArgument = false
+        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
     internal class ConnectDatabaseProjectCommand : OeBaseCommand {
         

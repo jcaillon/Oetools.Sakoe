@@ -6,10 +6,10 @@ using Oetools.Sakoe.ShellProgressBar;
 namespace Oetools.Sakoe.Command.Oe {
     
     [Command(
+        "deploy", "de",
         Description = "TODO : deploy help text",
         ExtendedHelpText = "TODO : help",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
-        ThrowOnUnexpectedArgument = false
+        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
     internal class DeployCommand : OeBaseCommand {
         

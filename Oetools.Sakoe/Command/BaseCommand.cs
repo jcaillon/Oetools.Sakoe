@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using McMaster.Extensions.CommandLineUtils;
+using McMaster.Extensions.CommandLineUtils.HelpText;
 using Oetools.Builder.Utilities;
 using Oetools.Sakoe.Utilities;
 using Oetools.Utilities.Lib.Extension;
@@ -66,10 +67,13 @@ namespace Oetools.Sakoe.Command {
             using (var logger = new ConsoleLogger(console, IsVerbose ? ConsoleLogger.LogLvl.Debug : ConsoleLogger.LogLvl.Info, IsProgressBarOff)) {
                 Console = console;
                 Log = logger;
+                app.HelpTextGenerator = new HelpTextGenerator {
+                    ShowLogo = !IsLogoOn
+                };
+                if (IsLogoOn) {
+                    HelpTextGenerator.DrawLogo(console.Out);
+                }
                 try {
-                    if (IsLogoOn) {
-                        DrawLogo(console);
-                    }
                     ExecutePreCommand(app, console);
                     var returnCode = ExecuteCommand(app, console);
                     ExecutePostCommand(app, console);
@@ -118,10 +122,6 @@ namespace Oetools.Sakoe.Command {
             enumValue = outEnumvalue;
             validValuesList = outValidValuesList;
             return found;
-        }
-
-        private void DrawLogo(IConsole console) {
-            console.WriteLine($"SAKOE v{typeof(BaseCommand).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion} )xxxxx[;;;;;;;;;>");
         }
         
     }

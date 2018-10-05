@@ -7,20 +7,20 @@ using Oetools.Utilities.Lib;
 namespace Oetools.Sakoe.Command.Oe {
     
     [Command(
+        "project", "pr",
         Description = "TODO",
         ExtendedHelpText = "TODO",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
-        ThrowOnUnexpectedArgument = false
+        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    [Subcommand("new", typeof(NewProjectCommand))]
+    [Subcommand(typeof(NewProjectCommand))]
     internal class ProjectCommand : OeBaseCommand {
    }
     
     [Command(
+        "new", "ne",
         Description = "TODO",
         ExtendedHelpText = "TODO",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
-        ThrowOnUnexpectedArgument = false
+        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
     internal class NewProjectCommand : OeBaseCommand {
         

@@ -9,22 +9,23 @@ namespace Oetools.Sakoe.Command {
     /// The main command of the application, called when the user passes no arguments/commands
     /// </summary>
     [Command(
-        Description = "============\nTODO : short description of this CLI",
-        ExtendedHelpText = "\nTODO : extended help for this CLI\n============",
+        FullName = "SAKOE - a Swiss Army Knife for OpenEdge",
+        Description = "TODO : short description of this CLI",
+        ExtendedHelpText = "TODO : extended help for this CLI",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
-        ThrowOnUnexpectedArgument = false,
         ResponseFileHandling = ResponseFileHandling.ParseArgsAsSpaceSeparated
     )]
     [VersionOptionFromMember("-version|--version", MemberName = nameof(GetVersion), Description = "Show version information")]
     [HelpOption("-?|-h|--help", Description = "Show help information", Inherited = true)]
-    [Subcommand("deploy", typeof(DeployCommand))]
-    [Subcommand("db", typeof(DatabaseCommand))]
-    [Subcommand("lint", typeof(LintCommand))]
-    [Subcommand("project", typeof(ProjectCommand))]
-    [Subcommand("build", typeof(BuildCommand))]
+    [Subcommand(typeof(DeployCommand))]
+    [Subcommand(typeof(DatabaseCommand))]
+    [Subcommand(typeof(LintCommand))]
+    [Subcommand( typeof(ProjectCommand))]
+    [Subcommand(typeof(BuildCommand))]
+    [Subcommand(typeof(XcodeCommand))]
     internal class MainCommand : BaseCommand {
         
-        private static string GetVersion() => typeof(MainCommand).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+        private static string GetVersion() => $"v{typeof(MainCommand).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}";
 
         public static int ExecuteMainCommand(string[] args) => CommandLineApplication.Execute<MainCommand>(args);
     }
