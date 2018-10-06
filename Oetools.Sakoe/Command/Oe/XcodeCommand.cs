@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using McMaster.Extensions.CommandLineUtils;
+using Oetools.Builder.Project.Task;
 using Oetools.Builder.Utilities;
 using Oetools.Utilities.Lib;
 
@@ -24,10 +25,7 @@ namespace Oetools.Sakoe.Command.Oe {
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         AllowArgumentSeparator = true
     )]
-    internal class EncryptXcodeCommand : OeBaseCommand {
-        
-        [Option("-f|--filter", "", CommandOptionType.SingleValue)]
-        protected string IncludeFilter { get; set; }
+    internal class EncryptXcodeCommand : OeFilterBaseCommand {
         
         [Option("-k|--key", "", CommandOptionType.SingleValue)]
         protected string EncryptionKey { get; set; }
@@ -46,6 +44,29 @@ namespace Oetools.Sakoe.Command.Oe {
             foreach (var arg in RemainingArgs) {
                 Log.Info(arg);
             }
+
+            var filter = new OeTaskFilter {
+                
+            };
+            //var lister = new SourceFilesLister(sourceDirectory, _cancelSource) {
+            //    SourcePathFilter = 
+            //};
+            //foreach (var directory in lister.GetDirectoryList()) {
+            //    if (!output.Contains(directory)) {
+            //        output.Add(directory);
+            //    }
+            //}
+            
+            
+            
+//            var lister = new SourceFilesLister(sourceDirectory, _cancelSource) {
+//                SourcePathFilter = PropathSourceDirectoriesFilter
+//            };
+//            foreach (var directory in lister.GetDirectoryList()) {
+//                if (!output.Contains(directory)) {
+//                    output.Add(directory);
+//                }
+//            }
             
             return 0;
         }

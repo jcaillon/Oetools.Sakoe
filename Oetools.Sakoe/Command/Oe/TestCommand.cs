@@ -6,12 +6,12 @@ using Oetools.Sakoe.ShellProgressBar;
 namespace Oetools.Sakoe.Command.Oe {
     
     [Command(
-        "deploy", "de",
-        Description = "TODO : deploy help text",
+        "test", "te",
+        Description = "A command to test the behaviour of this tool",
         ExtendedHelpText = "TODO : help",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class DeployCommand : OeBaseCommand {
+    internal class TestCommand : OeBaseCommand {
         
         [Argument(0)]
         [LegalFilePath]
@@ -26,9 +26,8 @@ namespace Oetools.Sakoe.Command.Oe {
         // This will automatically be set before OnExecute is invoked
         private MainCommand Parent { get; set; }
 
+
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            
-            
             
             Log.Info("info");
             Log.Info($"info : {console.IsOutputRedirected}");
@@ -64,6 +63,7 @@ namespace Oetools.Sakoe.Command.Oe {
 
             for (int j = 0; j < 15; j++) {
                 for (var i = 0; i <= 100; i++) {
+                    _cancelSource.Token.ThrowIfCancellationRequested();
                     Log.ReportProgress(100, i, $"Executing {j} task {i}");
                     Thread.Sleep(10);
                 }

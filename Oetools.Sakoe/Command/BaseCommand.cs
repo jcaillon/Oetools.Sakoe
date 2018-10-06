@@ -20,11 +20,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using McMaster.Extensions.CommandLineUtils;
 using McMaster.Extensions.CommandLineUtils.HelpText;
 using Oetools.Builder.Utilities;
+using Oetools.Sakoe.Command.Exceptions;
 using Oetools.Sakoe.Utilities;
 using Oetools.Utilities.Lib.Extension;
 
@@ -36,51 +40,64 @@ namespace Oetools.Sakoe.Command {
     public abstract class BaseCommand {
         
         private const string VerboseTemplate = "-vb|--verbose";
-
-        protected virtual string UseVerboseMessage => $"Get more details on this error by adding the verbose option : {VerboseTemplate}";
+        
+        private string UseVerboseMessage => $"Get more details on this error by adding the verbose option : {VerboseTemplate}";
         
         [Option(VerboseTemplate, "Execute the command using a verbose log/error output", CommandOptionType.NoValue)]
         // ReSharper disable once UnassignedGetOnlyAutoProperty
         // ReSharper disable once MemberCanBePrivate.Global
-        protected bool IsVerbose { get; }
+        public bool IsVerbose { get; }
         
-        [Option("-nopb|--no-progressbar", "Never display progress bars", CommandOptionType.NoValue)]
+        [Option("-nop|--no-progress", "Never display progress bars", CommandOptionType.NoValue)]
         // ReSharper disable once UnassignedGetOnlyAutoProperty
         // ReSharper disable once MemberCanBePrivate.Global
-        protected bool IsProgressBarOff { get; }
+        public bool IsProgressBarOff { get; }
         
         [Option("-logo|--with-logo", "Always display the logo on start", CommandOptionType.NoValue)]
         // ReSharper disable once UnassignedGetOnlyAutoProperty
         // ReSharper disable once MemberCanBePrivate.Global
-        protected bool IsLogoOn { get; }
+        public bool IsLogoOn { get; }
 
-        private IConsole Console { get; set; }
+        protected IConsole Console { get; set; }
         
         protected ILogger Log { get; private set; }
         
         protected virtual void ExecutePreCommand(CommandLineApplication app, IConsole console) { }
 
         protected virtual void ExecutePostCommand(CommandLineApplication app, IConsole console) { }
+
+        private int _numberOfCancelKeyPress;
         
+        protected CancellationTokenSource _cancelSource;
+        
+        public static readonly HelpTextGenerator HelpTextGenerator = new HelpTextGenerator();
+
         // ReSharper disable once UnusedMember.Global
         protected int OnExecute(CommandLineApplication app, IConsole console) {
             using (var logger = new ConsoleLogger(console, IsVerbose ? ConsoleLogger.LogLvl.Debug : ConsoleLogger.LogLvl.Info, IsProgressBarOff)) {
+                
                 Console = console;
                 Log = logger;
-                app.HelpTextGenerator = new HelpTextGenerator {
-                    ShowLogo = !IsLogoOn
-                };
+                
+                _cancelSource = new CancellationTokenSource();
+                Console.CancelKeyPress += ConsoleOnCancelKeyPress;
+                
                 if (IsLogoOn) {
                     HelpTextGenerator.DrawLogo(console.Out);
                 }
+                
+                int exitCode = 9;
+                
+                var stopwatch = Stopwatch.StartNew();
+                
                 try {
                     ExecutePreCommand(app, console);
                     var returnCode = ExecuteCommand(app, console);
                     ExecutePostCommand(app, console);
                     if (returnCode.Equals(0)) {
-                        Log.Success("OK");
+                        Log.Success($"Exit code 0 - in {stopwatch.Elapsed.ConvertToHumanTime()} - Ok");
                     } else {
-                        Log.Warn($"EXIT CODE {returnCode}");
+                        Log.Warn($"Exit code {returnCode} - in {stopwatch.Elapsed.ConvertToHumanTime()} - Warn");
                     }
 
                     return returnCode;
@@ -89,10 +106,13 @@ namespace Oetools.Sakoe.Command {
                     if (!IsVerbose) {
                         Log.Info(UseVerboseMessage);
                     }
+                    if (e is CommandException ce) {
+                        exitCode = ce.ExitCode;
+                    }
                 }
 
-                Log.Fatal("ERROR");
-                return 9;
+                Log.Fatal($"Exit code {exitCode} - in {stopwatch.Elapsed.ConvertToHumanTime()} - Error");
+                return exitCode;
             }
         }
 
@@ -103,26 +123,53 @@ namespace Oetools.Sakoe.Command {
         /// <param name="console"></param>
         /// <returns></returns>
         protected virtual int ExecuteCommand(CommandLineApplication app, IConsole console) {
+            if (!IsLogoOn && app.Parent == null) {
+                HelpTextGenerator.DrawLogo(console.Out);
+            }
             app.ShowHelp();
             Log.Warn("You must provide a command");
             return 1;
         }
-        
+
+        /// <summary>
+        /// Resolve a string into an enumeration value, returning the possible values for said string
+        /// </summary>
+        /// <param name="stringValue"></param>
+        /// <param name="enumValue"></param>
+        /// <param name="validValuesList"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         protected bool TryGetEnumValue<T>(string stringValue, out long enumValue, out List<string> validValuesList) {
             bool found = false;
             var outValidValuesList = new List<string>();
-            long outEnumvalue = 0;
+            long outEnumValue = 0;
             typeof(T).ForEach<T>((name, val) => {
                 if (name.Equals(stringValue)) {
-                    outEnumvalue = val;
+                    outEnumValue = val;
                     found = true;
                 }
                 outValidValuesList.Add(name);
             });
-            enumValue = outEnumvalue;
+            enumValue = outEnumValue;
             validValuesList = outValidValuesList;
             return found;
         }
         
+        /// <summary>
+        /// On CTRL+C
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected virtual void ConsoleOnCancelKeyPress(object sender, ConsoleCancelEventArgs e) {
+            _numberOfCancelKeyPress++;
+            Log.Warn($"CTRL+C pressed (press {4 - _numberOfCancelKeyPress} times more for emergency exit)");
+            Log.Warn("Cancelling execution, please be patient...");
+            _cancelSource.Cancel();
+
+            if (_numberOfCancelKeyPress < 4) {
+                e.Cancel = true;
+            }
+        }
     }
+    
 }

@@ -55,7 +55,6 @@ namespace Oetools.Sakoe.Command.Oe {
         
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             Log.Warn("Build");
-            app.ShowHint();
             return 1;
         }
 

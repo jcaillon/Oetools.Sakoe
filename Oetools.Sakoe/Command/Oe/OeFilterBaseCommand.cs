@@ -1,7 +1,7 @@
 ﻿#region header
 // ========================================================================
 // Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
-// This file (CommandException.cs) is part of Oetools.Sakoe.
+// This file (OeBaseCommand.cs) is part of Oetools.Sakoe.
 // 
 // Oetools.Sakoe is a free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,22 +19,28 @@
 #endregion
 
 using System;
+using System.IO;
+using System.Linq;
+using McMaster.Extensions.CommandLineUtils;
+using Oetools.Builder.Utilities;
+using Oetools.Sakoe.Command.Exceptions;
+using Oetools.Utilities.Openedge;
 
-namespace Oetools.Sakoe.Command.Exceptions {
-    public class CommandException : Exception {
+namespace Oetools.Sakoe.Command.Oe {
+    
+    public abstract class OeFilterBaseCommand : OeBaseCommand {
         
-        public int ExitCode { get; set; }
+        [Option("-if|--include-filter", "", CommandOptionType.SingleValue)]
+        protected string IncludeFilter { get; set; }
         
-        public CommandException(string message) : base(message) { }
-
-        public CommandException(string message, int exitCode) : base(message) {
-            ExitCode = exitCode;
-        }
+        [Option("-ef|--exclude-filter", "", CommandOptionType.SingleValue)]
+        protected string ExcludeFilter { get; set; }
         
-        public CommandException(string message, Exception innerException) : base(message, innerException) { }
-
-        public CommandException(string message, Exception innerException, int exitCode) : base(message, innerException) {
-            ExitCode = exitCode;
-        }
+        [Option("-irf|--include-regex-filter", "", CommandOptionType.SingleValue)]
+        protected string IncludeRegexFilter { get; set; }
+        
+        [Option("-erf|--exclude-regex-filter", "", CommandOptionType.SingleValue)]
+        protected string ExcludeRegexFilter { get; set; }
+        
     }
 }

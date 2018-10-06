@@ -24,14 +24,10 @@ using McMaster.Extensions.CommandLineUtils;
 using McMaster.Extensions.CommandLineUtils.HelpText;
 
 namespace Oetools.Sakoe.Utilities {
+    
     public class HelpTextGenerator : DefaultHelpTextGenerator {
-
-        public bool ShowLogo { get; set; } = true;
         
         protected override void GenerateHeader(CommandLineApplication application, TextWriter output) {
-            if (ShowLogo) {
-                DrawLogo(output);
-            }
             if (!string.IsNullOrEmpty(application.Description)) {
                 output.WriteLine(application.Description);
                 output.WriteLine();
@@ -46,7 +42,7 @@ namespace Oetools.Sakoe.Utilities {
         }
 
         public static void DrawLogo(TextWriter output) {
-            output.WriteLine($"SAKOE - a Swiss Army Knife for OpenEdge v{typeof(HelpTextGenerator).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}");
+            output.WriteLine($"SAKOE - a Swiss Army Knife for OpenEdge - v{typeof(HelpTextGenerator).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}");
             output.WriteLine();
             output.WriteLine(@"                '`.    ");
             output.WriteLine(@" '`.    .^      \  \   ");
@@ -58,4 +54,5 @@ namespace Oetools.Sakoe.Utilities {
             output.WriteLine();
         }
     }
+    
 }

@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Command.Exceptions;
+using Oetools.Sakoe.Utilities;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge;
@@ -194,11 +195,11 @@ namespace Oetools.Sakoe.Command.Oe {
     [Command(
         "create", "cr",
         Description = "TODO : database creation",
-        ExtendedHelpText = "TODO : database creation",
+        ExtendedHelpText = "TODO : extended database creation",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
     internal class CreateDatabaseCommand : OeBaseCommand {
-        
+                
         [Required]
         [LegalFilePath]
         [Argument(0, Name = "Target database path", Description = "Path to the database to create (.db extension is optional)")]

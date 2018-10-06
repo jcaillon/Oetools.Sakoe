@@ -129,31 +129,37 @@ namespace Oetools.Sakoe.Utilities {
 
             switch (level) {
                 case LogLvl.Debug:
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    _console.ForegroundColor = ConsoleColor.DarkGray;
                     break;
                 case LogLvl.Info:
-                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    _console.ForegroundColor = ConsoleColor.Cyan;
                     break;
                 case LogLvl.Done:
-                    Console.ForegroundColor = ConsoleColor.Green;
+                    _console.ForegroundColor = ConsoleColor.Green;
                     break;
                 case LogLvl.Warn:
-                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    _console.ForegroundColor = ConsoleColor.Yellow;
                     break;
                 case LogLvl.Error:
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    _console.ForegroundColor = ConsoleColor.DarkRed;
                     break;
                 case LogLvl.Fatal:
-                    Console.ForegroundColor = ConsoleColor.Red;
+                    _console.ForegroundColor = ConsoleColor.Red;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(level), level, null);
             }
 
-            _console.WriteLine($"{level.ToString().ToUpper().PadRight(5, ' ')} [{DateTime.Now:dd.MM.yy HH:mm:ss}] {message}");
+            var outputMessage = $"{level.ToString().ToUpper().PadRight(5, ' ')} [{DateTime.Now:yy-MM-dd HH:mm:ss}] {message}";
+            if (level >= LogLvl.Error) {
+                _console.Error.WriteLine(outputMessage);
+            } else {
+                _console.Out.WriteLine(outputMessage);
+            }
+
             if (e != null) {
-                Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.WriteLine(e.ToString());
+                _console.ForegroundColor = ConsoleColor.DarkGray;
+                _console.Error.WriteLine(e.ToString());
             }
             //_console.ResetColor();
         }
