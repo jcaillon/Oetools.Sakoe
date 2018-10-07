@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Command.Oe;
+using Oetools.Sakoe.Utilities;
 
 namespace Oetools.Sakoe.Command {
     
@@ -29,9 +30,19 @@ namespace Oetools.Sakoe.Command {
         private static string GetVersion() => $"v{typeof(MainCommand).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}";
 
         public static int ExecuteMainCommand(string[] args) {
-            using (var app = new CommandLineApplication<MainCommand>(HelpTextGenerator, PhysicalConsole.Singleton, Directory.GetCurrentDirectory(), true)) {
-                app.Conventions.UseDefaultConventions();
-                return app.Execute(args);
+            var console = PhysicalConsole.Singleton;
+            try {
+                using (var app = new CommandLineApplicationCustomHint<MainCommand>(HelpTextGenerator, console, Directory.GetCurrentDirectory(), true)) {
+                    app.Conventions.UseDefaultConventions();
+                    app.ParserSettings.MakeSuggestionsInErrorMessage = true;
+                    return app.Execute(args);
+                } 
+            } catch (CommandParsingException ex) {
+                using (var log = new ConsoleLogger(console, ConsoleLogger.LogLvl.Info, true)) {
+                    log.Error(ex.Message);
+                    log.Fatal($"Exit code {FatalExitCode} - Error");
+                    return FatalExitCode;
+                }
             }
         }
     }

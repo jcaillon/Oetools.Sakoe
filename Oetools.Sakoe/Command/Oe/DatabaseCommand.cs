@@ -199,7 +199,7 @@ namespace Oetools.Sakoe.Command.Oe {
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
     internal class CreateDatabaseCommand : OeBaseCommand {
-                
+        
         [Required]
         [LegalFilePath]
         [Argument(0, Name = "Target database path", Description = "Path to the database to create (.db extension is optional)")]

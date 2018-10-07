@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Concurrent;
+using System.Threading;
 
-namespace Oetools.Sakoe.ShellProgressBar
+namespace ShellProgressBar
 {
 	public class ChildProgressBar : ProgressBarBase, IProgressBar
 	{

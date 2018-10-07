@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder.Project.Task;
@@ -27,15 +28,24 @@ namespace Oetools.Sakoe.Command.Oe {
     )]
     internal class EncryptXcodeCommand : OeFilterBaseCommand {
         
+        [DirectoryExists]
+        [Option("-d|--directory", "", CommandOptionType.MultipleValue)]
+        public string[] Directories { get; set; }
+        
+        [FileExists]
+        [Option("-f|--file", "", CommandOptionType.MultipleValue)]
+        public string[] Files { get; set; }
+        
+        [CheckEncryptionKey]
         [Option("-k|--key", "", CommandOptionType.SingleValue)]
-        protected string EncryptionKey { get; set; }
+        public string EncryptionKey { get; set; }
         
         [Option("-pre|--prefix", "", CommandOptionType.SingleValue)]
-        protected string OutputFilePrefix { get; set; }
+        public string OutputFilePrefix { get; set; }
         
-        [DirectoryExists]
+        [LegalFilePath]
         [Option("-od|--output-directory", "", CommandOptionType.SingleValue)]
-        protected string OutputDirectory { get; set; }
+        public string OutputDirectory { get; set; }
         
         public string[] RemainingArgs { get; set; }
         
@@ -81,6 +91,7 @@ namespace Oetools.Sakoe.Command.Oe {
     )]
     internal class DecryptXcodeCommand : OeBaseCommand {
 
+        [CheckEncryptionKey]
         [Option("-k|--key", "", CommandOptionType.SingleValue)]
         protected string EncryptionKey { get; set; }
 
@@ -96,6 +107,17 @@ namespace Oetools.Sakoe.Command.Oe {
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
 
             return 0;
+        }
+    }
+
+    class CheckEncryptionKeyAttribute : ValidationAttribute {
+        protected override ValidationResult IsValid(object value, ValidationContext context) {
+            if (value != null && value is string str) {
+                if (str.Length > 8) {
+                    return new ValidationResult($"{context.DisplayName} is longer than 8");
+                }
+            }
+            return ValidationResult.Success;
         }
     }
 }

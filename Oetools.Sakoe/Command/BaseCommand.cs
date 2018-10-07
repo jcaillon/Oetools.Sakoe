@@ -38,6 +38,8 @@ namespace Oetools.Sakoe.Command {
     /// Defines options that will be inherited by all the commands
     /// </summary>
     public abstract class BaseCommand {
+
+        protected const int FatalExitCode = 9;
         
         private const string VerboseTemplate = "-vb|--verbose";
         
@@ -57,8 +59,6 @@ namespace Oetools.Sakoe.Command {
         // ReSharper disable once UnassignedGetOnlyAutoProperty
         // ReSharper disable once MemberCanBePrivate.Global
         public bool IsLogoOn { get; }
-
-        protected IConsole Console { get; set; }
         
         protected ILogger Log { get; private set; }
         
@@ -71,22 +71,20 @@ namespace Oetools.Sakoe.Command {
         protected CancellationTokenSource _cancelSource;
         
         public static readonly HelpTextGenerator HelpTextGenerator = new HelpTextGenerator();
-
+        
         // ReSharper disable once UnusedMember.Global
         protected int OnExecute(CommandLineApplication app, IConsole console) {
             using (var logger = new ConsoleLogger(console, IsVerbose ? ConsoleLogger.LogLvl.Debug : ConsoleLogger.LogLvl.Info, IsProgressBarOff)) {
-                
-                Console = console;
                 Log = logger;
                 
                 _cancelSource = new CancellationTokenSource();
-                Console.CancelKeyPress += ConsoleOnCancelKeyPress;
+                console.CancelKeyPress += ConsoleOnCancelKeyPress;
                 
                 if (IsLogoOn) {
                     HelpTextGenerator.DrawLogo(console.Out);
                 }
                 
-                int exitCode = 9;
+                int exitCode = FatalExitCode;
                 
                 var stopwatch = Stopwatch.StartNew();
                 
@@ -102,7 +100,7 @@ namespace Oetools.Sakoe.Command {
 
                     return returnCode;
                 } catch (Exception e) {
-                    Log.Error($"**{e.Message}", e);
+                    Log.Error($"{e.Message}", e);
                     if (!IsVerbose) {
                         Log.Info(UseVerboseMessage);
                     }
@@ -112,7 +110,16 @@ namespace Oetools.Sakoe.Command {
                 }
 
                 Log.Fatal($"Exit code {exitCode} - in {stopwatch.Elapsed.ConvertToHumanTime()} - Error");
+                
                 return exitCode;
+            }
+        }
+        
+        public int OnValidationError(ValidationResult r) {
+            using (var log = new ConsoleLogger(PhysicalConsole.Singleton, ConsoleLogger.LogLvl.Info, true)) {
+                log.Error(r.ErrorMessage);
+                log.Fatal($"Exit code {FatalExitCode} - Error");
+                return FatalExitCode;
             }
         }
 

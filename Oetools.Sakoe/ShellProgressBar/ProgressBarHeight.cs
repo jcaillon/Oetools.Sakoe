@@ -1,4 +1,4 @@
-namespace Oetools.Sakoe.ShellProgressBar
+namespace ShellProgressBar
 {
 	public enum ProgressBarHeight
 	{

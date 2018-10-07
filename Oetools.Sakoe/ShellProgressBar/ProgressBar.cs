@@ -1,28 +1,27 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
+using Oetools.Utilities.Lib;
 
-namespace Oetools.Sakoe.ShellProgressBar
+namespace ShellProgressBar
 {
 	public class ProgressBar : ProgressBarBase, IProgressBar
 	{
-		private static readonly object Lock = new object();
-#if WINDOWSONLYBUILD
-		private static readonly bool IsWindows = true;
-#else
-		private static readonly bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-#endif
-		
+		private static readonly bool IsWindows = Utils.IsRuntimeWindowsPlatform;
+
 		private readonly ConsoleColor _originalColor;
 		private readonly int _originalCursorTop;
 		private readonly int _originalWindowTop;
-		private bool _isDisposed;
+		private int _isDisposed;
 
 		private Timer _timer;
-
-		private int _visisbleDescendants = 0;
+		private int _visibleDescendants = 0;
+		private readonly AutoResetEvent _displayProgressEvent;
+		private readonly Task _displayProgress;
 
 		public ProgressBar(int maxTicks, string message, ConsoleColor color)
 			: this(maxTicks, message, new ProgressBarOptions {ForegroundColor = color})
@@ -42,13 +41,36 @@ namespace Oetools.Sakoe.ShellProgressBar
 				TaskbarProgress.SetState(TaskbarProgress.TaskbarStates.Normal);
 
 			if (this.Options.DisplayTimeInRealTime)
-				_timer = new Timer((s) => DisplayProgress(), null, 500, 500);
+				_timer = new Timer((s) => OnTimerTick(), null, 500, 500);
 			else //draw once
 				_timer = new Timer((s) =>
 				{
 					_timer.Dispose();
 					DisplayProgress();
 				}, null, 0, 1000);
+
+			_displayProgressEvent = new AutoResetEvent(false);
+			_displayProgress = Task.Run(() =>
+			{
+				while (_isDisposed == 0)
+				{
+					if (!_displayProgressEvent.WaitOne(TimeSpan.FromSeconds(10)))
+						continue;
+					try
+					{
+						UpdateProgress();
+					}
+					catch
+					{
+						// don't want to crash background thread
+					}
+				}
+			});
+		}
+
+		protected virtual void OnTimerTick()
+		{
+			DisplayProgress();
 		}
 
 		protected override void Grow(ProgressBarHeight direction)
@@ -56,10 +78,10 @@ namespace Oetools.Sakoe.ShellProgressBar
 			switch (direction)
 			{
 				case ProgressBarHeight.Increment:
-					Interlocked.Increment(ref _visisbleDescendants);
+					Interlocked.Increment(ref _visibleDescendants);
 					break;
 				case ProgressBarHeight.Decrement:
-					Interlocked.Decrement(ref _visisbleDescendants);
+					Interlocked.Decrement(ref _visibleDescendants);
 					break;
 			}
 		}
@@ -113,6 +135,7 @@ namespace Oetools.Sakoe.ShellProgressBar
 				else
 					Console.Write(i == (depth - 1) ? ind.Glyph : "  ");
 			}
+
 			Console.ForegroundColor = indentation[depth - 1].ConsoleColor;
 		}
 
@@ -140,6 +163,7 @@ namespace Oetools.Sakoe.ShellProgressBar
 				Console.Write(new string(progressBackgroundCharacter ?? progressCharacter, width - newWidth));
 			}
 			else Console.Write(new string(' ', width - newWidth));
+
 			Console.ForegroundColor = indentation[depth - 1].ConsoleColor;
 		}
 
@@ -154,90 +178,85 @@ namespace Oetools.Sakoe.ShellProgressBar
 				else
 					Console.Write("│ ");
 			}
+
 			Console.ForegroundColor = indentation[depth - 1].ConsoleColor;
 		}
 
-		private static string ResetString() => new string(' ', Console.WindowWidth);
-
 		protected override void DisplayProgress()
 		{
-			if (_isDisposed) return;
+			_displayProgressEvent.Set();
+		}
 
+		private void UpdateProgress()
+		{
 			Console.CursorVisible = false;
 			var indentation = new[] {new Indentation(this.ForeGroundColor, true)};
 			var mainPercentage = this.Percentage;
+			var cursorTop = _originalCursorTop;
 
-			lock (Lock)
+			Console.ForegroundColor = this.ForeGroundColor;
+
+			void TopHalf()
 			{
-				Console.ForegroundColor = this.ForeGroundColor;
-
-				void TopHalf()
-				{
-					ProgressBarTopHalf(mainPercentage,
-						this.Options.ProgressCharacter,
-						this.Options.BackgroundCharacter,
-						this.Options.BackgroundColor,
-						indentation,
-						this.Options.ProgressBarOnBottom
-					);
-				}
-
-				if (this.Options.ProgressBarOnBottom)
-				{
-					Console.CursorLeft = 0;
-					ProgressBarBottomHalf(mainPercentage, this._startDate, null, this.Message, indentation, this.Options.ProgressBarOnBottom);
-
-					if (!IsWindows) Console.CursorTop = Console.CursorTop + 1;
-
-					Console.CursorLeft = 0;
-					TopHalf();
-				}
-				else
-				{
-					Console.CursorLeft = 0;
-					TopHalf();
-					if (!IsWindows) Console.CursorTop = Console.CursorTop + 1;
-
-					Console.CursorLeft = 0;
-					ProgressBarBottomHalf(mainPercentage, this._startDate, null, this.Message, indentation, this.Options.ProgressBarOnBottom);
-				}
-
-				if (this.Options.EnableTaskBarProgress)
-					TaskbarProgress.SetValue(mainPercentage, 100);
-
-				DrawChildren(this.Children, indentation);
-
-				ResetToBottom();
-
-				Console.CursorLeft = 0;
-				Console.CursorTop = _originalCursorTop;
-				Console.ForegroundColor = _originalColor;
-
-				if (!(mainPercentage >= 100)) return;
-				_timer?.Dispose();
-				_timer = null;
+				ProgressBarTopHalf(mainPercentage,
+					this.Options.ProgressCharacter,
+					this.Options.BackgroundCharacter,
+					this.Options.BackgroundColor,
+					indentation,
+					this.Options.ProgressBarOnBottom
+				);
 			}
+
+			if (this.Options.ProgressBarOnBottom)
+			{
+				ProgressBarBottomHalf(mainPercentage, this._startDate, null, this.Message, indentation, this.Options.ProgressBarOnBottom);
+				Console.SetCursorPosition(0, ++cursorTop);
+				TopHalf();
+			}
+			else
+			{
+				TopHalf();
+				Console.SetCursorPosition(0, ++cursorTop);
+				ProgressBarBottomHalf(mainPercentage, this._startDate, null, this.Message, indentation, this.Options.ProgressBarOnBottom);
+			}
+
+			if (this.Options.EnableTaskBarProgress)
+				TaskbarProgress.SetValue(mainPercentage, 100);
+
+			DrawChildren(this.Children, indentation, ref cursorTop);
+
+			ResetToBottom(ref cursorTop);
+
+			Console.SetCursorPosition(0, _originalCursorTop);
+			Console.ForegroundColor = _originalColor;
+
+			if (!(mainPercentage >= 100)) return;
+			_timer?.Dispose();
+			_timer = null;
 		}
 
-		private static void ResetToBottom()
+		private static void ResetToBottom(ref int cursorTop)
 		{
-			if (Console.CursorTop >= (Console.WindowHeight - 1)) return;
+			var resetString = new string(' ', Console.WindowWidth);
+			var windowHeight = Console.WindowHeight;
+			if (cursorTop >= (windowHeight - 1)) return;
 			do
 			{
-				Console.Write(ResetString());
-			} while (Console.CursorTop < (Console.WindowHeight - 1));
+				Console.Write(resetString);
+			} while (++cursorTop < (windowHeight - 1));
 		}
 
-		private static void DrawChildren(IEnumerable<ChildProgressBar> children, Indentation[] indentation)
+		private static void DrawChildren(IEnumerable<ChildProgressBar> children, Indentation[] indentation, ref int cursorTop)
 		{
 			var view = children.Where(c => !c.Collapse).Select((c, i) => new {c, i}).ToList();
 			if (!view.Any()) return;
 
+			var windowHeight = Console.WindowHeight;
 			var lastChild = view.Max(t => t.i);
 			foreach (var tuple in view)
 			{
 				//Dont bother drawing children that would fall off the screen
-				if (Console.CursorTop >= (Console.WindowHeight - 2))
+				if (cursorTop >= (windowHeight - 2))
 					return;
 
 				var child = tuple.c;
@@ -257,27 +276,23 @@ namespace Oetools.Sakoe.ShellProgressBar
 						child.Options.ProgressBarOnBottom
 					);
 				}
-				if (!IsWindows) Console.CursorTop = Console.CursorTop + 1;
+
+				Console.SetCursorPosition(0, ++cursorTop);
+
 				if (child.Options.ProgressBarOnBottom)
 				{
-					Console.CursorLeft = 0;
 					ProgressBarBottomHalf(percentage, child.StartDate, child.EndTime, child.Message, childIndentation, child.Options.ProgressBarOnBottom);
-					if (!IsWindows) Console.CursorTop = Console.CursorTop + 1;
-
-					Console.CursorLeft = 0;
+					Console.SetCursorPosition(0, ++cursorTop);
 					TopHalf();
 				}
 				else
 				{
-					Console.CursorLeft = 0;
 					TopHalf();
-					if (!IsWindows) Console.CursorTop = Console.CursorTop + 1;
-
-					Console.CursorLeft = 0;
+					Console.SetCursorPosition(0, ++cursorTop);
 					ProgressBarBottomHalf(percentage, child.StartDate, child.EndTime, child.Message, childIndentation, child.Options.ProgressBarOnBottom);
 				}
 
-				DrawChildren(child.Children, childIndentation);
+				DrawChildren(child.Children, childIndentation, ref cursorTop);
 			}
 		}
 
@@ -291,8 +306,21 @@ namespace Oetools.Sakoe.ShellProgressBar
 
 		public void Dispose()
 		{
+			if (Interlocked.CompareExchange(ref _isDisposed, 1, 0) != 0)
+				return;
+
+			// make sure background task is stopped before we clean up
+			_displayProgressEvent.Set();
+			_displayProgress.Wait();
+
+			// update one last time - needed because background task might have
+			// been already in progress before Dispose was called and it might
+			// have been running for a very long time due to poor performance
+			// of System.Console
+			UpdateProgress();
+
 			if (this.EndTime == null) this.EndTime = DateTime.Now;
-			var openDescendantsPadding = (_visisbleDescendants * 2);
+			var openDescendantsPadding = (_visibleDescendants * 2);
 
 			if (this.Options.EnableTaskBarProgress)
 				TaskbarProgress.SetState(TaskbarProgress.TaskbarStates.NoProgress);
@@ -309,14 +337,12 @@ namespace Oetools.Sakoe.ShellProgressBar
 				else moveDown = _originalCursorTop + 2;
 
 				Console.CursorVisible = true;
-				Console.CursorLeft = 0;
-				Console.CursorTop = (openDescendantsPadding + moveDown);
+				Console.SetCursorPosition(0, openDescendantsPadding + moveDown);
 			}
 			// This is bad and I should feel bad, but i rather eat pbar exceptions in productions then causing false negatives
 			catch
 			{
 			}
-			_isDisposed = true;
 			_timer?.Dispose();
 			_timer = null;
 			foreach (var c in this.Children) c.Dispose();

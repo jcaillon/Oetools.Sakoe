@@ -1,12 +1,15 @@
 using System;
+using System.Runtime.InteropServices;
+using Oetools.Utilities.Lib;
 
-namespace Oetools.Sakoe.ShellProgressBar
+namespace ShellProgressBar
 {
 	/// <summary>
 	/// Control the behaviour of your progressbar
 	/// </summary>
 	public class ProgressBarOptions
 	{
+		private bool _enableTaskBarProgress;
 		public static readonly ProgressBarOptions Default = new ProgressBarOptions();
 
 		/// <summary> The foreground color of the progress bar, message and time</summary>
@@ -28,7 +31,7 @@ namespace Oetools.Sakoe.ShellProgressBar
 
 		/// <summary>
 		/// When true will redraw the progressbar using a timer, otherwise only update when
-		/// <see cref="ProgressBarBase.Tick(string)"/> is called.
+		/// <see cref="ProgressBarBase.Tick"/> is called.
 		/// Defaults to true
 		///  </summary>
 		public bool DisplayTimeInRealTime { get; set; } = true;
@@ -51,6 +54,16 @@ namespace Oetools.Sakoe.ShellProgressBar
 		/// <remarks>
 		/// This feature is available on the Windows platform.
 		/// </remarks>
-		public bool EnableTaskBarProgress { get; set; }
+		public bool EnableTaskBarProgress
+		{
+			get => _enableTaskBarProgress;
+			set
+			{
+				if (value && !Utils.IsRuntimeWindowsPlatform)
+					throw new NotSupportedException("Task bar progress only works on Windows");
+
+				_enableTaskBarProgress = value;
+			}
+		}
 	}
 }

@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using Oetools.Utilities.Lib;
 
-namespace Oetools.Sakoe.ShellProgressBar
+namespace ShellProgressBar
 {
 	public static class TaskbarProgress
 	{
@@ -57,13 +58,8 @@ namespace Oetools.Sakoe.ShellProgressBar
 		static extern IntPtr GetConsoleWindow();
 
 		private static readonly ITaskbarList3 _taskbarInstance = (ITaskbarList3) new TaskbarInstance();
-		
-#if WINDOWSONLYBUILD
-		private static readonly bool _taskbarSupported = true;
-#else
-		private static readonly bool _taskbarSupported = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-#endif
-		
+		private static readonly bool _taskbarSupported = Utils.IsRuntimeWindowsPlatform;
+
 		public static void SetState(TaskbarStates taskbarState)
 		{
 			if (_taskbarSupported)

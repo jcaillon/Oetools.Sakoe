@@ -1,6 +1,6 @@
 using System;
 
-namespace Oetools.Sakoe.ShellProgressBar
+namespace ShellProgressBar
 {
 	public interface IProgressBar : IDisposable
 	{

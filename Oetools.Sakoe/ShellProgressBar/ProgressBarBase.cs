@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Concurrent;
+using System.Text;
 using System.Threading;
 
-namespace Oetools.Sakoe.ShellProgressBar
+namespace ShellProgressBar
 {
 	public abstract class ProgressBarBase
 	{
+
 		protected readonly DateTime _startDate = DateTime.Now;
 		private int _maxTicks;
 		private int _currentTick;

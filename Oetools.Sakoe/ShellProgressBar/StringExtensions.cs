@@ -1,4 +1,8 @@
-﻿namespace Oetools.Sakoe.ShellProgressBar
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace ShellProgressBar
 {
     internal static class StringExtensions
     {

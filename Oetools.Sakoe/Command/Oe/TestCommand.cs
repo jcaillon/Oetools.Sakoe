@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Threading;
 using McMaster.Extensions.CommandLineUtils;
-using Oetools.Sakoe.ShellProgressBar;
+using Oetools.Utilities.Openedge.Database;
+using ShellProgressBar;
 
 namespace Oetools.Sakoe.Command.Oe {
     
@@ -20,6 +21,9 @@ namespace Oetools.Sakoe.Command.Oe {
         [Option("--git-dir")]
         [DirectoryExists]
         public string GitDir { get; set; }
+        
+        [Option("-b|--block")]
+        public (bool HasValue, DatabaseBlockSize value) Block { get; set; }
 
         // You can use this pattern when the parent command may have options or methods you want to
         // use from sub-commands.
@@ -28,6 +32,10 @@ namespace Oetools.Sakoe.Command.Oe {
 
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
+            
+            Log.Info(Block.HasValue.ToString());
+            Log.Info(Block.value.ToString());
+            
             
             Log.Info("info");
             Log.Info($"info : {console.IsOutputRedirected}");
