@@ -30,6 +30,7 @@ using McMaster.Extensions.CommandLineUtils.HelpText;
 using Oetools.Builder.Utilities;
 using Oetools.Sakoe.Command.Exceptions;
 using Oetools.Sakoe.Utilities;
+using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
 
 namespace Oetools.Sakoe.Command {
@@ -41,14 +42,14 @@ namespace Oetools.Sakoe.Command {
 
         protected const int FatalExitCode = 9;
         
-        private const string VerboseTemplate = "-vb|--verbose";
+        private const string VerbosityTemplate = "-vb|--verbosity";
         
-        private string UseVerboseMessage => $"Get more details on this error by adding the verbose option : {VerboseTemplate}";
-        
-        [Option(VerboseTemplate, "Execute the command using a verbose log/error output", CommandOptionType.NoValue)]
+        private string UseVerboseMessage => $"Get more details on this error by activating the debug verbosity : {VerbosityTemplate} debug";
+
+        [Option(VerbosityTemplate, "Sets the verbosity of this command line tool", CommandOptionType.SingleValue)]
         // ReSharper disable once UnassignedGetOnlyAutoProperty
         // ReSharper disable once MemberCanBePrivate.Global
-        public bool IsVerbose { get; }
+        public ConsoleLogger.LogLvl Verbosity { get; } = ConsoleLogger.LogLvl.Info;
         
         [Option("-nop|--no-progress", "Never display progress bars", CommandOptionType.NoValue)]
         // ReSharper disable once UnassignedGetOnlyAutoProperty
@@ -62,6 +63,8 @@ namespace Oetools.Sakoe.Command {
         
         protected ILogger Log { get; private set; }
         
+        private IConsole Console { get; set; }
+        
         protected virtual void ExecutePreCommand(CommandLineApplication app, IConsole console) { }
 
         protected virtual void ExecutePostCommand(CommandLineApplication app, IConsole console) { }
@@ -74,7 +77,9 @@ namespace Oetools.Sakoe.Command {
         
         // ReSharper disable once UnusedMember.Global
         protected int OnExecute(CommandLineApplication app, IConsole console) {
-            using (var logger = new ConsoleLogger(console, IsVerbose ? ConsoleLogger.LogLvl.Debug : ConsoleLogger.LogLvl.Info, IsProgressBarOff)) {
+            Console = console;
+            
+            using (var logger = new ConsoleLogger(console, Verbosity, IsProgressBarOff)) {
                 Log = logger;
                 
                 _cancelSource = new CancellationTokenSource();
@@ -93,7 +98,7 @@ namespace Oetools.Sakoe.Command {
                     var returnCode = ExecuteCommand(app, console);
                     ExecutePostCommand(app, console);
                     if (returnCode.Equals(0)) {
-                        Log.Success($"Exit code 0 - in {stopwatch.Elapsed.ConvertToHumanTime()} - Ok");
+                        Log.Done($"Exit code 0 - in {stopwatch.Elapsed.ConvertToHumanTime()} - Ok");
                     } else {
                         Log.Warn($"Exit code {returnCode} - in {stopwatch.Elapsed.ConvertToHumanTime()} - Warn");
                     }
@@ -101,7 +106,7 @@ namespace Oetools.Sakoe.Command {
                     return returnCode;
                 } catch (Exception e) {
                     Log.Error($"{e.Message}", e);
-                    if (!IsVerbose) {
+                    if (Verbosity > ConsoleLogger.LogLvl.Debug) {
                         Log.Info(UseVerboseMessage);
                     }
                     if (e is CommandException ce) {
@@ -115,6 +120,7 @@ namespace Oetools.Sakoe.Command {
             }
         }
         
+        // ReSharper disable once UnusedMember.Global
         public int OnValidationError(ValidationResult r) {
             using (var log = new ConsoleLogger(PhysicalConsole.Singleton, ConsoleLogger.LogLvl.Info, true)) {
                 log.Error(r.ErrorMessage);
@@ -136,6 +142,16 @@ namespace Oetools.Sakoe.Command {
             app.ShowHelp();
             Log.Warn("You must provide a command");
             return 1;
+        }
+
+        protected void WriteOutput(string output) {
+            Console.ResetColor();
+            Console.Out.Write(output);
+        }
+
+        protected void WriteLineOutput(string output) {
+            Console.ResetColor();
+            Console.Out.WriteLine(output);
         }
 
         /// <summary>

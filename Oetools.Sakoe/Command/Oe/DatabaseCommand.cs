@@ -185,8 +185,8 @@ namespace Oetools.Sakoe.Command.Oe {
             var options = dbOperator.ProServe(TargetDatabasePath, ServiceName, NbUsers.value > 0 ? (int?) NbUsers.value : null, RemainingArgs == null ? null : string.Join(" ", RemainingArgs));
             Log.Info($"Proserve with options : {options.PrettyQuote()}");
             
-            Log.Success($"Database started successfully, connection string :");
-            Log.Success($"{UoeDatabaseOperator.GetMultiUserConnectionString(TargetDatabasePath, ServiceName)}");
+            Log.Done($"Database started successfully, connection string :");
+            Log.Done($"{UoeDatabaseOperator.GetMultiUserConnectionString(TargetDatabasePath, ServiceName)}");
             
             return 0;
         }
@@ -291,7 +291,7 @@ namespace Oetools.Sakoe.Command.Oe {
                     Log.Warn("The database physical structure (described in .st) has been generated automatically, this database should not be used in production");
                 }
 
-                Log.Success($"Database created successfully : {TargetDatabasePath.PrettyQuote()}");
+                Log.Done($"Database created successfully : {TargetDatabasePath.PrettyQuote()}");
 
             }
 

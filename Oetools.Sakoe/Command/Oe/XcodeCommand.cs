@@ -1,19 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.IO;
+using System.Linq;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder.Project.Task;
-using Oetools.Builder.Utilities;
-using Oetools.Utilities.Lib;
+using Oetools.Utilities.Openedge;
 
 namespace Oetools.Sakoe.Command.Oe {
     
     [Command(
         "xcode", "xc",
         Description = "Encrypt and decrypt files using the algorithm of the XCODE utility",
-        ExtendedHelpText = "The original idea of the XCODE utility is to obfuscate your openedge code before making it available.\nThis is an encryption feature which uses a ASCII key/password of a maximum of 8 characters.\nThe original XCODE utility uses the default key \"Progress\" if no custom key is supplied (so does this command).\nThe encryption process does not use a standard cryptography method, it uses a 16-bits CRC inside a custom algo.",
+        ExtendedHelpText = @"The original idea of the XCODE utility is to obfuscate your openedge code before making it available.
+This is an encryption feature which uses a ASCII key/password of a maximum of 8 characters.
+The original XCODE utility uses the default key ""Progress"" if no custom key is supplied (so does this command).
+The encryption process does not use a standard cryptography method, it uses a 16-bits CRC inside a custom algo.",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
+    [Subcommand(typeof(ListXcodeCommand))]
     [Subcommand(typeof(EncryptXcodeCommand))]
     [Subcommand(typeof(DecryptXcodeCommand))]
     internal class XcodeCommand : OeBaseCommand {
@@ -26,28 +30,19 @@ namespace Oetools.Sakoe.Command.Oe {
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         AllowArgumentSeparator = true
     )]
-    internal class EncryptXcodeCommand : OeFilterBaseCommand {
+    internal class EncryptXcodeCommand : OeFileListBaseCommand {
         
-        [DirectoryExists]
-        [Option("-d|--directory", "", CommandOptionType.MultipleValue)]
-        public string[] Directories { get; set; }
-        
-        [FileExists]
-        [Option("-f|--file", "", CommandOptionType.MultipleValue)]
-        public string[] Files { get; set; }
-        
-        [CheckEncryptionKey]
         [Option("-k|--key", "", CommandOptionType.SingleValue)]
-        public string EncryptionKey { get; set; }
+        public string EncryptionKey { get; }
         
         [Option("-pre|--prefix", "", CommandOptionType.SingleValue)]
-        public string OutputFilePrefix { get; set; }
+        public string OutputFilePrefix { get; }
         
         [LegalFilePath]
         [Option("-od|--output-directory", "", CommandOptionType.SingleValue)]
-        public string OutputDirectory { get; set; }
+        public string OutputDirectory { get; }
         
-        public string[] RemainingArgs { get; set; }
+        public string[] RemainingArgs { get; }
         
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
 
@@ -91,18 +86,17 @@ namespace Oetools.Sakoe.Command.Oe {
     )]
     internal class DecryptXcodeCommand : OeBaseCommand {
 
-        [CheckEncryptionKey]
         [Option("-k|--key", "", CommandOptionType.SingleValue)]
-        protected string EncryptionKey { get; set; }
+        public string EncryptionKey { get; }
 
         [Option("-pre|--prefix", "", CommandOptionType.SingleValue)]
-        protected string OutputFilePrefix { get; set; }
+        public string OutputFilePrefix { get; }
 
         [DirectoryExists]
-        [Option("-d|--output-directory", "", CommandOptionType.SingleValue)]
-        protected string OutputDirectory { get; set; }
+        [Option("-od|--output-directory", "", CommandOptionType.SingleValue)]
+        public string OutputDirectory { get; }
 
-        public string[] RemainingArgs { get; set; }
+        public string[] RemainingArgs { get; }
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
 
@@ -110,14 +104,42 @@ namespace Oetools.Sakoe.Command.Oe {
         }
     }
 
-    class CheckEncryptionKeyAttribute : ValidationAttribute {
-        protected override ValidationResult IsValid(object value, ValidationContext context) {
-            if (value != null && value is string str) {
-                if (str.Length > 8) {
-                    return new ValidationResult($"{context.DisplayName} is longer than 8");
+    [Command(
+        "list", "li",
+        Description = "List encrypted (or decrypted) files", 
+        ExtendedHelpText = "TODO", 
+        OptionsComparison = StringComparison.CurrentCultureIgnoreCase, 
+        AllowArgumentSeparator = true
+    )]
+    internal class ListXcodeCommand : OeFileListBaseCommand {
+        
+        [DirectoryExists]
+        [Argument(0, "directory", "The directory to list. Defaults to the current directory.")]
+        public string Directory { get; }
+
+        [Option("-de|--decrypted", "List all decrypted files (or default to listing encrypted files).", CommandOptionType.NoValue)]
+        public bool ListDecrypted { get; } = false;
+
+        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
+
+            if (!string.IsNullOrEmpty(Directory)) {
+                Log.Debug($"Adding directory to list : {Directory}");
+                var directories = Directories?.ToList() ?? new List<string>();
+                directories.Add(Directory);
+                Directories = directories.ToArray();
+            }
+            
+            var xcode = new UoeEncryptor(null);
+            
+            foreach (var file in GetFilesList()) {
+                var isEncrypted = xcode.IsFileEncrypted(file);
+                if (isEncrypted && !ListDecrypted || !isEncrypted && ListDecrypted) {
+                    WriteLineOutput(file);
                 }
             }
-            return ValidationResult.Success;
+            
+            return 0;
         }
     }
+
 }

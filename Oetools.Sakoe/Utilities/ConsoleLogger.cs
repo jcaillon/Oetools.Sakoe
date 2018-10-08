@@ -75,7 +75,7 @@ namespace Oetools.Sakoe.Utilities {
             Log(LogLvl.Info, message, e);
         }
 
-        public void Success(string message, Exception e = null) {
+        public void Done(string message, Exception e = null) {
             Log(LogLvl.Done, message, e);
         }
 
@@ -170,7 +170,8 @@ namespace Oetools.Sakoe.Utilities {
             Done,
             Warn,
             Error,
-            Fatal
+            Fatal,
+            None
         }
 
         public void Dispose() {

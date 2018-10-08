@@ -19,11 +19,12 @@ namespace Oetools.Sakoe.Command {
     )]
     [VersionOptionFromMember("-version|--version", MemberName = nameof(GetVersion), Description = "Show version information")]
     [HelpOption("-?|-h|--help", Description = "Show help information", Inherited = true)]
-    [Subcommand(typeof(TestCommand))]
+    [Subcommand(typeof(SelfTestCommand))]
     [Subcommand(typeof(DatabaseCommand))]
     [Subcommand(typeof(LintCommand))]
     [Subcommand( typeof(ProjectCommand))]
     [Subcommand(typeof(BuildCommand))]
+    [Subcommand(typeof(HelpCommand))]
     [Subcommand(typeof(XcodeCommand))]
     internal class MainCommand : BaseCommand {
         
