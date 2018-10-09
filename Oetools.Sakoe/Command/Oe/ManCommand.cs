@@ -7,14 +7,14 @@ using Oetools.Utilities.Lib;
 namespace Oetools.Sakoe.Command.Oe {
 
     [Command(
-        Name, "he",
-        Description = "Help for the use of this tool",
+        Name, "man", "ma",
+        Description = "Read the (f*ing) manual for this tool",
         ExtendedHelpText = "TODO",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
     [Subcommand(typeof(FiltersHelpCommand))]
-    internal class HelpCommand : OeBaseCommand {
-        public const string Name = "help";
+    internal class ManCommand : OeBaseCommand {
+        public const string Name = "manual";
     }
     
     

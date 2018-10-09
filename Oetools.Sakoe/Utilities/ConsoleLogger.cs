@@ -141,10 +141,10 @@ namespace Oetools.Sakoe.Utilities {
                     _console.ForegroundColor = ConsoleColor.Yellow;
                     break;
                 case LogLvl.Error:
-                    _console.ForegroundColor = ConsoleColor.DarkRed;
+                    _console.ForegroundColor = ConsoleColor.Red;
                     break;
                 case LogLvl.Fatal:
-                    _console.ForegroundColor = ConsoleColor.Red;
+                    _console.ForegroundColor = ConsoleColor.Magenta;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(level), level, null);

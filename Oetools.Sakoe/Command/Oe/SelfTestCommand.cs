@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Threading;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Utilities.Openedge.Database;
@@ -9,7 +10,7 @@ namespace Oetools.Sakoe.Command.Oe {
     
     [Command(
         "selftest", "st",
-        Description = "A command to test the behaviour of this tool",
+        Description = "A command to test the behaviour of this tool.",
         ExtendedHelpText = "sakoe selftest",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
@@ -17,6 +18,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Subcommand(typeof(LogSelfTestCommand))]
     [Subcommand(typeof(InputSelfTestCommand))]
     [Subcommand(typeof(PromptSelfTestCommand))]
+    [Subcommand(typeof(ResponseFileSelfTestCommand))]
     internal class SelfTestCommand : OeBaseCommand {
         
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
@@ -144,6 +146,42 @@ sakoe st input -b2 s1024",
                 }
                 return ValidationResult.Success;
             }
+        }
+
+    }
+    
+    /// <summary>
+    /// Usage : sakoe selftest responsefile -c @file.txt
+    /// Will display the content of file.txt, line by line, where each line is an argument
+    /// </summary>
+    [Command(
+        "responsefile", "rf",
+        Description = "Subcommand that shows the usage of a response file",
+        ExtendedHelpText = "sakoe selftest responsefile",
+        OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
+        AllowArgumentSeparator = true
+    )]
+    internal class ResponseFileSelfTestCommand : OeBaseCommand {
+        
+        [Option("-c|--create", "Create the response file", CommandOptionType.NoValue)]
+        public bool Create { get; }
+        
+        [Option("-f", "List of files.", CommandOptionType.MultipleValue)]
+        public string[] Files { get; }
+        
+        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
+            Log.Info("First do : sakoe selftest responsefile -c");
+            Log.Info("Then typical usage is : sakoe @file.txt");
+            if (Create) {
+                File.WriteAllText("file.txt", $"{app.Parent.Name}\n{app.Name}\n-f\nnew file derp\n-f\nnew.txt\n-f\ncool");
+                Log.Info("Created txt file : file.txt");
+            }
+            if (Files != null) {
+                foreach (var file in Files) {
+                    Log.Done(file);
+                }
+            }
+            return 0;
         }
 
     }

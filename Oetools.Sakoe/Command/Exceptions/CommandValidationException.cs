@@ -1,7 +1,7 @@
-﻿#region header
+#region header
 // ========================================================================
 // Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
-// This file (CommandException.cs) is part of Oetools.Sakoe.
+// This file (CommandValidationException.cs) is part of Oetools.Sakoe.
 // 
 // Oetools.Sakoe is a free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,11 +21,8 @@
 using System;
 
 namespace Oetools.Sakoe.Command.Exceptions {
-    public class CommandException : Exception {
-        
-        public int ExitCode { get; set; }
-        
-        public CommandException(string message) : base(message) { }       
-        public CommandException(string message, Exception innerException) : base(message, innerException) { }
+    public class CommandValidationException : CommandException {
+        public CommandValidationException(string message) : base(message) { }
+        public CommandValidationException(string message, Exception innerException) : base(message, innerException) { }
     }
 }

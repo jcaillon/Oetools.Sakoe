@@ -22,6 +22,7 @@ using System.IO;
 using System.Reflection;
 using McMaster.Extensions.CommandLineUtils;
 using McMaster.Extensions.CommandLineUtils.HelpText;
+using Oetools.Utilities.Lib;
 
 namespace Oetools.Sakoe.Utilities {
     
@@ -42,15 +43,13 @@ namespace Oetools.Sakoe.Utilities {
         }
 
         public static void DrawLogo(TextWriter output) {
-            output.WriteLine($"SAKOE - a Swiss Army Knife for OpenEdge - v{typeof(HelpTextGenerator).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}");
             output.WriteLine();
-            output.WriteLine(@"                '`.    ");
-            output.WriteLine(@" '`.    .^      \  \   ");
-            output.WriteLine(@"  \ \  /;/       \ \\  ");
-            output.WriteLine(@"   \ \/_/_________\  \ ");
-            output.WriteLine(@"    `/ .           _  \");
-            output.WriteLine(@"     \________________/");
-            output.WriteLine();
+            output.WriteLine(@"                '`.        ");
+            output.WriteLine(@" '`.    .^      \  \       == SAKOE ==");
+            output.WriteLine(@"  \ \  /;/       \ \\      a Swiss Army Knife for OpenEdge");
+            output.WriteLine(@"   \ \/_/_________\  \     " + $"running with {(Utils.IsNetFrameworkBuild ? ".netframework" : $".netcore-{(Utils.IsRuntimeWindowsPlatform ? "win" : "unix")}")}");
+            output.WriteLine(@"    `/ .           _  \    " + $"v{typeof(HelpTextGenerator).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}");
+            output.WriteLine(@"     \________________/    ");
             output.WriteLine();
         }
     }

@@ -12,28 +12,45 @@ namespace Oetools.Sakoe.Command {
     /// </summary>
     [Command(
         FullName = "SAKOE - a Swiss Army Knife for OpenEdge",
-        Description = "TODO : short description of this CLI",
-        ExtendedHelpText = "TODO : extended help for this CLI",
+        Description = "SAKOE is a collection of tools aimed to simplify your work in Openedge environments.",
+        ExtendedHelpText = @"Website: https://jcaillon.github.io/Oetools.Sakoe/
+
+Get raw output:
+  If you want a raw output for each commands (without display the log lines), you can set the verbosity to ""None"" and use the no progress bars option.
+    sakoe [command] -vb None -nop
+
+Exit code:
+  The convention followed by this tool is the following.
+    0 : used when a command completed successfully, without errors nor warnings.
+    1-8 : used when a command completed but with warnings, the level can be used to pinpoint different kind of warnings.
+    9 : used when a command does not complete and ends up in error.
+
+Response file parsing:
+  Instead of using a long command line, you can use a response file that contains each argument/option that should be used.
+  Everything that is usually separated by a space in the command line should be separated by a new line in the file.
+  You do not have to double quote arguments containing spaces, they will be considered as a whole as long as they are on a separated line.
+    sakoe @responsefile.txt
+",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
-        ResponseFileHandling = ResponseFileHandling.ParseArgsAsSpaceSeparated
+        ResponseFileHandling = ResponseFileHandling.ParseArgsAsLineSeparated
     )]
-    [VersionOptionFromMember("-version|--version", MemberName = nameof(GetVersion), Description = "Show version information")]
-    [HelpOption("-?|-h|--help", Description = "Show help information", Inherited = true)]
+    [HelpOption("-?|-h|--help", Description = "Show help information.", Inherited = true)]
+#if DEBUG
     [Subcommand(typeof(SelfTestCommand))]
+#endif
     [Subcommand(typeof(DatabaseCommand))]
     [Subcommand(typeof(LintCommand))]
     [Subcommand( typeof(ProjectCommand))]
     [Subcommand(typeof(BuildCommand))]
-    [Subcommand(typeof(HelpCommand))]
+    [Subcommand(typeof(ManCommand))]
+    [Subcommand(typeof(ShowVersionCommand))]
     [Subcommand(typeof(XcodeCommand))]
     internal class MainCommand : BaseCommand {
         
-        private static string GetVersion() => $"v{typeof(MainCommand).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}";
-
         public static int ExecuteMainCommand(string[] args) {
             var console = PhysicalConsole.Singleton;
             try {
-                using (var app = new CommandLineApplicationCustomHint<MainCommand>(HelpTextGenerator, console, Directory.GetCurrentDirectory(), true)) {
+                using (var app = new CommandLineApplicationCustomHint<MainCommand>(HelpGenerator, console, Directory.GetCurrentDirectory(), true)) {
                     app.Conventions.UseDefaultConventions();
                     app.ParserSettings.MakeSuggestionsInErrorMessage = true;
                     return app.Execute(args);
@@ -42,6 +59,8 @@ namespace Oetools.Sakoe.Command {
                 using (var log = new ConsoleLogger(console, ConsoleLogger.LogLvl.Info, true)) {
                     log.Error(ex.Message);
                     log.Fatal($"Exit code {FatalExitCode} - Error");
+                    
+                    console.ResetColor();
                     return FatalExitCode;
                 }
             }

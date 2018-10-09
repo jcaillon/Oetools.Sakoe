@@ -26,54 +26,61 @@ using Oetools.Builder.Utilities;
 
 namespace Oetools.Sakoe.Command.Oe {
     
-    public abstract class OeFileListBaseCommand : OeBaseCommand {
+    public abstract class FileListBaseCommand : OeBaseCommand {
         
         [FileExists]
-        [Option("-f|--file", "File that should be added to the listing. Can be used multiple times.", CommandOptionType.MultipleValue, ValueName = nameof(Files))]
-        public string[] Files { get; }
+        [Option("-f|--file <path>", "File that should be added to the listing. Can be used multiple times.", CommandOptionType.MultipleValue)]
+        public string[] Files { get; protected set; }
         
         [DirectoryExists]
-        [Option("-d|--directory", "Directory containing files that should be added to the listing. Can be used multiple times.", CommandOptionType.MultipleValue)]
+        [Option("-d|--directory <path>", "Directory containing files that should be added to the listing. Can be used multiple times.", CommandOptionType.MultipleValue)]
         public string[] Directories { get; protected set; }
         
-        [Option("-if|--include-filter", "Include filter for directory listing. Can use wildcards (**,*,?). See " + HelpCommand.Name + " " + FiltersHelpCommand.Name + ".", CommandOptionType.SingleValue)]
+        [Option("-r|--recursive", "Recursive listing in the directories.", CommandOptionType.NoValue)]
+        public bool RecursiveListing { get; }
+        
+        [Option("-i|--include <filter>", "Include filter for directory listing. Can use wildcards (**,*,?). See " + ManCommand.Name + " " + FiltersHelpCommand.Name + ".", CommandOptionType.SingleValue)]
         public string IncludeFilter { get; }
         
-        [Option("-ef|--exclude-filter", "Exclude filter for directory listing. Can use wildcards (**,*,?). See " + HelpCommand.Name + " " + FiltersHelpCommand.Name + ".", CommandOptionType.SingleValue)]
+        [Option("-e|--exclude <filter>", "Exclude filter for directory listing. Can use wildcards (**,*,?). See " + ManCommand.Name + " " + FiltersHelpCommand.Name + ".", CommandOptionType.SingleValue)]
         public string ExcludeFilter { get; }
         
-        [Option("-irf|--include-regex-filter", "Regular expression include filter for directory listing. See " + HelpCommand.Name + " " + FiltersHelpCommand.Name + ".", CommandOptionType.SingleValue)]
+        [Option("-ir|--include-regex <filter>", "Regular expression include filter for directory listing. See " + ManCommand.Name + " " + FiltersHelpCommand.Name + ".", CommandOptionType.SingleValue)]
         public string IncludeRegexFilter { get; }
         
-        [Option("-erf|--exclude-regex-filter", "Regular expression include filter for directory listing. See " + HelpCommand.Name + " " + FiltersHelpCommand.Name + ".", CommandOptionType.SingleValue)]
+        [Option("-er|--exclude-regex <filter>", "Regular expression include filter for directory listing. See " + ManCommand.Name + " " + FiltersHelpCommand.Name + ".", CommandOptionType.SingleValue)]
         public string ExcludeRegexFilter { get; }
 
-        public IEnumerable<string> GetFilesList() {
+        public virtual IEnumerable<string> GetFilesList(CommandLineApplication app) {
             if (Files == null && Directories == null) {
                 Log.Debug($"No files or directories in options, adding the current directory : {Directory.GetCurrentDirectory()}");
                 Directories = new[] {
                     Directory.GetCurrentDirectory()
                 };
             }
+
             var filter = new OeTaskFilter {
                 Include = IncludeFilter,
                 Exclude = ExcludeFilter,
                 IncludeRegex = IncludeRegexFilter,
                 ExcludeRegex = ExcludeRegexFilter
             };
+            filter.Validate();
+            
             if (Files != null) {
                 foreach (var file in Files) {
                     yield return file;
                 }
             }
-            filter.Validate();
-            foreach (var directory in Directories) {
-                var lister = new SourceFilesLister(directory, _cancelSource) {
-                    SourcePathFilter = filter,
-                    Log = Log
-                };
-                foreach (var file in lister.GetFileList()) {
-                    yield return file.FilePath;
+            if (Directories != null) {
+                foreach (var directory in Directories) {
+                    var lister = new SourceFilesLister(directory, _cancelSource) {
+                        SourcePathFilter = filter, Log = Log,
+                        RecursiveListing = RecursiveListing
+                    };
+                    foreach (var file in lister.GetFileList()) {
+                        yield return file.FilePath;
+                    }
                 }
             }
         }

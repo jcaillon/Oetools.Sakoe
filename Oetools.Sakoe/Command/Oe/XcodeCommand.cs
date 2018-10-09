@@ -1,20 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder.Project.Task;
+using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge;
 
 namespace Oetools.Sakoe.Command.Oe {
     
     [Command(
         "xcode", "xc",
-        Description = "Encrypt and decrypt files using the algorithm of the XCODE utility",
-        ExtendedHelpText = @"The original idea of the XCODE utility is to obfuscate your openedge code before making it available.
-This is an encryption feature which uses a ASCII key/password of a maximum of 8 characters.
-The original XCODE utility uses the default key ""Progress"" if no custom key is supplied (so does this command).
-The encryption process does not use a standard cryptography method, it uses a 16-bits CRC inside a custom algo.",
+        Description = "Encrypt and decrypt files using the XCODE utility algorithm.",
+        ExtendedHelpText = @"About XCODE:
+  The original idea of the XCODE utility is to obfuscate your Openedge code before making it available.
+  This is an encryption feature which uses a ASCII key/password of a maximum of 8 characters.
+  The original XCODE utility uses the default key ""Progress"" if no custom key is supplied (so does this command).
+  The encryption process does not use a standard cryptography method, it uses a 16-bits CRC inside a custom algorithm.",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
     [Subcommand(typeof(ListXcodeCommand))]
@@ -25,119 +28,132 @@ The encryption process does not use a standard cryptography method, it uses a 16
     
     [Command(
         "encrypt", "en",
-        Description = "Encrypt files using the openedge XCODE algorithm",
+        Description = "Encrypt files using the XCODE algorithm. Output the list of processed files.",
         ExtendedHelpText = "",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
-        AllowArgumentSeparator = true
+        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class EncryptXcodeCommand : OeFileListBaseCommand {
+    internal class EncryptXcodeCommand : ProcessFileListBaseCommand {
         
-        [Option("-k|--key", "", CommandOptionType.SingleValue)]
-        public string EncryptionKey { get; }
+        [Option("-k|--key", @"The encryption key to use for the process. Defaults to ""Progress"".", CommandOptionType.SingleValue)]
+        public string EncryptionKey { get; set; }
         
-        [Option("-pre|--prefix", "", CommandOptionType.SingleValue)]
-        public string OutputFilePrefix { get; }
+        [Option("-su|--suffix", "A suffix to append to each filename processed.", CommandOptionType.SingleValue)]
+        public string OutputFileSuffix { get; }
         
         [LegalFilePath]
-        [Option("-od|--output-directory", "", CommandOptionType.SingleValue)]
+        [Option("-od|--output-directory", "Output all processed file in this common directory.", CommandOptionType.SingleValue)]
         public string OutputDirectory { get; }
         
-        public string[] RemainingArgs { get; }
-        
-        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-
-            foreach (var arg in RemainingArgs) {
-                Log.Info(arg);
+        protected void ValidateOptions() {
+            if (string.IsNullOrEmpty(EncryptionKey)) {
+                EncryptionKey = "Progress";
+                Log.Info($"Using default encryption key : {EncryptionKey.PrettyQuote()}.");
             }
 
-            var filter = new OeTaskFilter {
-                
-            };
-            //var lister = new SourceFilesLister(sourceDirectory, _cancelSource) {
-            //    SourcePathFilter = 
-            //};
-            //foreach (var directory in lister.GetDirectoryList()) {
-            //    if (!output.Contains(directory)) {
-            //        output.Add(directory);
-            //    }
-            //}
+            if (EncryptionKey.Length > 8) {
+                Log.Warn("The max length for encryption key is 8 characters. Everything above is actually ignored.");
+                Log.Warn($"The actual key used will be : {EncryptionKey.Substring(0, 8).PrettyQuote()}.");
+            }
+        }
+
+        protected void ProcessFiles(CommandLineApplication app, bool encrypt) {
+            ValidateOptions();
+
+            if (!string.IsNullOrEmpty(OutputDirectory) && !Directory.Exists(OutputDirectory)) {
+                Log.Info($"Creating directory : {OutputDirectory}.");
+                Directory.CreateDirectory(OutputDirectory);
+            }
+
+            Log.Info("Listing files...");
+
+            var filesList = GetFilesList(app).ToList();
             
+            Log.Info($"Processing {filesList.Count} files.");
             
-            
-//            var lister = new SourceFilesLister(sourceDirectory, _cancelSource) {
-//                SourcePathFilter = PropathSourceDirectoriesFilter
-//            };
-//            foreach (var directory in lister.GetDirectoryList()) {
-//                if (!output.Contains(directory)) {
-//                    output.Add(directory);
-//                }
-//            }
-            
+            var xcode = new UoeEncryptor(EncryptionKey);
+
+            var i = 0;
+            var outputList = new List<string>();
+            foreach (var file in filesList) {
+                var outputFile = Path.Combine((string.IsNullOrEmpty(OutputDirectory) ? Path.GetDirectoryName(file) : OutputDirectory) ?? "", $"{Path.GetFileName(file)}{(string.IsNullOrEmpty(OutputFileSuffix) ? "" : OutputFileSuffix)}");
+                try {
+                    xcode.ConvertFile(file, encrypt, outputFile);
+                    outputList.Add($"{file} >> {outputFile}");
+                } catch (UoeAlreadyConvertedException) { }
+                i++;
+                Log.ReportProgress(filesList.Count, i, $"Converting file to : {outputFile}.");
+            }
+
+            foreach (var file in outputList) {
+                WriteLineOutput(file);
+            }
+
+            Log.Info($"A total of {outputList.Count} files were converted.");
+        }
+        
+        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
+            ProcessFiles(app, true);
             return 0;
         }
     }
 
     [Command(
         "decrypt", "de",
-        Description = "Decrypt files using the openedge XCODE algorithm", 
-        ExtendedHelpText = "TODO", 
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase, 
-        AllowArgumentSeparator = true
+        Description = "Decrypt files using the XCODE algorithm. Output the list of processed files.", 
+        ExtendedHelpText = "", 
+        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class DecryptXcodeCommand : OeBaseCommand {
-
-        [Option("-k|--key", "", CommandOptionType.SingleValue)]
-        public string EncryptionKey { get; }
-
-        [Option("-pre|--prefix", "", CommandOptionType.SingleValue)]
-        public string OutputFilePrefix { get; }
-
-        [DirectoryExists]
-        [Option("-od|--output-directory", "", CommandOptionType.SingleValue)]
-        public string OutputDirectory { get; }
-
-        public string[] RemainingArgs { get; }
+    internal class DecryptXcodeCommand : EncryptXcodeCommand {
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-
+            ProcessFiles(app, false);
             return 0;
         }
     }
 
     [Command(
         "list", "li",
-        Description = "List encrypted (or decrypted) files", 
-        ExtendedHelpText = "TODO", 
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase, 
-        AllowArgumentSeparator = true
-    )]
-    internal class ListXcodeCommand : OeFileListBaseCommand {
-        
-        [DirectoryExists]
-        [Argument(0, "directory", "The directory to list. Defaults to the current directory.")]
-        public string Directory { get; }
+        Description = "List only encrypted (or decrypted) files.", 
+        ExtendedHelpText = @"Examples:
 
+  List only the encrypted files in a list of files in argument.
+    sakoe xcode list -r -vb none -nop
+  Get a raw list of all the encrypted files in the current directory (recursive).
+    sakoe xcode list -r -vb none -nop", 
+        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+    )]
+    internal class ListXcodeCommand : ProcessFileListBaseCommand {
+        
         [Option("-de|--decrypted", "List all decrypted files (or default to listing encrypted files).", CommandOptionType.NoValue)]
         public bool ListDecrypted { get; } = false;
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
 
-            if (!string.IsNullOrEmpty(Directory)) {
-                Log.Debug($"Adding directory to list : {Directory}");
-                var directories = Directories?.ToList() ?? new List<string>();
-                directories.Add(Directory);
-                Directories = directories.ToArray();
-            }
+            Log.Info("Listing files...");
+
+            var filesList = GetFilesList(app).ToList();
+            
+            Log.Info($"Starting the analyze on {filesList.Count} files.");
             
             var xcode = new UoeEncryptor(null);
-            
-            foreach (var file in GetFilesList()) {
+
+            var i = 0;
+            var outputList = new List<string>();
+            foreach (var file in filesList) {
                 var isEncrypted = xcode.IsFileEncrypted(file);
                 if (isEncrypted && !ListDecrypted || !isEncrypted && ListDecrypted) {
-                    WriteLineOutput(file);
+                    outputList.Add(file);
                 }
+                i++;
+                Log.ReportProgress(filesList.Count, i, $"Analyzing {file}.");
             }
-            
+
+            foreach (var file in outputList) {
+                WriteLineOutput(file);
+            }
+
+            Log.Info($"A total of {outputList.Count} files are {(ListDecrypted ? "decrypted" : "encrypted")}.");
+
             return 0;
         }
     }

@@ -46,17 +46,17 @@ namespace Oetools.Sakoe.Command {
         
         private string UseVerboseMessage => $"Get more details on this error by activating the debug verbosity : {VerbosityTemplate} debug";
 
-        [Option(VerbosityTemplate, "Sets the verbosity of this command line tool", CommandOptionType.SingleValue)]
+        [Option(VerbosityTemplate + " <level>", "Sets the verbosity of this command line tool.", CommandOptionType.SingleValue)]
         // ReSharper disable once UnassignedGetOnlyAutoProperty
         // ReSharper disable once MemberCanBePrivate.Global
         public ConsoleLogger.LogLvl Verbosity { get; } = ConsoleLogger.LogLvl.Info;
         
-        [Option("-nop|--no-progress", "Never display progress bars", CommandOptionType.NoValue)]
+        [Option("-nop|--no-progress", "Never show progress bars.", CommandOptionType.NoValue)]
         // ReSharper disable once UnassignedGetOnlyAutoProperty
         // ReSharper disable once MemberCanBePrivate.Global
         public bool IsProgressBarOff { get; }
         
-        [Option("-logo|--with-logo", "Always display the logo on start", CommandOptionType.NoValue)]
+        [Option("-logo|--with-logo", "Always show the logo on start.", CommandOptionType.NoValue)]
         // ReSharper disable once UnassignedGetOnlyAutoProperty
         // ReSharper disable once MemberCanBePrivate.Global
         public bool IsLogoOn { get; }
@@ -73,7 +73,7 @@ namespace Oetools.Sakoe.Command {
         
         protected CancellationTokenSource _cancelSource;
         
-        public static readonly HelpTextGenerator HelpTextGenerator = new HelpTextGenerator();
+        public static readonly HelpTextGenerator HelpGenerator = new HelpTextGenerator();
         
         // ReSharper disable once UnusedMember.Global
         protected int OnExecute(CommandLineApplication app, IConsole console) {
@@ -102,8 +102,9 @@ namespace Oetools.Sakoe.Command {
                     } else {
                         Log.Warn($"Exit code {returnCode} - in {stopwatch.Elapsed.ConvertToHumanTime()} - Warn");
                     }
-
+                    Console.ResetColor();
                     return returnCode;
+                    
                 } catch (Exception e) {
                     Log.Error($"{e.Message}", e);
                     if (Verbosity > ConsoleLogger.LogLvl.Debug) {
@@ -116,6 +117,7 @@ namespace Oetools.Sakoe.Command {
 
                 Log.Fatal($"Exit code {exitCode} - in {stopwatch.Elapsed.ConvertToHumanTime()} - Error");
                 
+                Console.ResetColor();
                 return exitCode;
             }
         }
@@ -123,8 +125,11 @@ namespace Oetools.Sakoe.Command {
         // ReSharper disable once UnusedMember.Global
         public int OnValidationError(ValidationResult r) {
             using (var log = new ConsoleLogger(PhysicalConsole.Singleton, ConsoleLogger.LogLvl.Info, true)) {
-                log.Error(r.ErrorMessage);
+                var faultyMembers = string.Join(", ", r.MemberNames);
+                log.Error($"{(faultyMembers.Length > 0 ? $"{faultyMembers} : " : "")}{r.ErrorMessage}");
                 log.Fatal($"Exit code {FatalExitCode} - Error");
+                
+                PhysicalConsole.Singleton.ResetColor();
                 return FatalExitCode;
             }
         }
