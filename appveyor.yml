@@ -45,7 +45,7 @@ install:
 #---------------------------------#
 
 build_script:
-  - cmd: build.bat
+  - cmd: Oetools.Builder\update_xsd.bat && build.bat
 
 #---------------------------------#
 #       tests configuration       #
