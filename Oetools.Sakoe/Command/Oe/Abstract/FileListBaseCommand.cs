@@ -26,7 +26,7 @@ using Oetools.Builder.Utilities;
 
 namespace Oetools.Sakoe.Command.Oe {
     
-    public abstract class FileListBaseCommand : OeBaseCommand {
+    public abstract class FileListBaseCommand : BaseCommand {
         
         [FileExists]
         [Option("-f|--file <path>", "File that should be added to the listing. Can be used multiple times.", CommandOptionType.MultipleValue)]

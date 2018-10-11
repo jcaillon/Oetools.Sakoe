@@ -19,11 +19,11 @@ namespace Oetools.Sakoe.Command.Oe {
     [Subcommand(typeof(InputSelfTestCommand))]
     [Subcommand(typeof(PromptSelfTestCommand))]
     [Subcommand(typeof(ResponseFileSelfTestCommand))]
-    internal class SelfTestCommand : OeBaseCommand {
+    internal class SelfTestCommand : BaseCommand {
         
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             
-            Log.Info("dummy command");
+            Log.Info("Dummy command.");
             
             return 0;
         }
@@ -38,7 +38,7 @@ sakoe st input -b2 s1024",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         AllowArgumentSeparator = true
     )]
-    internal class InputSelfTestCommand : OeBaseCommand {
+    internal class InputSelfTestCommand : BaseCommand {
         
         [Argument(0)]
         [LegalFilePath]
@@ -161,7 +161,7 @@ sakoe st input -b2 s1024",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         AllowArgumentSeparator = true
     )]
-    internal class ResponseFileSelfTestCommand : OeBaseCommand {
+    internal class ResponseFileSelfTestCommand : BaseCommand {
         
         [Option("-c|--create", "Create the response file", CommandOptionType.NoValue)]
         public bool Create { get; }
@@ -192,7 +192,7 @@ sakoe st input -b2 s1024",
         ExtendedHelpText = "sakoe selftest prompt",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class PromptSelfTestCommand : OeBaseCommand {
+    internal class PromptSelfTestCommand : BaseCommand {
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             
@@ -226,7 +226,7 @@ sakoe st input -b2 s1024",
         ExtendedHelpText = "sakoe selftest log",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class LogSelfTestCommand : OeBaseCommand {
+    internal class LogSelfTestCommand : BaseCommand {
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             
@@ -276,7 +276,7 @@ sakoe st input -b2 s1024",
         ExtendedHelpText = "sakoe selftest progressbar",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class ProgressSelfTestCommand : OeBaseCommand {
+    internal class ProgressSelfTestCommand : BaseCommand {
         
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             

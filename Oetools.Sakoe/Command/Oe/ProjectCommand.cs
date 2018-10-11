@@ -16,7 +16,7 @@ namespace Oetools.Sakoe.Command.Oe {
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
     [Subcommand(typeof(NewProjectCommand))]
-    internal class ProjectCommand : OeBaseCommand {
+    internal class ProjectCommand : BaseCommand {
    }
     
     [Command(
@@ -25,7 +25,7 @@ namespace Oetools.Sakoe.Command.Oe {
         ExtendedHelpText = "",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class NewProjectCommand : OeBaseCommand {
+    internal class NewProjectCommand : BaseCommand {
         
         [DirectoryExists]
         [Argument(0, Name = "<directory>", Description = "The directory in which to initialize the project. Default to current directory.")]

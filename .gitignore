@@ -377,3 +377,4 @@ _ReSharper*
 #####################################################################
 *.dll
 *.pdb
+/Oetools.Sakoe/Resources/Dependencies

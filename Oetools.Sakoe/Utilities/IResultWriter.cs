@@ -1,7 +1,7 @@
 #region header
 // ========================================================================
 // Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
-// This file (CommandLineApplication2.cs) is part of Oetools.Sakoe.
+// This file (IResultWriter.cs) is part of Oetools.Sakoe.
 // 
 // Oetools.Sakoe is a free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,21 +18,9 @@
 // ========================================================================
 #endregion
 
-using McMaster.Extensions.CommandLineUtils;
-using McMaster.Extensions.CommandLineUtils.HelpText;
-using Oetools.Sakoe.Utilities;
-
-namespace Oetools.Sakoe.Command {
-    
-    public class CommandLineApplicationCustomHint<TModel> : CommandLineApplication<TModel> where TModel : class {
-
-        private readonly IConsole _console;
-        
-        public CommandLineApplicationCustomHint(IHelpTextGenerator helpTextGenerator, IConsole console, string workingDirectory, bool throwOnUnexpectedArg) : base(helpTextGenerator, console, workingDirectory, throwOnUnexpectedArg) {
-            _console = console;
-        }
-        
-        public override void ShowHint() { }
-        
+namespace Oetools.Sakoe.Utilities {
+    public interface IResultWriter {
+        void WriteResult(string result);
+        void WriteResultOnNewLine(string result);
     }
 }

@@ -23,7 +23,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Subcommand(typeof(ListXcodeCommand))]
     [Subcommand(typeof(EncryptXcodeCommand))]
     [Subcommand(typeof(DecryptXcodeCommand))]
-    internal class XcodeCommand : OeBaseCommand {
+    internal class XcodeCommand : BaseCommand {
     }
     
     [Command(
@@ -85,7 +85,7 @@ namespace Oetools.Sakoe.Command.Oe {
             }
 
             foreach (var file in outputList) {
-                WriteLineOutput(file);
+                Out.WriteResultOnNewLine(file);
             }
 
             Log.Info($"A total of {outputList.Count} files were converted.");
@@ -149,7 +149,7 @@ namespace Oetools.Sakoe.Command.Oe {
             }
 
             foreach (var file in outputList) {
-                WriteLineOutput(file);
+                Out.WriteResultOnNewLine(file);
             }
 
             Log.Info($"A total of {outputList.Count} files are {(ListDecrypted ? "decrypted" : "encrypted")}.");

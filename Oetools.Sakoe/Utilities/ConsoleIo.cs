@@ -25,7 +25,7 @@ using ShellProgressBar;
 
 namespace Oetools.Sakoe.Utilities {
     
-    public class ConsoleLogger : ILogger, ITraceLogger, IDisposable {
+    public class ConsoleIo : IResultWriter, ILogger, ITraceLogger, IDisposable {
 
         private readonly LogLvl _logLevel;
         
@@ -39,7 +39,9 @@ namespace Oetools.Sakoe.Utilities {
 
         private bool _isProgressBarOff;
 
-        public ConsoleLogger(IConsole console, LogLvl level, bool isProgressBarOff) {
+        private bool _hasWroteToOuput;
+
+        public ConsoleIo(IConsole console, LogLvl level, bool isProgressBarOff) {
             _console = console;
             _logLevel = level;
             _isProgressBarOff = isProgressBarOff;
@@ -113,6 +115,8 @@ namespace Oetools.Sakoe.Utilities {
                 _progressBar.Dispose();
                 _progressBar = null;
             }
+
+            //_hasWroteToOuput = false;
         }
 
         public void ReportGlobalProgress(int max, int current, string message) {
@@ -152,16 +156,36 @@ namespace Oetools.Sakoe.Utilities {
 
             var outputMessage = $"{level.ToString().ToUpper().PadRight(5, ' ')} [{DateTime.Now:yy-MM-dd HH:mm:ss}] {message}";
             if (level >= LogLvl.Error) {
-                _console.Error.WriteLine(outputMessage);
+                WriteConsole(outputMessage, true, true);
             } else {
-                _console.Out.WriteLine(outputMessage);
+                WriteConsole(outputMessage, true);
             }
 
             if (e != null) {
                 _console.ForegroundColor = ConsoleColor.DarkGray;
-                _console.Error.WriteLine(e.ToString());
+                WriteConsole(e.ToString(), true, true);
             }
             //_console.ResetColor();
+        }
+
+        public void WriteResult(string result) {
+            _console.ResetColor();
+            WriteConsole(result);
+        }
+
+        public void WriteResultOnNewLine(string result) {
+            _console.ResetColor();
+            WriteConsole(result, true);
+        }
+
+        private void WriteConsole(string message, bool newLine = false, bool writeToErrorStream = false) {
+            if (newLine && _hasWroteToOuput) {
+                (writeToErrorStream ? _console.Error : _console.Out).Write(_console.Out.NewLine);
+            }
+            if (!string.IsNullOrEmpty(message)) {
+                (writeToErrorStream ? _console.Error : _console.Out).Write(message);
+                _hasWroteToOuput = true;
+            }
         }
         
         public enum LogLvl {

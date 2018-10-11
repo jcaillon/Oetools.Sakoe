@@ -13,7 +13,8 @@ namespace Oetools.Sakoe.Command {
     [Command(
         FullName = "SAKOE - a Swiss Army Knife for OpenEdge",
         Description = "SAKOE is a collection of tools aimed to simplify your work in Openedge environments.",
-        ExtendedHelpText = @"Website: https://jcaillon.github.io/Oetools.Sakoe/
+        ExtendedHelpText = @"Website: 
+  https://jcaillon.github.io/Oetools.Sakoe/
 
 Get raw output:
   If you want a raw output for each commands (without display the log lines), you can set the verbosity to ""None"" and use the no progress bars option.
@@ -34,7 +35,7 @@ Response file parsing:
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         ResponseFileHandling = ResponseFileHandling.ParseArgsAsLineSeparated
     )]
-    [HelpOption("-?|-h|--help", Description = "Show help information.", Inherited = true)]
+    [HelpOption("-?|-h|" + HelpLongName, Description = "Show help information.", Inherited = true)]
 #if DEBUG
     [Subcommand(typeof(SelfTestCommand))]
 #endif
@@ -45,7 +46,13 @@ Response file parsing:
     [Subcommand(typeof(ManCommand))]
     [Subcommand(typeof(ShowVersionCommand))]
     [Subcommand(typeof(XcodeCommand))]
+    [Subcommand(typeof(HashCommand))]
+    [Subcommand(typeof(ProHelpProHelpCommand))]
+    [Subcommand(typeof(UtilitiesCommand))]
+    [Subcommand(typeof(ProlibCommand))]
     internal class MainCommand : BaseCommand {
+
+        public const string HelpLongName = "--help";
         
         public static int ExecuteMainCommand(string[] args) {
             var console = PhysicalConsole.Singleton;
@@ -56,8 +63,9 @@ Response file parsing:
                     return app.Execute(args);
                 } 
             } catch (CommandParsingException ex) {
-                using (var log = new ConsoleLogger(console, ConsoleLogger.LogLvl.Info, true)) {
+                using (var log = new ConsoleIo(console, ConsoleIo.LogLvl.Info, true)) {
                     log.Error(ex.Message);
+                    log.Info($"Specify {HelpLongName} for a list of available options and commands.");
                     log.Fatal($"Exit code {FatalExitCode} - Error");
                     
                     console.ResetColor();

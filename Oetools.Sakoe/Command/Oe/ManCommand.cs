@@ -13,10 +13,21 @@ namespace Oetools.Sakoe.Command.Oe {
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
     [Subcommand(typeof(FiltersHelpCommand))]
-    internal class ManCommand : OeBaseCommand {
+    internal class ManCommand : BaseCommand {
         public const string Name = "manual";
+        
+        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
+
+            Out.WriteResultOnNewLine("Write the manual.");
+            Out.WriteResultOnNewLine(null);
+            Out.WriteResultOnNewLine("Topics :");
+            foreach (var command in app.Commands) {
+                Out.WriteResultOnNewLine($"  {command.Name} {command.Description}.");
+            }
+            
+            return 0;
+        }
     }
-    
     
     [Command(
         Name, "fi",
@@ -24,10 +35,10 @@ namespace Oetools.Sakoe.Command.Oe {
         ExtendedHelpText = "TODO",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class FiltersHelpCommand : OeBaseCommand {
+    internal class FiltersHelpCommand : BaseCommand {
         public const string Name = "filters";
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            WriteLineOutput("Write something about the filters");
+            Out.WriteResultOnNewLine("Write something about the filters.");
             return 0;
         }
     }

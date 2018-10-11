@@ -49,7 +49,7 @@ namespace Oetools.Sakoe.Command {
         [Option(VerbosityTemplate + " <level>", "Sets the verbosity of this command line tool.", CommandOptionType.SingleValue)]
         // ReSharper disable once UnassignedGetOnlyAutoProperty
         // ReSharper disable once MemberCanBePrivate.Global
-        public ConsoleLogger.LogLvl Verbosity { get; } = ConsoleLogger.LogLvl.Info;
+        public ConsoleIo.LogLvl Verbosity { get; } = ConsoleIo.LogLvl.Info;
         
         [Option("-nop|--no-progress", "Never show progress bars.", CommandOptionType.NoValue)]
         // ReSharper disable once UnassignedGetOnlyAutoProperty
@@ -62,6 +62,8 @@ namespace Oetools.Sakoe.Command {
         public bool IsLogoOn { get; }
         
         protected ILogger Log { get; private set; }
+        
+        protected IResultWriter Out { get; private set; }
         
         private IConsole Console { get; set; }
         
@@ -79,8 +81,9 @@ namespace Oetools.Sakoe.Command {
         protected int OnExecute(CommandLineApplication app, IConsole console) {
             Console = console;
             
-            using (var logger = new ConsoleLogger(console, Verbosity, IsProgressBarOff)) {
+            using (var logger = new ConsoleIo(console, Verbosity, IsProgressBarOff)) {
                 Log = logger;
+                Out = logger;
                 
                 _cancelSource = new CancellationTokenSource();
                 console.CancelKeyPress += ConsoleOnCancelKeyPress;
@@ -107,7 +110,7 @@ namespace Oetools.Sakoe.Command {
                     
                 } catch (Exception e) {
                     Log.Error($"{e.Message}", e);
-                    if (Verbosity > ConsoleLogger.LogLvl.Debug) {
+                    if (Verbosity > ConsoleIo.LogLvl.Debug) {
                         Log.Info(UseVerboseMessage);
                     }
                     if (e is CommandException ce) {
@@ -124,9 +127,10 @@ namespace Oetools.Sakoe.Command {
         
         // ReSharper disable once UnusedMember.Global
         public int OnValidationError(ValidationResult r) {
-            using (var log = new ConsoleLogger(PhysicalConsole.Singleton, ConsoleLogger.LogLvl.Info, true)) {
+            using (var log = new ConsoleIo(PhysicalConsole.Singleton, ConsoleIo.LogLvl.Info, true)) {
                 var faultyMembers = string.Join(", ", r.MemberNames);
                 log.Error($"{(faultyMembers.Length > 0 ? $"{faultyMembers} : " : "")}{r.ErrorMessage}");
+                log.Info($"Specify {MainCommand.HelpLongName} for a list of available options and commands.");
                 log.Fatal($"Exit code {FatalExitCode} - Error");
                 
                 PhysicalConsole.Singleton.ResetColor();
@@ -147,16 +151,6 @@ namespace Oetools.Sakoe.Command {
             app.ShowHelp();
             Log.Warn("You must provide a command");
             return 1;
-        }
-
-        protected void WriteOutput(string output) {
-            Console.ResetColor();
-            Console.Out.Write(output);
-        }
-
-        protected void WriteLineOutput(string output) {
-            Console.ResetColor();
-            Console.Out.WriteLine(output);
         }
 
         /// <summary>
@@ -192,6 +186,7 @@ namespace Oetools.Sakoe.Command {
             _numberOfCancelKeyPress++;
             Log.Warn($"CTRL+C pressed (press {4 - _numberOfCancelKeyPress} times more for emergency exit)");
             Log.Warn("Cancelling execution, please be patient...");
+            Console.ResetColor();
             _cancelSource.Cancel();
 
             if (_numberOfCancelKeyPress < 4) {

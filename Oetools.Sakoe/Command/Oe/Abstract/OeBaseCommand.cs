@@ -21,6 +21,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder.Utilities;
 using Oetools.Sakoe.Command.Exceptions;
 using Oetools.Utilities.Openedge;
@@ -29,16 +30,24 @@ namespace Oetools.Sakoe.Command.Oe {
     
     public abstract class OeBaseCommand : BaseCommand {
         
+        [DirectoryExists]
+        [Option("-dlc|--dlc", "The path to the directory containing the Openedge installation.", CommandOptionType.SingleValue)]
+        public string DlcDirectoryPath { get; }
+        
         /// <summary>
         /// Returns the DLC PATH
         /// </summary>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
         protected string GetDlcPath() {
+            if (!string.IsNullOrEmpty(DlcDirectoryPath)) {
+                return DlcDirectoryPath;
+            }
             var dlcPath = UoeUtilities.GetDlcPathFromEnv();
             if (string.IsNullOrEmpty(dlcPath) || !Directory.Exists(dlcPath)) {
-                throw new Exception("DLC folder not found, you must set the environment variable DLC to locate your openedge installation folder");
+                throw new Exception("The path to the Openedge installation directory has not been found : either use the --dlc option or set a DLC environment variable.");
             }
+            Log.Info($"Using the DLC path found in the environment variable : {dlcPath}.");
             return dlcPath;
         }
 
