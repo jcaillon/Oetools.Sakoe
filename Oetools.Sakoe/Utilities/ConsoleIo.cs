@@ -103,20 +103,24 @@ namespace Oetools.Sakoe.Utilities {
                 Log(LogLvl.Debug, $"{Math.Round((decimal) current / max * 100, 2)}% : {message}");
                 return;
             }
-            
-            if (_progressBar == null) {
-                _progressBar = new ProgressBar(max, message, _progressBarOptions);
-            }
-            if (max > 0 && max != _progressBar.MaxTicks) {
-                _progressBar.MaxTicks = max;
-            }
-            _progressBar.Tick(current, message);
-            if (max == current) {
-                _progressBar.Dispose();
-                _progressBar = null;
-            }
 
-            //_hasWroteToOuput = false;
+            try {
+                if (_progressBar == null) {
+                    _progressBar = new ProgressBar(max, message, _progressBarOptions);
+                }
+                if (max > 0 && max != _progressBar.MaxTicks) {
+                    _progressBar.MaxTicks = max;
+                }
+                _progressBar.Tick(current, message);
+                if (max == current) {
+                    _progressBar.Dispose();
+                    _progressBar = null;
+                }
+
+                _hasWroteToOuput = false;
+            } catch (Exception) {
+                // ignored
+            }
         }
 
         public void ReportGlobalProgress(int max, int current, string message) {
@@ -169,12 +173,12 @@ namespace Oetools.Sakoe.Utilities {
         }
 
         public void WriteResult(string result) {
-            _console.ResetColor();
+            _console.ForegroundColor = ConsoleColor.White;
             WriteConsole(result);
         }
 
         public void WriteResultOnNewLine(string result) {
-            _console.ResetColor();
+            _console.ForegroundColor = ConsoleColor.White;
             WriteConsole(result, true);
         }
 

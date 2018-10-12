@@ -1,10 +1,7 @@
 ﻿using System;
-using System.IO;
 using System.Reflection;
 using McMaster.Extensions.CommandLineUtils;
-using Oetools.Builder.Utilities;
 using Oetools.Sakoe.Utilities;
-using Oetools.Utilities.Lib;
 
 namespace Oetools.Sakoe.Command.Oe {
 

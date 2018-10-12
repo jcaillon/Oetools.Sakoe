@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using McMaster.Extensions.CommandLineUtils;
-using Oetools.Builder.Project.Task;
 using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge;
+using Oetools.Utilities.Openedge.Exceptions;
 
 namespace Oetools.Sakoe.Command.Oe {
     
@@ -75,6 +74,7 @@ namespace Oetools.Sakoe.Command.Oe {
             var i = 0;
             var outputList = new List<string>();
             foreach (var file in filesList) {
+                CancelToken?.ThrowIfCancellationRequested();
                 var outputFile = Path.Combine((string.IsNullOrEmpty(OutputDirectory) ? Path.GetDirectoryName(file) : OutputDirectory) ?? "", $"{Path.GetFileName(file)}{(string.IsNullOrEmpty(OutputFileSuffix) ? "" : OutputFileSuffix)}");
                 try {
                     xcode.ConvertFile(file, encrypt, outputFile);
@@ -140,6 +140,7 @@ namespace Oetools.Sakoe.Command.Oe {
             var i = 0;
             var outputList = new List<string>();
             foreach (var file in filesList) {
+                CancelToken?.ThrowIfCancellationRequested();
                 var isEncrypted = xcode.IsFileEncrypted(file);
                 if (isEncrypted && !ListDecrypted || !isEncrypted && ListDecrypted) {
                     outputList.Add(file);

@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.InteropServices;
 using Oetools.Utilities.Lib;
 
 namespace ShellProgressBar

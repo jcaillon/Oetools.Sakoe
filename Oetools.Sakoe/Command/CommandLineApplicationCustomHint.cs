@@ -20,7 +20,6 @@
 
 using McMaster.Extensions.CommandLineUtils;
 using McMaster.Extensions.CommandLineUtils.HelpText;
-using Oetools.Sakoe.Utilities;
 
 namespace Oetools.Sakoe.Command {
     

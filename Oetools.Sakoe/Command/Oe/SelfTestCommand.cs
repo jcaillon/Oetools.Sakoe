@@ -105,7 +105,6 @@ sakoe st input -b2 s1024",
         private SelfTestCommand Parent { get; }
         
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            
             Log.Info($"File = {File ?? "null"}");
             Log.Info($"GitDir = {GitDir ?? "null"}");
             Log.Info($"RequestMethod = {RequestMethod}");
@@ -229,6 +228,8 @@ sakoe st input -b2 s1024",
     internal class LogSelfTestCommand : BaseCommand {
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
+            Out.WriteResultOnNewLine("this is an output, it will still be displayed if the verbosity is set to None");
+            Out.WriteResult(".");
             
             Log.ReportGlobalProgress(100, 5, "Logging 5% global progress");
             
@@ -248,11 +249,12 @@ sakoe st input -b2 s1024",
             for (var i = 0; i <= 90; i++) {
                 CancelToken?.ThrowIfCancellationRequested();
                 Log.ReportProgress(100, i, $"Executing task {i}");
-                Thread.Sleep(100);
+                Thread.Sleep(10);
             }
-            
+
+            Out.WriteResultOnNewLine("another output!");
             Log.Done("Above task did not end completely");
-            
+
             Log.ReportGlobalProgress(100, 30, "Logging 30% global progress");
 
             for (var i = 0; i <= 100; i++) {
@@ -261,6 +263,7 @@ sakoe st input -b2 s1024",
                 Thread.Sleep(10);
             }
 
+            Out.WriteResultOnNewLine("another output!");
             Log.Done("Task above ended well");
             
             Log.ReportGlobalProgress(100, 100, "Logging 100% global progress");
