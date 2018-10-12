@@ -246,7 +246,7 @@ sakoe st input -b2 s1024",
             Log.Done("Log success");
 
             for (var i = 0; i <= 90; i++) {
-                _cancelSource.Token.ThrowIfCancellationRequested();
+                CancelToken?.ThrowIfCancellationRequested();
                 Log.ReportProgress(100, i, $"Executing task {i}");
                 Thread.Sleep(100);
             }
@@ -256,7 +256,7 @@ sakoe st input -b2 s1024",
             Log.ReportGlobalProgress(100, 30, "Logging 30% global progress");
 
             for (var i = 0; i <= 100; i++) {
-                _cancelSource.Token.ThrowIfCancellationRequested();
+                CancelToken?.ThrowIfCancellationRequested();
                 Log.ReportProgress(100, i, $"Executing task {i}");
                 Thread.Sleep(10);
             }

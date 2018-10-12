@@ -74,7 +74,7 @@ namespace Oetools.Sakoe.Command.Oe {
             }
             if (Directories != null) {
                 foreach (var directory in Directories) {
-                    var lister = new SourceFilesLister(directory, _cancelSource) {
+                    var lister = new SourceFilesLister(directory, CancelToken) {
                         SourcePathFilter = filter, Log = Log,
                         RecursiveListing = RecursiveListing
                     };

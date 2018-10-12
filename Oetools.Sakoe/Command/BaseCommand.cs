@@ -66,6 +66,8 @@ namespace Oetools.Sakoe.Command {
         protected IResultWriter Out { get; private set; }
         
         private IConsole Console { get; set; }
+
+        protected CancellationToken? CancelToken => _cancelSource?.Token;
         
         protected virtual void ExecutePreCommand(CommandLineApplication app, IConsole console) { }
 

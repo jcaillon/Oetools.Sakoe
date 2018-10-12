@@ -31,7 +31,7 @@ namespace Oetools.Sakoe.Command.Oe {
     
     [Command(
         "prolib", "pl",
-        Description = "Wrapper commands for the prolib utility (.pl files).", 
+        Description = "CRUD operations for pro-libraries (.pl files).", 
         ExtendedHelpText = "", 
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
