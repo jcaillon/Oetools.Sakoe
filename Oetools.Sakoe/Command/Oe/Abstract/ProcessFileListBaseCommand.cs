@@ -31,7 +31,7 @@ namespace Oetools.Sakoe.Command.Oe {
         
         [LegalFilePath]
         [Argument(0, "<file or directory>", "The file to process or a directory with files to process. Defaults to the current directory.")]
-        public string FileOrDirectory { get; }
+        public virtual string FileOrDirectory { get; }
 
         public override IEnumerable<string> GetFilesList(CommandLineApplication app) {
             if (!string.IsNullOrEmpty(FileOrDirectory)) {
@@ -49,7 +49,7 @@ namespace Oetools.Sakoe.Command.Oe {
                     Directories = directories.ToArray();
                     
                 } else {
-                    throw new CommandValidationException($"The argument {app.Arguments[0].Name} is not a valid file nor a valid directory : {FileOrDirectory.PrettyQuote()}");
+                    throw new CommandValidationException($"The argument <file or directory> is not a valid file nor a valid directory : {FileOrDirectory.PrettyQuote()}");
                 }
                 
             }

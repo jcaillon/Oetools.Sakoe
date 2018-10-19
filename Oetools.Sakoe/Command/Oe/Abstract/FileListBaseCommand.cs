@@ -74,12 +74,13 @@ namespace Oetools.Sakoe.Command.Oe {
             }
             if (Directories != null) {
                 foreach (var directory in Directories) {
-                    var lister = new SourceFilesLister(directory, CancelToken) {
-                        SourcePathFilter = filter, Log = Log,
+                    var lister = new PathLister(directory, CancelToken) {
+                        PathFilter = filter, 
+                        Log = Log,
                         RecursiveListing = RecursiveListing
                     };
                     foreach (var file in lister.GetFileList()) {
-                        yield return file.FilePath;
+                        yield return file.Path;
                     }
                 }
             }

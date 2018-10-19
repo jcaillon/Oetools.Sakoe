@@ -22,6 +22,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using McMaster.Extensions.CommandLineUtils;
+using Oetools.Utilities.Archive;
 using Oetools.Utilities.Openedge;
 
 namespace Oetools.Sakoe.Command.Oe {
@@ -33,7 +34,10 @@ namespace Oetools.Sakoe.Command.Oe {
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
     [Subcommand(typeof(ListProlibCommand))]
-    internal class ProlibCommand : BaseCommand {
+    internal class ProlibCommand : ArchiverBaseCommand {
+
+        public override IArchiver GetArchiver() => Archiver.New(ArchiverType.Prolib);
+        
     }
     
     [Command(
