@@ -21,6 +21,7 @@
 using System.Collections.Generic;
 using System.IO;
 using McMaster.Extensions.CommandLineUtils;
+using Oetools.Builder.Project;
 using Oetools.Builder.Project.Task;
 using Oetools.Builder.Utilities;
 
@@ -58,15 +59,14 @@ namespace Oetools.Sakoe.Command.Oe {
                     Directory.GetCurrentDirectory()
                 };
             }
-
-            var filter = new OeTaskFilter {
+            var filter = new OeFilterOptions {
                 Include = IncludeFilter,
                 Exclude = ExcludeFilter,
                 IncludeRegex = IncludeRegexFilter,
-                ExcludeRegex = ExcludeRegexFilter
+                ExcludeRegex = ExcludeRegexFilter,
+                RecursiveListing = RecursiveListing
             };
             filter.Validate();
-            
             if (Files != null) {
                 foreach (var file in Files) {
                     yield return file;
@@ -75,9 +75,8 @@ namespace Oetools.Sakoe.Command.Oe {
             if (Directories != null) {
                 foreach (var directory in Directories) {
                     var lister = new PathLister(directory, CancelToken) {
-                        PathFilter = filter, 
-                        Log = Log,
-                        RecursiveListing = RecursiveListing
+                        FilterOptions = filter, 
+                        Log = Log
                     };
                     foreach (var file in lister.GetFileList()) {
                         yield return file.Path;
