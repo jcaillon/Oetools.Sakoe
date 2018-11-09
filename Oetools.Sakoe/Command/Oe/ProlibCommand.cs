@@ -36,8 +36,8 @@ namespace Oetools.Sakoe.Command.Oe {
     [Subcommand(typeof(ListProlibCommand))]
     internal class ProlibCommand : ArchiverBaseCommand {
 
-        public override IArchiver GetArchiver() => Archiver.New(ArchiverType.Prolib);
-        
+        public override IArchiver GetArchiver() => Archiver.NewProlibArchiver();
+
     }
     
     [Command(

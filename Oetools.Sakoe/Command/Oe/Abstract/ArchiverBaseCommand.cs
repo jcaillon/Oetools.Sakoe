@@ -98,40 +98,4 @@ namespace Oetools.Sakoe.Command.Oe {
             return 0;
         }
     }
-    
-    public class TaskArchive : OeTaskFileTargetArchive {
-        
-        [XmlAttribute("TargetCabFilePath")]
-        [ReplaceVariables(LeaveUnknownUntouched = true)]
-        public string TargetCabFilePath { get; set; }
-        
-        [XmlAttribute(AttributeName = "ArchivesCompressionLevel")]
-        public string ArchivesCompressionLevel { get; set; }
-
-        public override OeCompressionLevel GetArchivesCompressionLevel() {
-            if (Enum.TryParse(ArchivesCompressionLevel, true, out OeCompressionLevel level)) {
-                return level;
-            }
-            return OeCompressionLevel.None;
-        }
-
-        protected override IArchiver GetArchiver() {
-            throw new NotImplementedException();
-        }
-
-        protected override string GetTargetArchive() => TargetCabFilePath;
-        
-        protected override string GetTargetArchivePropertyName() => nameof(TargetCabFilePath);
-
-        protected override OeTargetArchive GetNewTargetArchive() => new OeTargetArchiveCab();
-
-        public override void ExecuteForFilesTargetArchives(IEnumerable<IOeFileToBuildTargetArchive> files) => throw new NotImplementedException();
-    }
-    
-    internal class FileInArchive : IFileInArchiveToExtract, IFileInArchiveToDelete, IFileToArchive {
-        public string ArchivePath { get; set; }
-        public string RelativePathInArchive { get; set; }
-        public string ExtractionPath { get; set; }
-        public string SourcePath { get; set; }
-    }
 }
