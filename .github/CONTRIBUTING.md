@@ -1,5 +1,6 @@
-Thank you for contributing {{.RepoName}}!
-===
+Thank you for contributing to this repo
+
+------
 
 The prefered language is english.
 
