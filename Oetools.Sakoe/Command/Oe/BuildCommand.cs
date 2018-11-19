@@ -1,5 +1,7 @@
 ﻿using System;
 using McMaster.Extensions.CommandLineUtils;
+using Oetools.Builder;
+using Oetools.Builder.Project;
 using Oetools.Builder.Utilities;
 
 namespace Oetools.Sakoe.Command.Oe {
@@ -30,32 +32,13 @@ namespace Oetools.Sakoe.Command.Oe {
         [Option("-cf|--extra-config-file", "", CommandOptionType.SingleValue)]
         protected string ExtraConfigFilePath { get; set; }
         
-        [LegalFilePath]
-        [Option("-sd|--source-directory", "Specify the source directory for the build, default to the current directory", CommandOptionType.SingleValue)]
-        protected string SourceDirectory { get; set; }
-        
-        // ----------- OVERRIDE ------------
-        
-        [LegalFilePath]
-        [Option("-o|--output-directory", "Specify the output directory for the build (overrides value in " + OeBuilderConstants.OeProjectExtension + ")", CommandOptionType.SingleValue)]
-        protected string OutputDirectory { get; set; }
-
-        [LegalFilePath]
-        [Option("-rp|--report-path", " (overrides value in " + OeBuilderConstants.OeProjectExtension + ")", CommandOptionType.SingleValue)]
-        protected string ReportFilePath { get; set; }
-        
-        [LegalFilePath]
-        [Option("-ho|--history-output", " (overrides value in " + OeBuilderConstants.OeProjectExtension + ")", CommandOptionType.SingleValue)]
-        protected string BuildHistoryOutputFilePath { get; set; }
-        
-        [LegalFilePath]
-        [FileExists]
-        [Option("-hi|--history-input", " (overrides value in " + OeBuilderConstants.OeProjectExtension + ")", CommandOptionType.SingleValue)]
-        protected string BuildHistoryInputFilePath { get; set; }    
-        
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            Log.Warn("Build");
-            return 1;
+            var project = OeProject.Load(ProjectFilePath ?? GetCurrentProjectFilePath());
+            using (var builder = new BuilderAuto(project, ConfigurationName)) {
+                builder.CancelToken = CancelToken;
+                builder.Log = Log;
+                builder.Build();}
+            return 0;
         }
 
     }

@@ -57,7 +57,7 @@ namespace Oetools.Sakoe.Command.Oe {
         /// <returns></returns>
         /// <exception cref="CommandException"></exception>
         protected string GetCurrentProjectFilePath() {
-            var list = Directory.EnumerateFiles(Directory.GetCurrentDirectory(), $"{OeBuilderConstants.OeProjectExtension}*", SearchOption.TopDirectoryOnly).ToList();
+            var list = Directory.EnumerateFiles(Path.Combine(Directory.GetCurrentDirectory(), OeBuilderConstants.OeProjectDirectory), $"*{OeBuilderConstants.OeProjectExtension}", SearchOption.TopDirectoryOnly).ToList();
             if (list.Count == 0) {
                 throw new CommandException($"No project file ({OeBuilderConstants.OeProjectExtension}) found in the current folder {Directory.GetCurrentDirectory()}");
             }

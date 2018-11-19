@@ -61,6 +61,8 @@ Response file parsing:
                     app.ParserSettings.MakeSuggestionsInErrorMessage = true;
                     return app.Execute(args);
                 } 
+            //} catch (UnrecognizedCommandParsingException ex) {
+            //    System.Console($"nearest match .... {ex.NearestMatch}")
             } catch (CommandParsingException ex) {
                 using (var log = new ConsoleIo(console, ConsoleIo.LogLvl.Info, true)) {
                     log.Error(ex.Message);
