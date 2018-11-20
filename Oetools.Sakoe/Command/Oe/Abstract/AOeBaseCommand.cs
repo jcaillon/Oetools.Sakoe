@@ -26,9 +26,9 @@ using Oetools.Builder.Utilities;
 using Oetools.Sakoe.Command.Exceptions;
 using Oetools.Utilities.Openedge;
 
-namespace Oetools.Sakoe.Command.Oe {
+namespace Oetools.Sakoe.Command.Oe.Abstract {
     
-    public abstract class OeBaseCommand : BaseCommand {
+    public abstract class AOeBaseCommand : BaseCommand {
         
         [DirectoryExists]
         [Option("-dlc|--dlc", "The path to the directory containing the Openedge installation.", CommandOptionType.SingleValue)]

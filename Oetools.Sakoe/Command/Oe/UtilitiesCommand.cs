@@ -22,6 +22,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using McMaster.Extensions.CommandLineUtils;
+using Oetools.Sakoe.Command.Oe.Abstract;
 using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge;
 
@@ -68,7 +69,7 @@ It will also ignore comment lines starting with #.",
         ExtendedHelpText = @"", 
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class GetProExecPathUtilitiesCommand : OeBaseCommand {
+    internal class GetProExecPathUtilitiesCommand : AOeBaseCommand {
         
         [Option("-c|--char-mode", "Specify to return the path of the character mode executable.", CommandOptionType.NoValue)]
         public bool CharMode { get; }
@@ -90,7 +91,7 @@ It returns only existing directories or .pl files.
 It also expands environment variables like %TEMP% or $DLC.", 
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class GetPropathFromIniUtilitiesCommand : OeBaseCommand {
+    internal class GetPropathFromIniUtilitiesCommand : AOeBaseCommand {
         
         [Required]
         [FileExists]
@@ -121,7 +122,7 @@ It also expands environment variables like %TEMP% or $DLC.",
         ExtendedHelpText = @"", 
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class GetProVersionUtilitiesCommand : OeBaseCommand {
+    internal class GetProVersionUtilitiesCommand : AOeBaseCommand {
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
 

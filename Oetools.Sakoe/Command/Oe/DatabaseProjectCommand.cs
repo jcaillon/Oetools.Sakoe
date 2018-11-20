@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using McMaster.Extensions.CommandLineUtils;
+using Oetools.Sakoe.Command.Oe.Abstract;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Openedge.Database;
 
@@ -22,7 +23,7 @@ namespace Oetools.Sakoe.Command.Oe {
         ExtendedHelpText = "TODO : database",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class ConnectDatabaseProjectCommand : OeBaseCommand {
+    internal class ConnectDatabaseProjectCommand : AOeBaseCommand {
         
         [Required]
         [LegalFilePath]

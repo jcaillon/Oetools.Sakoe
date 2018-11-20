@@ -3,6 +3,7 @@ using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder;
 using Oetools.Builder.Project;
 using Oetools.Builder.Utilities;
+using Oetools.Sakoe.Command.Oe.Abstract;
 
 namespace Oetools.Sakoe.Command.Oe {
     
@@ -12,7 +13,7 @@ namespace Oetools.Sakoe.Command.Oe {
         ExtendedHelpText = "TODO",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class BuildCommand : OeBaseCommand {
+    internal class BuildCommand : AOeBaseCommand {
         
         [LegalFilePath]
         [Argument(0, Name = "Project file path", Description = "Path to the project file (" + OeBuilderConstants.OeProjectExtension + " extension is optional), default to any " + OeBuilderConstants.OeProjectExtension + " file in the .oe folder if it exists")]

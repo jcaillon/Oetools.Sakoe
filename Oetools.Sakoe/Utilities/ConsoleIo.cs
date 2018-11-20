@@ -21,7 +21,7 @@
 using System;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder.Utilities;
-using ShellProgressBar;
+using Oetools.Sakoe.ShellProgressBar;
 
 namespace Oetools.Sakoe.Utilities {
     

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace ShellProgressBar
+namespace Oetools.Sakoe.ShellProgressBar
 {
 	public class FixedDurationBar : ProgressBar
 	{

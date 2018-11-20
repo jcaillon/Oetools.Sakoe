@@ -22,6 +22,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using McMaster.Extensions.CommandLineUtils;
+using Oetools.Sakoe.Command.Oe.Abstract;
 using Oetools.Utilities.Archive;
 using Oetools.Utilities.Openedge;
 

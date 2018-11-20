@@ -1,6 +1,6 @@
 using System;
 
-namespace ShellProgressBar
+namespace Oetools.Sakoe.ShellProgressBar
 {
 	public class ChildProgressBar : ProgressBarBase, IProgressBar
 	{

@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Threading;
 using McMaster.Extensions.CommandLineUtils;
+using Oetools.Sakoe.ShellProgressBar;
 using Oetools.Utilities.Openedge.Database;
-using ShellProgressBar;
 
 namespace Oetools.Sakoe.Command.Oe {
     

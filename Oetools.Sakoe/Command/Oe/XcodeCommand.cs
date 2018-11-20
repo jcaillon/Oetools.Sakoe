@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using McMaster.Extensions.CommandLineUtils;
+using Oetools.Sakoe.Command.Oe.Abstract;
 using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge;
 using Oetools.Utilities.Openedge.Exceptions;

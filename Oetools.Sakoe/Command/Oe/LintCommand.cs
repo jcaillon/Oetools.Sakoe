@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using McMaster.Extensions.CommandLineUtils;
+using Oetools.Sakoe.Command.Oe.Abstract;
 
 namespace Oetools.Sakoe.Command.Oe {
     
@@ -12,7 +13,7 @@ namespace Oetools.Sakoe.Command.Oe {
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         AllowArgumentSeparator = true
     )]
-    internal class LintCommand : OeBaseCommand {
+    internal class LintCommand : AOeBaseCommand {
         [Option("-m")]
         public string Message { get; set; }
 

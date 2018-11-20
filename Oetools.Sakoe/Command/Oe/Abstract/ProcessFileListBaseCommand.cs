@@ -25,7 +25,7 @@ using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Command.Exceptions;
 using Oetools.Utilities.Lib.Extension;
 
-namespace Oetools.Sakoe.Command.Oe {
+namespace Oetools.Sakoe.Command.Oe.Abstract {
     
     public abstract class ProcessFileListBaseCommand : FileListBaseCommand {
         

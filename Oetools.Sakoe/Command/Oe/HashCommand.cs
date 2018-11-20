@@ -25,6 +25,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using McMaster.Extensions.CommandLineUtils;
+using Oetools.Sakoe.Command.Oe.Abstract;
 using Oetools.Utilities.Openedge;
 
 namespace Oetools.Sakoe.Command.Oe {

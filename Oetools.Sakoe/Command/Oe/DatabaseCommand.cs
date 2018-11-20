@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Command.Exceptions;
+using Oetools.Sakoe.Command.Oe.Abstract;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge.Database;
@@ -33,7 +34,7 @@ namespace Oetools.Sakoe.Command.Oe {
         ExtendedHelpText = "TODO : database",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class RepairDatabaseCommand : OeBaseCommand {
+    internal class RepairDatabaseCommand : AOeBaseCommand {
         
         [Required]
         [LegalFilePath]
@@ -59,7 +60,7 @@ namespace Oetools.Sakoe.Command.Oe {
         ExtendedHelpText = "TODO : database",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class DeleteDatabaseCommand : OeBaseCommand {
+    internal class DeleteDatabaseCommand : AOeBaseCommand {
         
         [Required]
         [LegalFilePath]
@@ -86,7 +87,7 @@ namespace Oetools.Sakoe.Command.Oe {
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         AllowArgumentSeparator = true
     )]
-    internal class StopDatabaseCommand : OeBaseCommand {
+    internal class StopDatabaseCommand : AOeBaseCommand {
         
         [Required]
         [LegalFilePath]
@@ -131,7 +132,7 @@ namespace Oetools.Sakoe.Command.Oe {
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         AllowArgumentSeparator = true
     )]
-    internal class StartDatabaseCommand : OeBaseCommand {
+    internal class StartDatabaseCommand : AOeBaseCommand {
         
         [Required]
         [LegalFilePath]
@@ -196,7 +197,7 @@ namespace Oetools.Sakoe.Command.Oe {
         ExtendedHelpText = "TODO : extended database creation",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class CreateDatabaseCommand : OeBaseCommand {
+    internal class CreateDatabaseCommand : AOeBaseCommand {
         
         [Required]
         [LegalFilePath]

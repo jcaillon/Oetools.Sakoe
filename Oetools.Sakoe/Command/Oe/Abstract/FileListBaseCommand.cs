@@ -21,11 +21,9 @@
 using System.Collections.Generic;
 using System.IO;
 using McMaster.Extensions.CommandLineUtils;
-using Oetools.Builder.Project;
-using Oetools.Builder.Project.Task;
 using Oetools.Builder.Utilities;
 
-namespace Oetools.Sakoe.Command.Oe {
+namespace Oetools.Sakoe.Command.Oe.Abstract {
     
     public abstract class FileListBaseCommand : BaseCommand {
         
@@ -59,7 +57,7 @@ namespace Oetools.Sakoe.Command.Oe {
                     Directory.GetCurrentDirectory()
                 };
             }
-            var filter = new OeFilterOptions {
+            var filter = new PathListerFilterOptions {
                 Include = IncludeFilter,
                 Exclude = ExcludeFilter,
                 IncludeRegex = IncludeRegexFilter,

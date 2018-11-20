@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Oetools.Utilities.Lib;
 
-namespace ShellProgressBar
+namespace Oetools.Sakoe.ShellProgressBar
 {
 	public class ProgressBar : ProgressBarBase, IProgressBar
 	{

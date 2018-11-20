@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using Oetools.Utilities.Lib;
 
-namespace ShellProgressBar
+namespace Oetools.Sakoe.ShellProgressBar
 {
 	public static class TaskbarProgress
 	{

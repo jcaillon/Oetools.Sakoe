@@ -18,20 +18,12 @@
 // ========================================================================
 #endregion
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Serialization;
 using McMaster.Extensions.CommandLineUtils;
-using Oetools.Builder.History;
-using Oetools.Builder.Project;
-using Oetools.Builder.Project.Task;
-using Oetools.Builder.Utilities.Attributes;
 using Oetools.Utilities.Archive;
 using Oetools.Utilities.Lib;
-using Oetools.Utilities.Openedge;
 
-namespace Oetools.Sakoe.Command.Oe {
+namespace Oetools.Sakoe.Command.Oe.Abstract {
     
     internal abstract class ArchiverBaseCommand : BaseCommand {
         
