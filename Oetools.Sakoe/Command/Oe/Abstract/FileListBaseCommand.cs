@@ -21,6 +21,7 @@
 using System.Collections.Generic;
 using System.IO;
 using McMaster.Extensions.CommandLineUtils;
+using Oetools.Builder.Project.Properties;
 using Oetools.Builder.Utilities;
 
 namespace Oetools.Sakoe.Command.Oe.Abstract {
@@ -57,7 +58,7 @@ namespace Oetools.Sakoe.Command.Oe.Abstract {
                     Directory.GetCurrentDirectory()
                 };
             }
-            var filter = new PathListerFilterOptions {
+            var filter = new OeSourceFilterOptions {
                 Include = IncludeFilter,
                 Exclude = ExcludeFilter,
                 IncludeRegex = IncludeRegexFilter,
