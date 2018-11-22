@@ -22,6 +22,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.Linq;
+using System.Text;
 using System.Threading;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder.Utilities;
@@ -149,6 +151,56 @@ namespace Oetools.Sakoe.Command {
             app.ShowHelp();
             Log.Warn("You must provide a command");
             return 1;
+        }
+
+        /// <summary>
+        /// Get the command line that calls the given type.
+        /// For instance, it will return sakoe project init of the type given is the command for init.
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        protected string GetCommandLineFromType(CommandLineApplication app, Type type) {
+            var rootApp = app;
+            while (rootApp.Parent != null) {
+                rootApp = rootApp.Parent;
+            }
+            var sb = new StringBuilder(rootApp.Name);
+            foreach (var command in GetCommandStackFromType(type)) {
+                sb.Append(' ');
+                sb.Append(command.Name);
+            }
+            return sb.ToString();
+        }
+        
+        /// <summary>
+        /// Returns a "stack" of <see cref="CommandAttribute"/> to reach the given type.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        protected List<CommandAttribute> GetCommandStackFromType(Type type) {
+            var subCommands = Attribute.GetCustomAttributes(typeof(MainCommand), typeof(SubcommandAttribute), true).OfType<SubcommandAttribute>().ToList();
+            var stack = new Stack<Tuple<List<CommandAttribute>, List<SubcommandAttribute>>>();
+            stack.Push(new Tuple<List<CommandAttribute>, List<SubcommandAttribute>>(new List<CommandAttribute>(), subCommands));
+            while (stack.Count > 0) {
+                var tuple = stack.Pop();
+                subCommands = tuple.Item2;
+                foreach (var subCommand in subCommands) {
+                    if (subCommand.Types == null) {
+                        continue;
+                    }
+                    foreach (var subCommandType in subCommand.Types) {
+                        var commandStack = tuple.Item1.ToList();
+                        commandStack.Add((CommandAttribute) Attribute.GetCustomAttribute(subCommandType, typeof(CommandAttribute), true));
+                        if (subCommandType == type) {
+                            return commandStack;
+                        }
+                        var subCommandList = Attribute.GetCustomAttributes(subCommandType, true).OfType<SubcommandAttribute>().ToList();
+                        stack.Push(new Tuple<List<CommandAttribute>, List<SubcommandAttribute>>(commandStack, subCommandList));
+                    }
+                }
+            }
+            return null;
         }
 
         /// <summary>
