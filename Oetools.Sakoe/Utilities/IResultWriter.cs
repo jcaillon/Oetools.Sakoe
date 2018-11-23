@@ -18,9 +18,12 @@
 // ========================================================================
 #endregion
 
+using System;
+
 namespace Oetools.Sakoe.Utilities {
     public interface IResultWriter {
-        void WriteResult(string result);
-        void WriteResultOnNewLine(string result);
+        void WriteResult(string result, ConsoleColor? color = null, int padding = 0);
+        void WriteResultOnNewLine(string result, ConsoleColor? color = null, int padding = 0);
+        void WriteNewLine();
     }
 }

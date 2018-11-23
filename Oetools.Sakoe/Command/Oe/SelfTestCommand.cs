@@ -7,6 +7,7 @@ using Oetools.Sakoe.ShellProgressBar;
 using Oetools.Utilities.Openedge.Database;
 
 namespace Oetools.Sakoe.Command.Oe {
+#if DEBUG
     
     [Command(
         "selftest", "st",
@@ -19,6 +20,8 @@ namespace Oetools.Sakoe.Command.Oe {
     [Subcommand(typeof(InputSelfTestCommand))]
     [Subcommand(typeof(PromptSelfTestCommand))]
     [Subcommand(typeof(ResponseFileSelfTestCommand))]
+    [Subcommand(typeof(WrapSelfTestCommand))]
+    [Subcommand(typeof(ConsoleFormatSelfTestCommand))]
     internal class SelfTestCommand : BaseCommand {
         
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
@@ -26,6 +29,110 @@ namespace Oetools.Sakoe.Command.Oe {
             Log.Info("Dummy command.");
             
             return 0;
+        }
+
+    }
+    
+    [Command(
+        "consoleformat", "cf",
+        Description = "Subcommand that shows the use of CsConsoleFormat",
+        ExtendedHelpText = "sakoe selftest consoleformat",
+        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+    )]
+    internal class ConsoleFormatSelfTestCommand : BaseCommand {
+
+        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
+
+            // The library is CsConsoleFormat
+            
+            /*
+            ConsoleRenderer.RenderDocument(new Document(
+                new Span("Order #") { Color = ConsoleColor.Blue }, 1, "\n",
+                new Separator(),
+                new Span("line"),
+                new Br(),
+                new Span("line"),
+                new Div(),
+                new Span("Customer: ") { Color = ConsoleColor.Yellow }, "name",
+                new Grid {
+                    Color = ConsoleColor.White,
+                    Stroke = LineThickness.None,
+                    Columns = { GridLength.Auto, GridLength.Auto, GridLength.Auto, },
+                    Children = {
+                        new Cell("Id") { Stroke = LineThickness.None,  },
+                        new Cell("Name") { Stroke = LineThickness.None },
+                        new Cell("Count") { Stroke = LineThickness.None },
+                        new Cell(1){ Stroke = LineThickness.None },
+                        new Cell("name1"){ Stroke = LineThickness.None },
+                        new Cell("count") { Align = Align.Right, Stroke = LineThickness.None },
+                        new Cell(1){ Stroke = LineThickness.None },
+                        new Cell(@"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas varius sapien
+vel purus hendrerit vehicula. Integer hendrerit viverra turpis, ac sagittis arcu
+pharetra id. Sed dapibus enim non dui posuere sit amet rhoncus tellus
+consectetur. Proin blandit lacus vitae nibh tincidunt cursus. Cum sociis natoque
+penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nam tincidunt
+purus at tortor tincidunt et aliquam dui gravida. Nulla consectetur sem vel
+felis vulputate et imperdiet orci pharetra. Nam vel tortor nisi. Sed eget porta
+tortor. Aliquam suscipit lacus vel odio faucibus tempor. Sed ipsum est,
+condimentum eget eleifend ac, ultricies non dui. Integer tempus, nunc sed
+venenatis feugiat, augue orci pellentesque risus, nec pretium lacus enim eu
+nibh."){ Stroke = LineThickness.None, Margin = new Thickness(1) },
+                        new Cell(@"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas varius sapien
+vel purus hendrerit vehicula. Integer hendrerit viverra turpis, ac sagittis arcu
+pharetra id. Sed dapibus enim non dui posuere sit amet rhoncus tellus
+consectetur. Proin blandit lacus vitae nibh tincidunt cursus. Cum sociis natoque
+penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nam tincidunt
+purus at tortor tincidunt et aliquam dui gravida. Nulla consectetur sem vel
+felis vulputate et imperdiet orci pharetra. Nam vel tortor nisi. Sed eget porta
+tortor. Aliquam suscipit lacus vel odio faucibus tempor. Sed ipsum est,
+condimentum eget eleifend ac, ultricies non dui. Integer tempus, nunc sed
+venenatis feugiat, augue orci pellentesque risus, nec pretium lacus enim eu
+nibh.") { Align = Align.Right ,Stroke = LineThickness.None },
+                    }
+                }
+            ));
+            */
+
+            return 1;
+        }
+
+    }
+    
+    [Command(
+        "wrap", "wr",
+        Description = "Subcommand that shows the word wrap",
+        ExtendedHelpText = "sakoe selftest wrap",
+        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+    )]
+    internal class WrapSelfTestCommand : BaseCommand {
+
+        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
+            Out.WriteResultOnNewLine("  0123456789abcdefghijklmnopsqrstu\n          0123456789abcdefghijklmnopsqrstu");
+            Out.WriteResultOnNewLine("012345");
+            Out.WriteResult("  01234567\n89");
+            Out.WriteResultOnNewLine("012345", ConsoleColor.Gray, 5);
+            Out.WriteResultOnNewLine("012345");
+            Out.WriteResultOnNewLine("0123456789abcdefghijklmnopsqrstu");
+            
+            Out.WriteResultOnNewLine("This is an output, it will still be displayed if the verbosity is set to None");
+            Out.WriteResult(". ");
+            Out.WriteResult("Another phrase.");
+            Out.WriteResultOnNewLine("This is an output, it will still be displayed if the verbosity is set to None");
+            Out.WriteResult(". ");
+            Out.WriteResult("Anotherphrasemustlongerzefzefzefzefzaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaefzefezzezefzfethanexpected.");
+            
+            Out.WriteResultOnNewLine(@"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas varius sapien vel purus hendrerit vehicula. Integer hendrerit viverra turpis, ac sagittis arcu pharetra id. Sed dapibus enim non dui posuere sit amet rhoncus tellus consectetur. Proin blandit lacus vitae nibh tincidunt cursus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nam tincidunt purus at tortor tincidunt et aliquam dui gravida. Nulla consectetur sem vel felis vulputate et imperdiet orci pharetra. 
+   Nam vel tortor nisi. Sed eget porta tortor. Aliquam suscipit lacus vel odio faucibus tempor. Sed ipsum est, condimentum eget eleifend ac, ultricies non dui. Integer tempus, nunc sed venenatis feugiat, augue orci pellentesque risus, nec pretium lacus enim eu nibh.");
+            
+            Out.WriteResultOnNewLine(null);
+            Log.Debug("Log debug");
+            Log.Info("Log info");
+            Log.Warn("Log warn");
+            Log.Error("Log error");
+            Log.Fatal("Log fatal");
+            Log.Done("Log success");
+
+            return 1;
         }
 
     }
@@ -322,4 +429,7 @@ sakoe st input -b2 s1024",
         }
 
     }
+    
+#endif
+    
 }

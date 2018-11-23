@@ -24,14 +24,14 @@ namespace Oetools.Sakoe.Command.Oe {
     
     [Command(
         "init", "in",
-        Description = "Initialize a new Openedge project.",
+        Description = "Initialize a new Openedge project file (" + OeBuilderConstants.OeProjectExtension + ").",
         ExtendedHelpText = "",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
     internal class IniProjectCommand : BaseCommand {
         
         [DirectoryExists]
-        [Argument(0, Name = "<directory>", Description = "The directory in which to initialize the project. Default to current directory.")]
+        [Argument(0, Name = "<directory>", Description = "The directory in which to initialize the project. Default to the current directory.")]
         public string SourceDirectory { get; set; }
         
         [LegalFilePath]
@@ -39,26 +39,26 @@ namespace Oetools.Sakoe.Command.Oe {
         public string ProjectName { get; set; }
         
         
-        [Option("-l|--local", "Indicates if the project should be created for a local use only.", CommandOptionType.NoValue)]
+        [Option("-l|--local", "Create the new project file for local use only.", CommandOptionType.NoValue)]
         public bool IsLocalProject { get; set; }
         
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-
+            
             if (string.IsNullOrEmpty(SourceDirectory)) {
                 SourceDirectory = Directory.GetCurrentDirectory();
-                Log.Trace?.Write($"Using current directory to initialize the project : {SourceDirectory.PrettyQuote()}.");
+                Log.Trace?.Write($"Using current directory to initialize the project: {SourceDirectory.PrettyQuote()}.");
             }
 
             SourceDirectory = SourceDirectory.MakePathAbsolute().ToCleanPath();
 
             if (string.IsNullOrEmpty(ProjectName)) {
                 ProjectName = Path.GetFileName(SourceDirectory);
-                Log.Trace?.Write($"Using directory name for the project name : {ProjectName.PrettyQuote()}.");
+                Log.Trace?.Write($"Using directory name for the project name: {ProjectName.PrettyQuote()}.");
             }
 
             var projectDirectory = IsLocalProject ? OeBuilderConstants.GetProjectDirectoryLocal(SourceDirectory) : OeBuilderConstants.GetProjectDirectory(SourceDirectory);
             if (Utils.CreateDirectoryIfNeeded(projectDirectory, FileAttributes.Hidden)) {
-                Log.Info($"Created project directory : {projectDirectory.PrettyQuote()}.");
+                Log.Info($"Created project directory: {projectDirectory.PrettyQuote()}.");
             }
 
             Log.Trace?.Write("Generating a default project.");
@@ -66,10 +66,10 @@ namespace Oetools.Sakoe.Command.Oe {
             
             var projectFilePath = Path.Combine(projectDirectory, $"{ProjectName}{OeBuilderConstants.OeProjectExtension}");
             if (File.Exists(projectFilePath)) {
-                throw new CommandValidationException($"The project file already exists, delete it first : {projectFilePath.PrettyQuote()}.");
+                throw new CommandValidationException($"The project file already exists, delete it first: {projectFilePath.PrettyQuote()}.");
             }
             
-            Log.Info($"Creating openedge project file: {projectFilePath.PrettyQuote()}.");
+            Log.Info($"Creating Openedge project file: {projectFilePath.PrettyQuote()}.");
             project.Save(projectFilePath);
             
             Log.Info($"Project created: {projectFilePath.PrettyQuote()}.");
@@ -78,7 +78,7 @@ namespace Oetools.Sakoe.Command.Oe {
 
 IMPORTANT README:
 
-The project file created (" + OeBuilderConstants.OeProjectDirectory + @") is defined in XML format and has a provided XML schema definition file (Project.xsd).
+The project file created (" + OeBuilderConstants.OeProjectExtension + @") is defined in XML format and has a provided XML schema definition file (Project.xsd).
 
 The project XML schema is fully documented and should be used to enable intellisense in your favorite editor.
 Example of xml editors with out-of-the-box intellisense (autocomplete) features for xml:
@@ -88,38 +88,41 @@ Example of xml editors with out-of-the-box intellisense (autocomplete) features 
 - Most jetbrain IDE
 
 Drag and drop the created " + OeBuilderConstants.OeProjectExtension + @" file into the editor of your choice and start configuring your build.
-You can use the command " + GetCommandLineFromType(app, typeof(InitGitignoreCommand)).PrettyQuote() + @" to setup your git repo.
-The file " + Path.Combine(OeBuilderConstants.OeProjectDirectory, OeBuilderConstants.OeProjectExtension).PrettyQuote() + @" should be versioned in your source repository to allow anyone who clones it to build your application.
-If you need to have a project file containing build configurations for your machine only, you can define a local project.
+The file " + Path.Combine(OeBuilderConstants.GetProjectDirectory(""), $"{ProjectName}{OeBuilderConstants.OeProjectExtension}").PrettyQuote() + @" should be versioned in your source repository to allow anyone who clones it to build your application.
+If you need to have a project file containing build configurations specific to your local machine, you can use the option " + (GetCommandOptionFromPropertyName(nameof(IsLocalProject))?.Template ?? "").PrettyQuote() + @". This will create the project file into the directory " + OeBuilderConstants.GetProjectDirectoryLocal("").PrettyQuote() + @" which should not be versioned. 
+For git repositories, use the command " + GetCommandLineFromType(app, typeof(InitGitignoreCommand)).PrettyQuote() + @" to set up your .gitignore file for sakoe projects.
 ");
             
             return 0;
         }
-        
-        
     }
 
     [Command(
         "gitinit", "gi", 
-        Description = "Initialize a .gitignore file adapted for sakoe projects (append if exist).", 
+        Description = "Initialize a .gitignore file adapted for sakoe projects (or append to, if it exists).", 
         ExtendedHelpText = "", 
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase)
     ]
     internal class InitGitignoreCommand : BaseCommand {
 
         [DirectoryExists]
-        [Argument(0, Name = "<directory>", Description = "The project directory. Defaults to the current directory.")]
+        [Argument(0, Name = "<directory>", Description = "The repository base directory (source directory). Defaults to the current directory.")]
         public string SourceDirectory { get; set; }
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
 
             var gitIgnorePath = Path.Combine(SourceDirectory, ".gitignore");
+
+            bool hasCarriageReturn = false;
             
             if (File.Exists(gitIgnorePath)) {
                 var gitIgnoreContent = File.ReadAllText(gitIgnorePath);
                 if (gitIgnoreContent.Contains(".oe/local/")) {
                     Log?.Info("The .gitignore already exists and seems to already contain the appropriate exclusions.");
+                    return 0;
                 }
+                
+                hasCarriageReturn = gitIgnoreContent.IndexOf('\r') >= 0;
             }
 
             var ignoreContent = new StringBuilder(@"
@@ -143,6 +146,12 @@ bin/
             ignoreContent.Append("*").AppendLine(UoeConstants.ExtDebugList);
             ignoreContent.Append("*").AppendLine(UoeConstants.ExtR);
             ignoreContent.Append("*").AppendLine(UoeConstants.ExtProlibFile);
+
+            ignoreContent.Replace("\r", "");
+
+            if (hasCarriageReturn) {
+                ignoreContent.Replace("\n", "\r\n");
+            }
             
             File.AppendAllText(gitIgnorePath, ignoreContent.ToString());
             

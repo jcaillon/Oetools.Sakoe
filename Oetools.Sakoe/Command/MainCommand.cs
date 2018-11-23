@@ -46,7 +46,7 @@ Response file parsing:
     [Subcommand(typeof(ShowVersionCommand))]
     [Subcommand(typeof(XcodeCommand))]
     [Subcommand(typeof(HashCommand))]
-    [Subcommand(typeof(ProHelpProHelpCommand))]
+    [Subcommand(typeof(ProHelpCommand))]
     [Subcommand(typeof(UtilitiesCommand))]
     [Subcommand(typeof(ProlibCommand))]
     internal class MainCommand : BaseCommand {
@@ -55,6 +55,7 @@ Response file parsing:
         
         public static int ExecuteMainCommand(string[] args) {
             var console = PhysicalConsole.Singleton;
+            HelpGenerator.Console = console;
             try {
                 using (var app = new CommandLineApplicationCustomHint<MainCommand>(HelpGenerator, console, Directory.GetCurrentDirectory(), true)) {
                     app.Conventions.UseDefaultConventions();
@@ -69,6 +70,8 @@ Response file parsing:
                     log.Info($"Specify {HelpLongName} for a list of available options and commands.");
                     log.Fatal($"Exit code {FatalExitCode} - Error");
                     
+                    
+                    log.WriteNewLine();
                     console.ResetColor();
                     return FatalExitCode;
                 }

@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using McMaster.Extensions.CommandLineUtils;
@@ -75,7 +76,7 @@ namespace Oetools.Sakoe.Command {
         
         protected CancellationTokenSource _cancelSource;
         
-        public static readonly HelpTextGenerator HelpGenerator = new HelpTextGenerator();
+        public static readonly HelpTextGenerator HelpGenerator = HelpTextGenerator.Singleton;
         
         // ReSharper disable once UnusedMember.Global
         protected int OnExecute(CommandLineApplication app, IConsole console) {
@@ -94,19 +95,18 @@ namespace Oetools.Sakoe.Command {
                 
                 int exitCode = FatalExitCode;
                 
-                var stopwatch = Stopwatch.StartNew();
-                
                 try {
                     ExecutePreCommand(app, console);
-                    var returnCode = ExecuteCommand(app, console);
+                    exitCode = ExecuteCommand(app, console);
                     ExecutePostCommand(app, console);
-                    if (returnCode.Equals(0)) {
-                        Log.Done($"Exit code 0 - in {stopwatch.Elapsed.ConvertToHumanTime()} - Ok");
+                    if (exitCode.Equals(0)) {
+                        Log.Done("Exit code 0");
                     } else {
-                        Log.Warn($"Exit code {returnCode} - in {stopwatch.Elapsed.ConvertToHumanTime()} - Warn");
+                        Log.Warn($"Exit code {exitCode}");
                     }
                     Console.ResetColor();
-                    return returnCode;
+                    Out.WriteNewLine();
+                    return exitCode;
                     
                 } catch (Exception e) {
                     Log.Error($"{e.Message}", e);
@@ -118,9 +118,10 @@ namespace Oetools.Sakoe.Command {
                     }
                 }
 
-                Log.Fatal($"Exit code {exitCode} - in {stopwatch.Elapsed.ConvertToHumanTime()} - Error");
+                Log.Fatal($"Exit code {exitCode}");
                 
                 Console.ResetColor();
+                Out.WriteNewLine();
                 return exitCode;
             }
         }
@@ -151,6 +152,19 @@ namespace Oetools.Sakoe.Command {
             app.ShowHelp();
             Log.Warn("You must provide a command");
             return 1;
+        }
+
+        /// <summary>
+        /// Return the command option of this type from the property name.
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <returns></returns>
+        protected OptionAttribute GetCommandOptionFromPropertyName(string propertyName) {
+            var propertyInfo = GetType().GetProperty(propertyName);
+            if (propertyInfo != null && Attribute.GetCustomAttribute(propertyInfo, typeof(OptionAttribute), true) is OptionAttribute option) {
+                return option;
+            }
+            return null;
         }
 
         /// <summary>

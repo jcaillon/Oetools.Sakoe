@@ -34,6 +34,8 @@ namespace Oetools.Sakoe.Command.Oe {
         protected string ExtraConfigFilePath { get; set; }
         
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
+            // TODO : list leafs of xml in the help. Use the xsd to get the help text of each
+            
             var project = OeProject.Load(ProjectFilePath ?? GetCurrentProjectFilePath());
             using (var builder = new BuilderAuto(project, ConfigurationName)) {
                 builder.CancelToken = CancelToken;

@@ -1,4 +1,5 @@
 ﻿#region header
+
 // ========================================================================
 // Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
 // This file (Logger.cs) is part of Oetools.Sakoe.
@@ -16,19 +17,19 @@
 // You should have received a copy of the GNU General Public License
 // along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
+
 #endregion
 
 using System;
+using System.Diagnostics;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder.Utilities;
 using Oetools.Sakoe.ShellProgressBar;
 
 namespace Oetools.Sakoe.Utilities {
-    
-    public class ConsoleIo : IResultWriter, ILogger, ITraceLogger, IDisposable {
-
+    public class ConsoleIo : ConsoleOutputWrapText, IResultWriter, ILogger, ITraceLogger, IDisposable {
         private readonly LogLvl _logLevel;
-        
+
         public ITraceLogger Trace { get; }
 
         private ProgressBarOptions _progressBarOptions;
@@ -39,15 +40,17 @@ namespace Oetools.Sakoe.Utilities {
 
         private bool _isProgressBarOff;
 
-        private bool _hasWroteToOuput;
+        private Stopwatch _stopwatch;
 
         public ConsoleIo(IConsole console, LogLvl level, bool isProgressBarOff) {
+            _stopwatch = Stopwatch.StartNew();
             _console = console;
             _logLevel = level;
             _isProgressBarOff = isProgressBarOff;
             if (_logLevel <= LogLvl.Debug) {
                 Trace = this;
             }
+
             _progressBarOptions = new ProgressBarOptions {
                 ForegroundColor = ConsoleColor.Cyan,
                 ForegroundColorDone = ConsoleColor.DarkGray,
@@ -98,11 +101,14 @@ namespace Oetools.Sakoe.Utilities {
             if (_isProgressBarOff) {
                 return;
             }
+
             if (_console.IsOutputRedirected) {
                 // cannot use the progress bar
                 Log(LogLvl.Debug, $"{Math.Round((decimal) current / max * 100, 2)}% : {message}");
                 return;
             }
+            
+            var textWidth = Console.WindowWidth - 1;
 
             try {
                 if (_progressBar == null) {
@@ -113,11 +119,8 @@ namespace Oetools.Sakoe.Utilities {
                 }
                 _progressBar.Tick(current, message);
                 if (max == current) {
-                    _progressBar.Dispose();
-                    _progressBar = null;
+                    StopProgressBar();
                 }
-
-                _hasWroteToOuput = false;
             } catch (Exception) {
                 // ignored
             }
@@ -126,10 +129,38 @@ namespace Oetools.Sakoe.Utilities {
         public void ReportGlobalProgress(int max, int current, string message) {
             Log(LogLvl.Info, $"global progress : {message}");
         }
+        
+        public void WriteResult(string result, ConsoleColor? color = null, int padding = 0) {
+            _console.ForegroundColor = color ?? ConsoleColor.White;
+            WriteToConsoleWithWordWrap(_console.Out, result, false, padding);
+        }
 
-        private void Log(LogLvl level, string message, Exception e = null) {
+        public void WriteResultOnNewLine(string result, ConsoleColor? color = null, int padding = 0) {
+            _console.ForegroundColor = color ?? ConsoleColor.White;
+            WriteToConsoleWithWordWrap(_console.Out, result, true, padding);
+        }
+
+        public void WriteNewLine() {
+            WriteNewLine(_console.Out);
+        }
+        
+        public enum LogLvl {
+            Debug,
+            Info,
+            Done,
+            Warn,
+            Error,
+            Fatal,
+            None
+        }
+
+        private void StopProgressBar() {
             _progressBar?.Dispose();
             _progressBar = null;
+        }
+
+        private void Log(LogLvl level, string message, Exception e = null) {
+            StopProgressBar();
 
             if (level < _logLevel) {
                 return;
@@ -158,48 +189,20 @@ namespace Oetools.Sakoe.Utilities {
                     throw new ArgumentOutOfRangeException(nameof(level), level, null);
             }
 
-            var outputMessage = $"{level.ToString().ToUpper().PadRight(5, ' ')} [{DateTime.Now:yy-MM-dd HH:mm:ss}] {message}";
+            var elapsed = _stopwatch.Elapsed;
+            var outputMessage = $"{level.ToString().ToUpper().PadRight(5, ' ')} [{elapsed.Hours:D2}:{elapsed.Minutes:D2}:{elapsed.Seconds:D2}.{elapsed.Milliseconds:D3}] {message}";
             if (level >= LogLvl.Error) {
-                WriteConsole(outputMessage, true, true);
+                WriteToConsoleWithWordWrap(_console.Error, outputMessage, true, 0);
             } else {
-                WriteConsole(outputMessage, true);
+                WriteToConsoleWithWordWrap(_console.Out, outputMessage, true, 0);
             }
 
             if (e != null) {
                 _console.ForegroundColor = ConsoleColor.DarkGray;
-                WriteConsole(e.ToString(), true, true);
+                WriteToConsoleWithWordWrap(_console.Error, e.ToString(), true, 0);
             }
+
             //_console.ResetColor();
-        }
-
-        public void WriteResult(string result) {
-            _console.ForegroundColor = ConsoleColor.White;
-            WriteConsole(result);
-        }
-
-        public void WriteResultOnNewLine(string result) {
-            _console.ForegroundColor = ConsoleColor.White;
-            WriteConsole(result, true);
-        }
-
-        private void WriteConsole(string message, bool newLine = false, bool writeToErrorStream = false) {
-            if (newLine && _hasWroteToOuput) {
-                (writeToErrorStream ? _console.Error : _console.Out).Write(_console.Out.NewLine);
-            }
-            if (!string.IsNullOrEmpty(message)) {
-                (writeToErrorStream ? _console.Error : _console.Out).Write(message);
-                _hasWroteToOuput = true;
-            }
-        }
-        
-        public enum LogLvl {
-            Debug,
-            Info,
-            Done,
-            Warn,
-            Error,
-            Fatal,
-            None
         }
 
         public void Dispose() {
