@@ -76,7 +76,7 @@ namespace Oetools.Sakoe.Command {
         
         protected CancellationTokenSource _cancelSource;
         
-        public static readonly HelpTextGenerator HelpGenerator = HelpTextGenerator.Singleton;
+        public static readonly HelpGenerator HelpGenerator = HelpGenerator.Singleton;
         
         // ReSharper disable once UnusedMember.Global
         protected int OnExecute(CommandLineApplication app, IConsole console) {
@@ -90,7 +90,7 @@ namespace Oetools.Sakoe.Command {
                 console.CancelKeyPress += ConsoleOnCancelKeyPress;
                 
                 if (IsLogoOn) {
-                    HelpTextGenerator.DrawLogo(console.Out);
+                    HelpGenerator.DrawLogo(console.Out);
                 }
                 
                 int exitCode = FatalExitCode;
@@ -104,8 +104,11 @@ namespace Oetools.Sakoe.Command {
                     } else {
                         Log.Warn($"Exit code {exitCode}");
                     }
+                    if (Verbosity < ConsoleIo.LogLvl.None) {
+                        Out.WriteNewLine();
+                    }
+
                     Console.ResetColor();
-                    Out.WriteNewLine();
                     return exitCode;
                     
                 } catch (Exception e) {
@@ -119,9 +122,11 @@ namespace Oetools.Sakoe.Command {
                 }
 
                 Log.Fatal($"Exit code {exitCode}");
+                if (Verbosity < ConsoleIo.LogLvl.None) {
+                    Out.WriteNewLine();
+                }
                 
                 Console.ResetColor();
-                Out.WriteNewLine();
                 return exitCode;
             }
         }
@@ -147,7 +152,7 @@ namespace Oetools.Sakoe.Command {
         /// <returns></returns>
         protected virtual int ExecuteCommand(CommandLineApplication app, IConsole console) {
             if (!IsLogoOn && app.Parent == null) {
-                HelpTextGenerator.DrawLogo(console.Out);
+                HelpGenerator.DrawLogo(console.Out);
             }
             app.ShowHelp();
             Log.Warn("You must provide a command");

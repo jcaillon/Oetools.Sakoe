@@ -23,30 +23,44 @@ using System.IO;
 
 namespace Oetools.Sakoe.Utilities {
     
-    public class ConsoleOutputWrapText {
+    /// <summary>
+    /// This class provides methods to output text to a <see cref="TextWriter"/> with word wrap.
+    /// </summary>
+    public abstract class TextWriterWordWrap {
         
         private bool _hasWroteToOuput;
 
         private int _currentConsoleLineSpaceTaken;
         
-        protected void WriteToConsoleWithWordWrap(TextWriter textWriter, string message, bool writeToNewLine, int padding) {
+        /// <summary>
+        /// Writes a text to the console with word wrap.
+        /// </summary>
+        /// <param name="textWriter">output text writer</param>
+        /// <param name="message">the message to write</param>
+        /// <param name="writeToNewLine">write the message to a separated line (otherwise continue to output on the same line)</param>
+        /// <param name="indentation">the indentation to give to the message when written on a new line</param>
+        protected void WriteToConsoleWithWordWrap(TextWriter textWriter, string message, bool writeToNewLine, int indentation) {
+            
+            // check message
             if (message == null) {
                 message = string.Empty;
             }
 
-            var textWidth = Console.WindowWidth - 1;
-            if (textWidth < 1) {
-                textWidth = 1;
+            // maximum length for a line
+            var maxLineWidth = Console.WindowWidth - 1;
+            if (maxLineWidth < 1) {
+                maxLineWidth = 1;
             }
-            if (padding >= textWidth) {
-                padding = textWidth - 1;
-            }
-            int lineStartPos, nextLineStartPos;
             
-            // Parse each line of text
+            // check padding
+            if (indentation >= maxLineWidth) {
+                indentation = maxLineWidth - 1;
+            }
+            
+            // for each line of text
+            int lineStartPos, nextLineStartPos;
             for (lineStartPos = 0; lineStartPos < message.Length; lineStartPos = nextLineStartPos) {
                 
-                // Find end of line
                 int eolPosition = message.IndexOf('\n', lineStartPos);
                 if (eolPosition == -1) {
                     nextLineStartPos = eolPosition = message.Length;
@@ -54,44 +68,46 @@ namespace Oetools.Sakoe.Utilities {
                     nextLineStartPos = eolPosition + 1;
                 }
 
-                bool newParagraph = true;
-                int paragraphPadding = 0;
+                // an input line can have indentation; if we split this input line into several lines (because it is too long),
+                // we need to keep the same indentation for each new line
+                bool newInputLineStarting = true;
+                int paragraphIndent = 0;
                 
-                // Write this line of message, breaking into smaller lines as needed
                 if (eolPosition > lineStartPos) {
                     do {
-                        if (writeToNewLine && _hasWroteToOuput || _currentConsoleLineSpaceTaken >= textWidth) {
+                        // write a new line
+                        if (writeToNewLine && _hasWroteToOuput || _currentConsoleLineSpaceTaken >= maxLineWidth) {
                             WriteNewLine(textWriter);
                         }
                         
                         int lineLength = eolPosition - lineStartPos;
-                        int totalPadding = (_currentConsoleLineSpaceTaken > 0 ? 0 : padding) + paragraphPadding;
-                        int currentConsoleLineSpaceLeft = textWidth - _currentConsoleLineSpaceTaken - totalPadding;
+                        int totalIndent = (_currentConsoleLineSpaceTaken > 0 ? 0 : indentation) + paragraphIndent;
+                        int currentConsoleLineSpaceLeft = maxLineWidth - _currentConsoleLineSpaceTaken - totalIndent;
                         
                         if (lineLength > currentConsoleLineSpaceLeft) {
-                            lineLength = BreakLine(message, lineStartPos, currentConsoleLineSpaceLeft, !writeToNewLine && message.Length <= textWidth - totalPadding);
+                            lineLength = GetLineLengthToKeep(message, lineStartPos, currentConsoleLineSpaceLeft, !writeToNewLine && message.Length <= maxLineWidth - totalIndent);
                         }
 
                         if (lineLength > 0) {
                             var line = message.Substring(lineStartPos, lineLength);
-                            textWriter.Write(_currentConsoleLineSpaceTaken > 0 ? line : line.PadLeft(lineLength + padding + paragraphPadding, ' '));
+                            textWriter.Write(_currentConsoleLineSpaceTaken > 0 ? line : line.PadLeft(lineLength + indentation + paragraphIndent, ' '));
                         }
                         
-                        if (newParagraph && writeToNewLine) {
-                            while (lineStartPos + paragraphPadding < message.Length && char.IsWhiteSpace(message[lineStartPos + paragraphPadding])) {
-                                paragraphPadding++;
+                        if (newInputLineStarting && writeToNewLine) {
+                            while (lineStartPos + paragraphIndent < message.Length && char.IsWhiteSpace(message[lineStartPos + paragraphIndent])) {
+                                paragraphIndent++;
                             }
-                            if (paragraphPadding >= textWidth) {
-                                paragraphPadding = textWidth - 1;
+                            if (paragraphIndent >= maxLineWidth) {
+                                paragraphIndent = maxLineWidth - 1;
                             }
                         }
-                        newParagraph = false;
+                        newInputLineStarting = false;
                         
                         _currentConsoleLineSpaceTaken += lineLength;
                         _hasWroteToOuput = true;
                         writeToNewLine = true;
 
-                        // Trim whitespace following break
+                        // trim the whitespaces following a word break
                         lineStartPos += lineLength;
                         while (lineStartPos < eolPosition && char.IsWhiteSpace(message[lineStartPos])) {
                             lineStartPos++;
@@ -102,15 +118,14 @@ namespace Oetools.Sakoe.Utilities {
         }
         
         /// <summary>
-        /// Locates position to break the given line so as to avoid
-        /// breaking words.
+        /// Returns the length to keep for this line in order to wrap words.
         /// </summary>
         /// <param name="text">String that contains line of text</param>
         /// <param name="pos">Index where line of text starts</param>
-        /// <param name="max">Maximum line length</param>
-        /// <param name="allowedToReturnZero"></param>
-        /// <returns>The modified line length</returns>
-        private static int BreakLine(string text, int pos, int max, bool allowedToReturnZero) {
+        /// <param name="max">Maximum line length allowed</param>
+        /// <param name="allowedToReturnZero">Can this method return 0 if there are no spaces between <paramref name="pos"/> and <paramref name="pos"/> + <paramref name="max"/></param>
+        /// <returns>The length to keep for this line</returns>
+        private static int GetLineLengthToKeep(string text, int pos, int max, bool allowedToReturnZero) {
             // Find last whitespace in line
             int i = max;
             while (i >= 0 && !char.IsWhiteSpace(text[pos + i])) {
@@ -135,9 +150,14 @@ namespace Oetools.Sakoe.Utilities {
             // Return length of text before whitespace
             return i + 1;
         }
-        
-        protected void WriteNewLine(TextWriter textWriter) {
-            textWriter.Write(Console.Out.NewLine);
+
+        /// <summary>
+        /// Write a new line char into the text writer
+        /// </summary>
+        /// <param name="textWriter"></param>
+        /// <param name="newLine"></param>
+        protected void WriteNewLine(TextWriter textWriter, string newLine = null) {
+            textWriter.Write(newLine ?? Console.Out.NewLine);
             _currentConsoleLineSpaceTaken = 0;
         }
     }

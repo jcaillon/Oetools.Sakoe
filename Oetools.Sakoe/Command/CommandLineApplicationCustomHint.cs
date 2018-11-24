@@ -32,6 +32,6 @@ namespace Oetools.Sakoe.Command {
         }
         
         public override void ShowHint() { }
-        
+
     }
 }

@@ -18,9 +18,9 @@ namespace Oetools.Sakoe.Command.Oe {
         
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             if (BareVersion) {
-                Out.WriteResultOnNewLine($"v{typeof(HelpTextGenerator).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}");
+                Out.WriteResultOnNewLine($"v{typeof(HelpGenerator).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}");
             } else {
-                HelpTextGenerator.DrawLogo(console.Out);
+                HelpGenerator.DrawLogo(console.Out);
             }
             return 0;
         }

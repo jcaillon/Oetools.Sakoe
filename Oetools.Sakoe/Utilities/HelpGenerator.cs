@@ -30,16 +30,16 @@ using McMaster.Extensions.CommandLineUtils.HelpText;
 using Oetools.Utilities.Lib;
 
 namespace Oetools.Sakoe.Utilities {
-    public class HelpTextGenerator : ConsoleOutputWrapText, IHelpTextGenerator {
+    public class HelpGenerator : TextWriterWordWrap, IHelpTextGenerator {
         /// <summary>
-        /// A singleton instance of <see cref="HelpTextGenerator" />.
+        /// A singleton instance of <see cref="HelpGenerator" />.
         /// </summary>
-        public static HelpTextGenerator Singleton { get; } = new HelpTextGenerator();
+        public static HelpGenerator Singleton { get; } = new HelpGenerator();
 
         /// <summary>
-        /// Initializes a new instance of <see cref="HelpTextGenerator"/>.
+        /// Initializes a new instance of <see cref="HelpGenerator"/>.
         /// </summary>
-        protected HelpTextGenerator() { }
+        protected HelpGenerator() { }
 
         /// <summary>
         /// Determines if commands are ordered by name in generated help text
@@ -64,7 +64,7 @@ namespace Oetools.Sakoe.Utilities {
             output.WriteLine(@"                '`.        ");
             output.WriteLine(@" '`.    .^      \  \       == SAKOE ==");
             output.WriteLine(@"  \ \  /;/       \ \\      A Swiss Army Knife for OpenEdge.");
-            output.WriteLine(@"   \ \/_/_________\  \     " + $"Version {typeof(HelpTextGenerator).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}.");
+            output.WriteLine(@"   \ \/_/_________\  \     " + $"Version {typeof(HelpGenerator).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}.");
             output.WriteLine(@"    `/ .           _  \    " + $"Running with {(Utils.IsNetFrameworkBuild ? ".netframework" : $".netcore-{(Utils.IsRuntimeWindowsPlatform ? "win" : "unix")}")}.");
             output.WriteLine(@"     \________________/    " + $"Session started on {DateTime.Now:yy-MM-dd} at {DateTime.Now:HH:mm:ss}.");
             output.WriteLine();

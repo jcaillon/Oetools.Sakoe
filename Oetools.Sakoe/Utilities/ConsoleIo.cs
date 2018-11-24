@@ -27,7 +27,7 @@ using Oetools.Builder.Utilities;
 using Oetools.Sakoe.ShellProgressBar;
 
 namespace Oetools.Sakoe.Utilities {
-    public class ConsoleIo : ConsoleOutputWrapText, IResultWriter, ILogger, ITraceLogger, IDisposable {
+    public class ConsoleIo : TextWriterWordWrap, IResultWriter, ILogger, ITraceLogger, IDisposable {
         private readonly LogLvl _logLevel;
 
         public ITraceLogger Trace { get; }

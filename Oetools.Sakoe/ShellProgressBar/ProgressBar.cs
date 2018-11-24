@@ -109,11 +109,6 @@ namespace Oetools.Sakoe.ShellProgressBar
 			var column1Width = Console.WindowWidth - durationString.Length - (depth * 2) + 2;
 			var column2Width = durationString.Length;
 
-			if (progressBarOnBottom)
-				DrawTopHalfPrefix(indentation, depth);
-			else
-				DrawBottomHalfPrefix(indentation, depth);
-
 			var format = $"{{0, -{column1Width}}}{{1,{column2Width}}}";
 
 			var truncatedMessage = StringExtensions.Excerpt($"{percentage:N2}%" + " " + message, column1Width);
@@ -205,23 +200,12 @@ namespace Oetools.Sakoe.ShellProgressBar
 				);
 			}
 
-			if (this.Options.ProgressBarOnBottom)
-			{
-				ProgressBarBottomHalf(mainPercentage, this._startDate, null, this.Message, indentation, this.Options.ProgressBarOnBottom);
-				Console.SetCursorPosition(0, ++cursorTop);
-				TopHalf();
-			}
-			else
-			{
-				TopHalf();
-				Console.SetCursorPosition(0, ++cursorTop);
-				ProgressBarBottomHalf(mainPercentage, this._startDate, null, this.Message, indentation, this.Options.ProgressBarOnBottom);
-			}
-
+			TopHalf();
+			Console.SetCursorPosition(0, ++cursorTop);
+			ProgressBarBottomHalf(mainPercentage, this._startDate, null, this.Message, indentation, this.Options.ProgressBarOnBottom);
+		
 			if (this.Options.EnableTaskBarProgress)
 				TaskbarProgress.SetValue(mainPercentage, 100);
-
-			DrawChildren(this.Children, indentation, ref cursorTop);
 
 			ResetToBottom(ref cursorTop);
 
