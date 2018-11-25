@@ -28,7 +28,7 @@ namespace Oetools.Sakoe.Utilities {
     /// </summary>
     public abstract class TextWriterWordWrap {
         
-        private bool _hasWroteToOuput;
+        protected bool _hasWroteToOuput;
 
         private int _currentConsoleLineSpaceTaken;
         

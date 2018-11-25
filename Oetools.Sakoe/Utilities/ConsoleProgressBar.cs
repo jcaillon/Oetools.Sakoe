@@ -28,19 +28,22 @@ using Oetools.Sakoe.ShellProgressBar;
 
 namespace Oetools.Sakoe.Utilities {
     
-    public class AProgressBar {
+    public class ConsoleProgressBar : IDisposable {
+        
         public ConsoleColor ForegroundColor { get; set; } = ConsoleColor.White;
 
         public ConsoleColor? ForegroundColorDone { get; set; } = ConsoleColor.Green;
 
         public ConsoleColor? BackgroundColor { get; set; } = ConsoleColor.DarkGray;
+        
+        public ConsoleColor? ForegroundColorUncomplete { get; set; } = ConsoleColor.Red;
 
         public ConsoleColor TextColor { get; set; }
 
-        public char ForegroundCharacter { get; set; } = '■'; // 
+        public char ForegroundCharacter { get; set; } = '■'; // \u2593
 
         public char BackgroundCharacter { get; set; } = '■';
-        
+
         public bool ClearProgressBarOnStop { get; set; }
 
         private Stopwatch _stopwatch;
@@ -54,13 +57,18 @@ namespace Oetools.Sakoe.Utilities {
         private int _lastLine2Width;
 
         private System.Timers.Timer _timer;
-        private int _lastCursorTop;
 
-        public AProgressBar(int maxTicks, string message) {
+        public ConsoleProgressBar(int maxTicks, string message) {
             TextColor = Console.ForegroundColor;
             _maxTicks = Math.Max(1, maxTicks);
             _message = message;
         }
+
+        public void Dispose() {
+            Stop();
+        }
+
+        public bool IsRunning => _stopwatch != null;
 
         public int CurrentTick => _currentTick;
 
@@ -74,13 +82,17 @@ namespace Oetools.Sakoe.Utilities {
             }
         }
 
-        public void Stop() {
+        public bool Stop() {
+            if (_stopwatch == null) {
+                return false;
+            }
+            
             Console.CursorVisible = true;
             Console.ResetColor();
             _timer?.Close();
             _timer?.Dispose();
             _timer = null;
-            
+
             // make sure to draw the latest state
             if (ClearProgressBarOnStop) {
                 ClearProgressBar();
@@ -97,6 +109,7 @@ namespace Oetools.Sakoe.Utilities {
 
             _stopwatch = null;
             TaskbarProgress.SetState(TaskbarProgress.TaskbarStates.NoProgress);
+            return true;
         }
 
         public void Tick(int newTickCount, string message = null) {
@@ -119,13 +132,13 @@ namespace Oetools.Sakoe.Utilities {
                 Console.CursorVisible = false;
                 ClearProgressBar();
             }
-            
+
             Console.SetCursorPosition(0, Console.CursorTop - 2);
 
             var maxWidth = _lastWindowWidth - 1;
 
             // line1, progress bar
-            Console.ForegroundColor = _timer == null ? ForegroundColorDone ?? ForegroundColor : ForegroundColor;
+            Console.ForegroundColor = _timer == null ? (_maxTicks == _currentTick ? ForegroundColorDone : ForegroundColorUncomplete) ?? ForegroundColor : ForegroundColor;
             var progress = Math.Min(1, (double) _currentTick / _maxTicks);
             TaskbarProgress.SetValue(progress * 100, 100);
             var progressWidth = (int) Math.Round(progress * maxWidth);
@@ -147,18 +160,20 @@ namespace Oetools.Sakoe.Utilities {
                 var elapsed = _stopwatch.Elapsed;
                 line2 = $"[{elapsed.Hours:D2}:{elapsed.Minutes:D2}:{elapsed.Seconds:D2}] {line2}";
             }
+
             line2 = $"{line2} {_message}";
             if (line2.Length > maxWidth) {
                 line2 = $"{line2.Substring(0, maxWidth - 3)}...";
             }
+
             _lastLine2Width = line2.Length;
             if (line2.Length < maxWidth) {
                 line2 = line2.PadRight(maxWidth, ' ');
             }
+
             Console.WriteLine(line2);
-            
+
             _lastWindowWidth = Console.WindowWidth;
-            _lastCursorTop = Console.CursorTop;
         }
 
         private void ClearProgressBar() {
@@ -197,13 +212,14 @@ namespace Oetools.Sakoe.Utilities {
             if (_timer == null) {
                 return;
             }
+
             _timer.Enabled = false;
 
             if (Monitor.TryEnter(_lock)) {
                 try {
                     DrawProgressBar();
                 } finally {
-                    Monitor.Exit(_lock);        
+                    Monitor.Exit(_lock);
                     _timer.Enabled = true;
                 }
             }

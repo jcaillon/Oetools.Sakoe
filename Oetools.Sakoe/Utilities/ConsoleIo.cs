@@ -32,15 +32,13 @@ namespace Oetools.Sakoe.Utilities {
 
         public ITraceLogger Trace { get; }
 
-        private ProgressBarOptions _progressBarOptions;
-
-        private ProgressBar _progressBar;
-
         private IConsole _console;
 
         private bool _isProgressBarOff;
 
         private Stopwatch _stopwatch;
+
+        private ConsoleProgressBar _progressBar;
 
         public ConsoleIo(IConsole console, LogLvl level, bool isProgressBarOff) {
             _stopwatch = Stopwatch.StartNew();
@@ -50,18 +48,6 @@ namespace Oetools.Sakoe.Utilities {
             if (_logLevel <= LogLvl.Debug) {
                 Trace = this;
             }
-
-            _progressBarOptions = new ProgressBarOptions {
-                ForegroundColor = ConsoleColor.Cyan,
-                ForegroundColorDone = ConsoleColor.DarkGray,
-                BackgroundColor = ConsoleColor.DarkGray,
-                BackgroundCharacter = '\u2593',
-                DisplayTimeInRealTime = true,
-                EnableTaskBarProgress = true,
-                CollapseWhenFinished = true,
-                ProgressBarOnBottom = false,
-                ProgressCharacter = '\u2593'
-            };
         }
 
         public void Fatal(string message, Exception e = null) {
@@ -108,11 +94,15 @@ namespace Oetools.Sakoe.Utilities {
                 return;
             }
             
-            var textWidth = Console.WindowWidth - 1;
-
             try {
                 if (_progressBar == null) {
-                    _progressBar = new ProgressBar(max, message, _progressBarOptions);
+                    _progressBar = new ConsoleProgressBar(max, message) {
+                        ClearProgressBarOnStop = true,
+                        TextColor = ConsoleColor.DarkGray
+                    };
+                }
+                if (!_progressBar.IsRunning) {
+                    WriteNewLine();
                 }
                 if (max > 0 && max != _progressBar.MaxTicks) {
                     _progressBar.MaxTicks = max;
@@ -126,21 +116,30 @@ namespace Oetools.Sakoe.Utilities {
             }
         }
 
+        private void StopProgressBar() {
+            if (_progressBar?.Stop() ?? false) {
+                _hasWroteToOuput = false;
+            }
+        }
+
         public void ReportGlobalProgress(int max, int current, string message) {
             Log(LogLvl.Info, $"global progress : {message}");
         }
         
         public void WriteResult(string result, ConsoleColor? color = null, int padding = 0) {
+            StopProgressBar();
             _console.ForegroundColor = color ?? ConsoleColor.White;
             WriteToConsoleWithWordWrap(_console.Out, result, false, padding);
         }
 
         public void WriteResultOnNewLine(string result, ConsoleColor? color = null, int padding = 0) {
+            StopProgressBar();
             _console.ForegroundColor = color ?? ConsoleColor.White;
             WriteToConsoleWithWordWrap(_console.Out, result, true, padding);
         }
 
         public void WriteNewLine() {
+            StopProgressBar();
             WriteNewLine(_console.Out);
         }
         
@@ -152,11 +151,6 @@ namespace Oetools.Sakoe.Utilities {
             Error,
             Fatal,
             None
-        }
-
-        private void StopProgressBar() {
-            _progressBar?.Dispose();
-            _progressBar = null;
         }
 
         private void Log(LogLvl level, string message, Exception e = null) {

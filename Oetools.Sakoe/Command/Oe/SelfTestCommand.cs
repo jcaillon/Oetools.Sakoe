@@ -15,7 +15,6 @@ namespace Oetools.Sakoe.Command.Oe {
         ExtendedHelpText = "sakoe selftest",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    [Subcommand(typeof(ProgressSelfTestCommand))]
     [Subcommand(typeof(LogSelfTestCommand))]
     [Subcommand(typeof(InputSelfTestCommand))]
     [Subcommand(typeof(PromptSelfTestCommand))]
@@ -356,7 +355,7 @@ sakoe st input -b2 s1024",
             for (var i = 0; i <= 90; i++) {
                 CancelToken?.ThrowIfCancellationRequested();
                 Log.ReportProgress(100, i, $"Executing task {i}");
-                Thread.Sleep(10);
+                Thread.Sleep(100);
             }
 
             Out.WriteResultOnNewLine("another output!");
@@ -367,7 +366,7 @@ sakoe st input -b2 s1024",
             for (var i = 0; i <= 100; i++) {
                 CancelToken?.ThrowIfCancellationRequested();
                 Log.ReportProgress(100, i, $"Executing task {i}");
-                Thread.Sleep(10);
+                Thread.Sleep(100);
             }
 
             Out.WriteResultOnNewLine("another output!");
@@ -380,55 +379,6 @@ sakoe st input -b2 s1024",
 
     }
     
-    [Command(
-        "progressbar", "pb",
-        Description = "Subcommand that shows the usage of progress bars",
-        ExtendedHelpText = "sakoe selftest progressbar",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
-    )]
-    internal class ProgressSelfTestCommand : BaseCommand {
-        
-        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            
-            const int totalTicks = 10;
-            var options = new ProgressBarOptions {
-                ForegroundColor = ConsoleColor.Yellow,
-                ForegroundColorDone = ConsoleColor.DarkGreen,
-                BackgroundColor = ConsoleColor.DarkGray,
-                BackgroundCharacter = '\u2593',
-                DisplayTimeInRealTime = false,
-                EnableTaskBarProgress = true
-            };
-            var childOptions = new ProgressBarOptions {
-                ForegroundColor = ConsoleColor.Magenta,
-                BackgroundColor = ConsoleColor.DarkMagenta,
-                BackgroundCharacter = '\u2593',
-                DisplayTimeInRealTime = false,
-                CollapseWhenFinished = false,
-                ForegroundColorDone = ConsoleColor.DarkGreen,
-            };
-            using (var pbar = new ProgressBar(totalTicks, "main progressbar", options)) {
-                TickToCompletion(pbar, totalTicks, sleep: 10, childAction: () => {
-                    using (var child = pbar.Spawn(totalTicks, "child actions", childOptions)) {
-                        TickToCompletion(child, totalTicks, sleep: 100);
-                    }
-                });
-            }
-            
-            return 1;
-        }
-        
-        private void TickToCompletion(IProgressBar pbar, int ticks, int sleep = 1750, Action childAction = null) {
-            var initialMessage = pbar.Message;
-            for (var i = 0; i < ticks; i++) {
-                pbar.Message = $"Start {i + 1} of {ticks}: {initialMessage}";
-                childAction?.Invoke();
-                Thread.Sleep(sleep);
-                pbar.Tick($"End {i + 1} of {ticks}: {initialMessage}");
-            }
-        }
-
-    }
     
 #endif
     

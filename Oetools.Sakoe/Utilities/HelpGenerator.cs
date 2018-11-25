@@ -61,12 +61,12 @@ namespace Oetools.Sakoe.Utilities {
         /// <param name="output"></param>
         public static void DrawLogo(TextWriter output) {
             output.WriteLine();
-            output.WriteLine(@"                '`.        ");
-            output.WriteLine(@" '`.    .^      \  \       == SAKOE ==");
-            output.WriteLine(@"  \ \  /;/       \ \\      A Swiss Army Knife for OpenEdge.");
-            output.WriteLine(@"   \ \/_/_________\  \     " + $"Version {typeof(HelpGenerator).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}.");
-            output.WriteLine(@"    `/ .           _  \    " + $"Running with {(Utils.IsNetFrameworkBuild ? ".netframework" : $".netcore-{(Utils.IsRuntimeWindowsPlatform ? "win" : "unix")}")}.");
-            output.WriteLine(@"     \________________/    " + $"Session started on {DateTime.Now:yy-MM-dd} at {DateTime.Now:HH:mm:ss}.");
+            output.WriteLine(@"                '`.        == SAKOE ==");
+            output.WriteLine(@" '`.    .^      \  \       A Swiss Army Knife for OpenEdge.");
+            output.WriteLine(@"  \ \  /;/       \ \\      " + $"Version {typeof(HelpGenerator).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}.");
+            output.WriteLine(@"   \ \/_/_________\  \     " + $"Running with {(Utils.IsNetFrameworkBuild ? ".netframework" : $".netcore-{(Utils.IsRuntimeWindowsPlatform ? "win" : "unix")}")}.");
+            output.WriteLine(@"    `/ .           _  \    " + $"Session started on {DateTime.Now:yy-MM-dd} at {DateTime.Now:HH:mm:ss}.");
+            output.WriteLine(@"     \________________/    ");
             output.WriteLine();
         }
         

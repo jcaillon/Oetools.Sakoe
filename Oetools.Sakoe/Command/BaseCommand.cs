@@ -96,6 +96,7 @@ namespace Oetools.Sakoe.Command {
                 int exitCode = FatalExitCode;
                 
                 try {
+                    Log.Debug($"Starting execution: {DateTime.Now:yy-MM-dd} @ {DateTime.Now:HH:mm:ss}.");
                     ExecutePreCommand(app, console);
                     exitCode = ExecuteCommand(app, console);
                     ExecutePostCommand(app, console);
