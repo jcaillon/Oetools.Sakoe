@@ -27,6 +27,18 @@ namespace Oetools.Sakoe.Utilities {
     /// This class provides methods to output text to a <see cref="TextWriter"/> with word wrap.
     /// </summary>
     public abstract class TextWriterWordWrap {
+
+        /// <summary>
+        /// Returns the maximum length that a line can have.
+        /// </summary>
+        /// <returns></returns>
+        protected virtual int GetLineMaximumLength() {
+            try {
+                return Console.WindowWidth - 1;
+            } catch (IOException) {
+                return 120;
+            }
+        }
         
         protected bool _hasWroteToOuput;
 
@@ -47,7 +59,7 @@ namespace Oetools.Sakoe.Utilities {
             }
 
             // maximum length for a line
-            var maxLineWidth = Console.WindowWidth - 1;
+            var maxLineWidth = GetLineMaximumLength();
             if (maxLineWidth < 1) {
                 maxLineWidth = 1;
             }

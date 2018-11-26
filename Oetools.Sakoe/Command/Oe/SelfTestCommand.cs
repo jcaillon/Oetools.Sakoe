@@ -351,6 +351,7 @@ sakoe st input -b2 s1024",
             Log.Error("Log error");
             Log.Fatal("Log fatal");
             Log.Done("Log success");
+            Log?.Info(GetTypeFromCommandLine(app).ToString());
 
             for (var i = 0; i <= 90; i++) {
                 CancelToken?.ThrowIfCancellationRequested();

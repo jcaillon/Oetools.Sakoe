@@ -22,11 +22,13 @@
 
 using System;
 using System.Diagnostics;
+using System.IO;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder.Utilities;
 using Oetools.Sakoe.ShellProgressBar;
 
 namespace Oetools.Sakoe.Utilities {
+    
     public class ConsoleIo : TextWriterWordWrap, IResultWriter, ILogger, ITraceLogger, IDisposable {
         private readonly LogLvl _logLevel;
 

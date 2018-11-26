@@ -172,6 +172,31 @@ namespace Oetools.Sakoe.Command {
             }
             return null;
         }
+        
+        protected static Type GetTypeFromCommandLine(CommandLineApplication app) {
+            var stack = new Stack<CommandLineApplication>();
+            stack.Push(app);
+            var rootApp = app;
+            while (rootApp.Parent != null) {
+                rootApp = rootApp.Parent;
+                stack.Push(rootApp);
+            }
+
+            Type currentType = typeof(MainCommand);
+            while (stack.Count > 0) {
+                var subCommands = Attribute.GetCustomAttributes(currentType, typeof(SubcommandAttribute), true).OfType<SubcommandAttribute>().ToList();
+                var commandName = stack.Pop().Name;
+                foreach (var subCommand in subCommands) {
+                    foreach (var subCommandType in subCommand.Types) {
+                        var commandAttr = Attribute.GetCustomAttribute(subCommandType, typeof(CommandAttribute), true) as CommandAttribute;
+                        if (commandAttr != null && commandAttr.Name.Equals(commandName)) {
+                            currentType = subCommandType;
+                        }
+                    }
+                }
+            }
+            return currentType;
+        }
 
         /// <summary>
         /// Get the command line that calls the given type.
@@ -180,7 +205,7 @@ namespace Oetools.Sakoe.Command {
         /// <param name="app"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        protected string GetCommandLineFromType(CommandLineApplication app, Type type) {
+        protected static string GetCommandLineFromType(CommandLineApplication app, Type type) {
             var rootApp = app;
             while (rootApp.Parent != null) {
                 rootApp = rootApp.Parent;
@@ -198,7 +223,7 @@ namespace Oetools.Sakoe.Command {
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        protected List<CommandAttribute> GetCommandStackFromType(Type type) {
+        protected static List<CommandAttribute> GetCommandStackFromType(Type type) {
             var subCommands = Attribute.GetCustomAttributes(typeof(MainCommand), typeof(SubcommandAttribute), true).OfType<SubcommandAttribute>().ToList();
             var stack = new Stack<Tuple<List<CommandAttribute>, List<SubcommandAttribute>>>();
             stack.Push(new Tuple<List<CommandAttribute>, List<SubcommandAttribute>>(new List<CommandAttribute>(), subCommands));
