@@ -21,7 +21,7 @@ namespace Oetools.Sakoe.Command.Oe {
         private MainCommand Parent { get; set; }
         
         [Required]
-        [Argument(0, Description = "Main command ", ShowInHelpText = true)]
+        [Argument(0, "<command>", "Main command ", ShowInHelpText = true)]
         public CommandType Command { get; } = CommandType.Deploy;
 
         [Option]

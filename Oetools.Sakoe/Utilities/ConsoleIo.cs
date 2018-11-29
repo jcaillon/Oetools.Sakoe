@@ -22,19 +22,16 @@
 
 using System;
 using System.Diagnostics;
-using System.IO;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder.Utilities;
-using Oetools.Sakoe.ShellProgressBar;
 
 namespace Oetools.Sakoe.Utilities {
     
-    public class ConsoleIo : TextWriterWordWrap, IResultWriter, ILogger, ITraceLogger, IDisposable {
+    public class ConsoleIo : ConsoleOutput, ILogger, ITraceLogger, IDisposable {
+        
         private readonly LogLvl _logLevel;
 
         public ITraceLogger Trace { get; }
-
-        private IConsole _console;
 
         private bool _isProgressBarOff;
 
@@ -42,7 +39,7 @@ namespace Oetools.Sakoe.Utilities {
 
         private ConsoleProgressBar _progressBar;
 
-        public ConsoleIo(IConsole console, LogLvl level, bool isProgressBarOff) {
+        public ConsoleIo(IConsole console, LogLvl level, bool isProgressBarOff) : base(console) {
             _stopwatch = Stopwatch.StartNew();
             _console = console;
             _logLevel = level;
@@ -52,6 +49,11 @@ namespace Oetools.Sakoe.Utilities {
             }
         }
 
+        public void Dispose() {
+            _progressBar?.Dispose();
+            _console.ResetColor();
+        }
+        
         public void Fatal(string message, Exception e = null) {
             Log(LogLvl.Fatal, message, e);
         }
@@ -127,22 +129,30 @@ namespace Oetools.Sakoe.Utilities {
         public void ReportGlobalProgress(int max, int current, string message) {
             Log(LogLvl.Info, $"global progress : {message}");
         }
+
+        public override void WriteResult(string result, ConsoleColor? color = null) {
+            StopProgressBar();
+            base.WriteResult(result, color);
+        }
+
+        public override void WriteResultOnNewLine(string result, ConsoleColor? color = null) {
+            StopProgressBar();
+            base.WriteResultOnNewLine(result, color);
+        }
         
-        public void WriteResult(string result, ConsoleColor? color = null, int padding = 0) {
+        public override void Write(string result, ConsoleColor? color = null, int padding = 0) {
             StopProgressBar();
-            _console.ForegroundColor = color ?? ConsoleColor.White;
-            WriteToConsoleWithWordWrap(_console.Out, result, false, padding);
+            base.Write(result, color, padding);
         }
 
-        public void WriteResultOnNewLine(string result, ConsoleColor? color = null, int padding = 0) {
+        public override void WriteOnNewLine(string result, ConsoleColor? color = null, int padding = 0) {
             StopProgressBar();
-            _console.ForegroundColor = color ?? ConsoleColor.White;
-            WriteToConsoleWithWordWrap(_console.Out, result, true, padding);
+            base.WriteOnNewLine(result, color, padding);
         }
 
-        public void WriteNewLine() {
+        protected override void WriteNewLine() {
             StopProgressBar();
-            WriteNewLine(_console.Out);
+            base.WriteNewLine();
         }
         
         public enum LogLvl {
@@ -197,12 +207,6 @@ namespace Oetools.Sakoe.Utilities {
                 _console.ForegroundColor = ConsoleColor.DarkGray;
                 WriteToConsoleWithWordWrap(_console.Error, e.ToString(), true, 0);
             }
-
-            //_console.ResetColor();
-        }
-
-        public void Dispose() {
-            _progressBar?.Dispose();
         }
     }
 }

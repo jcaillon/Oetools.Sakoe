@@ -55,7 +55,12 @@ namespace Oetools.Sakoe.Utilities {
             
             // check message
             if (message == null) {
-                message = string.Empty;
+                // write a new line
+                if (writeToNewLine && _hasWroteToOuput) {
+                    WriteNewLine(textWriter);
+                }
+                _hasWroteToOuput = true;
+                return;
             }
 
             // maximum length for a line
@@ -93,7 +98,7 @@ namespace Oetools.Sakoe.Utilities {
                         }
                         
                         int lineLength = eolPosition - lineStartPos;
-                        int totalIndent = (_currentConsoleLineSpaceTaken > 0 ? 0 : indentation) + paragraphIndent;
+                        int totalIndent = _currentConsoleLineSpaceTaken > 0 ? 0 : indentation + paragraphIndent;
                         int currentConsoleLineSpaceLeft = maxLineWidth - _currentConsoleLineSpaceTaken - totalIndent;
                         
                         if (lineLength > currentConsoleLineSpaceLeft) {
@@ -102,7 +107,9 @@ namespace Oetools.Sakoe.Utilities {
 
                         if (lineLength > 0) {
                             var line = message.Substring(lineStartPos, lineLength);
-                            textWriter.Write(_currentConsoleLineSpaceTaken > 0 ? line : line.PadLeft(lineLength + indentation + paragraphIndent, ' '));
+                            line = _currentConsoleLineSpaceTaken > 0 ? line : line.PadLeft(lineLength + indentation + paragraphIndent, ' ');
+                            textWriter.Write(line);
+                            _currentConsoleLineSpaceTaken += line.Length;
                         }
                         
                         if (newInputLineStarting && writeToNewLine) {
@@ -115,7 +122,6 @@ namespace Oetools.Sakoe.Utilities {
                         }
                         newInputLineStarting = false;
                         
-                        _currentConsoleLineSpaceTaken += lineLength;
                         _hasWroteToOuput = true;
                         writeToNewLine = true;
 
@@ -171,6 +177,7 @@ namespace Oetools.Sakoe.Utilities {
         protected void WriteNewLine(TextWriter textWriter, string newLine = null) {
             textWriter.Write(newLine ?? Console.Out.NewLine);
             _currentConsoleLineSpaceTaken = 0;
+            _hasWroteToOuput = true;
         }
     }
 }

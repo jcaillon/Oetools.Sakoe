@@ -16,7 +16,7 @@ namespace Oetools.Sakoe.Command.Oe {
     internal class BuildCommand : AOeBaseCommand {
         
         [LegalFilePath]
-        [Argument(0, Name = "Project file path", Description = "Path to the project file (" + OeBuilderConstants.OeProjectExtension + " extension is optional), default to any " + OeBuilderConstants.OeProjectExtension + " file in the .oe folder if it exists")]
+        [Argument(0, "<project file path>", "Path to the project file (" + OeBuilderConstants.OeProjectExtension + " extension is optional), default to any " + OeBuilderConstants.OeProjectExtension + " file in the .oe folder if it exists")]
         protected string ProjectFilePath { get; set; }
 
         [Option("-c|--config-name", "The name of the configuration to use for the build, found in " + OeBuilderConstants.OeProjectExtension + " file", CommandOptionType.SingleValue)]

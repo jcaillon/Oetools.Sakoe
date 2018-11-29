@@ -21,9 +21,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading;
 using McMaster.Extensions.CommandLineUtils;
@@ -50,19 +48,19 @@ namespace Oetools.Sakoe.Command {
         // ReSharper disable once MemberCanBePrivate.Global
         public ConsoleIo.LogLvl Verbosity { get; } = ConsoleIo.LogLvl.Info;
         
-        [Option("-nop|--no-progress", "Never show progress bars.", CommandOptionType.NoValue)]
+        [Option("-po|--progress-off", "Never show progress bars.", CommandOptionType.NoValue)]
         // ReSharper disable once UnassignedGetOnlyAutoProperty
         // ReSharper disable once MemberCanBePrivate.Global
         public bool IsProgressBarOff { get; }
         
-        [Option("-logo|--with-logo", "Always show the logo on start.", CommandOptionType.NoValue)]
+        [Option("-wl|--with-logo", "Always show the logo on start.", CommandOptionType.NoValue)]
         // ReSharper disable once UnassignedGetOnlyAutoProperty
         // ReSharper disable once MemberCanBePrivate.Global
         public bool IsLogoOn { get; }
         
         protected ILogger Log { get; private set; }
         
-        protected IResultWriter Out { get; private set; }
+        protected IConsoleOutput Out { get; private set; }
         
         private IConsole Console { get; set; }
 
@@ -74,23 +72,24 @@ namespace Oetools.Sakoe.Command {
 
         private int _numberOfCancelKeyPress;
         
-        protected CancellationTokenSource _cancelSource;
+        protected object _lock = new object();
         
-        public static readonly HelpGenerator HelpGenerator = HelpGenerator.Singleton;
+        protected CancellationTokenSource _cancelSource;
         
         // ReSharper disable once UnusedMember.Global
         protected int OnExecute(CommandLineApplication app, IConsole console) {
             Console = console;
             
-            using (var logger = new ConsoleIo(console, Verbosity, IsProgressBarOff)) {
-                Log = logger;
-                Out = logger;
+            using (var consoleIo = new ConsoleIo(console, Verbosity, IsProgressBarOff)) {
+                Log = consoleIo;
+                Out = consoleIo;
+                HelpGenerator.Singleton.Console = consoleIo;
                 
                 _cancelSource = new CancellationTokenSource();
                 console.CancelKeyPress += ConsoleOnCancelKeyPress;
                 
                 if (IsLogoOn) {
-                    HelpGenerator.DrawLogo(console.Out);
+                    Out.DrawLogo();
                 }
                 
                 int exitCode = FatalExitCode;
@@ -106,14 +105,12 @@ namespace Oetools.Sakoe.Command {
                         Log.Warn($"Exit code {exitCode}");
                     }
                     if (Verbosity < ConsoleIo.LogLvl.None) {
-                        Out.WriteNewLine();
+                        Out.WriteOnNewLine(null);
                     }
-
-                    Console.ResetColor();
                     return exitCode;
                     
                 } catch (Exception e) {
-                    Log.Error($"{e.Message}", e);
+                    Log.Error(e.Message, e);
                     if (Verbosity > ConsoleIo.LogLvl.Debug) {
                         Log.Info(UseVerboseMessage);
                     }
@@ -124,10 +121,8 @@ namespace Oetools.Sakoe.Command {
 
                 Log.Fatal($"Exit code {exitCode}");
                 if (Verbosity < ConsoleIo.LogLvl.None) {
-                    Out.WriteNewLine();
+                    Out.WriteOnNewLine(null);
                 }
-                
-                Console.ResetColor();
                 return exitCode;
             }
         }
@@ -136,11 +131,10 @@ namespace Oetools.Sakoe.Command {
         public int OnValidationError(ValidationResult r) {
             using (var log = new ConsoleIo(PhysicalConsole.Singleton, ConsoleIo.LogLvl.Info, true)) {
                 var faultyMembers = string.Join(", ", r.MemberNames);
-                log.Error($"{(faultyMembers.Length > 0 ? $"{faultyMembers} : " : "")}{r.ErrorMessage}");
+                log.Error($"{(faultyMembers.Length > 0 ? $"{faultyMembers} : ": "")}{r.ErrorMessage}");
                 log.Info($"Specify {MainCommand.HelpLongName} for a list of available options and commands.");
-                log.Fatal($"Exit code {FatalExitCode} - Error");
-                
-                PhysicalConsole.Singleton.ResetColor();
+                log.Fatal($"Exit code {FatalExitCode}");
+                log.WriteOnNewLine(null);
                 return FatalExitCode;
             }
         }
@@ -153,10 +147,10 @@ namespace Oetools.Sakoe.Command {
         /// <returns></returns>
         protected virtual int ExecuteCommand(CommandLineApplication app, IConsole console) {
             if (!IsLogoOn && app.Parent == null) {
-                HelpGenerator.DrawLogo(console.Out);
+                Out.DrawLogo();
             }
             app.ShowHelp();
-            Log.Warn("You must provide a command");
+            Log.Warn("You must provide a command.");
             return 1;
         }
 
@@ -173,119 +167,25 @@ namespace Oetools.Sakoe.Command {
             return null;
         }
         
-        protected static Type GetTypeFromCommandLine(CommandLineApplication app) {
-            var stack = new Stack<CommandLineApplication>();
-            stack.Push(app);
-            var rootApp = app;
-            while (rootApp.Parent != null) {
-                rootApp = rootApp.Parent;
-                stack.Push(rootApp);
-            }
-
-            Type currentType = typeof(MainCommand);
-            while (stack.Count > 0) {
-                var subCommands = Attribute.GetCustomAttributes(currentType, typeof(SubcommandAttribute), true).OfType<SubcommandAttribute>().ToList();
-                var commandName = stack.Pop().Name;
-                foreach (var subCommand in subCommands) {
-                    foreach (var subCommandType in subCommand.Types) {
-                        var commandAttr = Attribute.GetCustomAttribute(subCommandType, typeof(CommandAttribute), true) as CommandAttribute;
-                        if (commandAttr != null && commandAttr.Name.Equals(commandName)) {
-                            currentType = subCommandType;
-                        }
-                    }
-                }
-            }
-            return currentType;
-        }
-
-        /// <summary>
-        /// Get the command line that calls the given type.
-        /// For instance, it will return sakoe project init of the type given is the command for init.
-        /// </summary>
-        /// <param name="app"></param>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        protected static string GetCommandLineFromType(CommandLineApplication app, Type type) {
-            var rootApp = app;
-            while (rootApp.Parent != null) {
-                rootApp = rootApp.Parent;
-            }
-            var sb = new StringBuilder(rootApp.Name);
-            foreach (var command in GetCommandStackFromType(type)) {
-                sb.Append(' ');
-                sb.Append(command.Name);
-            }
-            return sb.ToString();
-        }
-        
-        /// <summary>
-        /// Returns a "stack" of <see cref="CommandAttribute"/> to reach the given type.
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        protected static List<CommandAttribute> GetCommandStackFromType(Type type) {
-            var subCommands = Attribute.GetCustomAttributes(typeof(MainCommand), typeof(SubcommandAttribute), true).OfType<SubcommandAttribute>().ToList();
-            var stack = new Stack<Tuple<List<CommandAttribute>, List<SubcommandAttribute>>>();
-            stack.Push(new Tuple<List<CommandAttribute>, List<SubcommandAttribute>>(new List<CommandAttribute>(), subCommands));
-            while (stack.Count > 0) {
-                var tuple = stack.Pop();
-                subCommands = tuple.Item2;
-                foreach (var subCommand in subCommands) {
-                    if (subCommand.Types == null) {
-                        continue;
-                    }
-                    foreach (var subCommandType in subCommand.Types) {
-                        var commandStack = tuple.Item1.ToList();
-                        commandStack.Add((CommandAttribute) Attribute.GetCustomAttribute(subCommandType, typeof(CommandAttribute), true));
-                        if (subCommandType == type) {
-                            return commandStack;
-                        }
-                        var subCommandList = Attribute.GetCustomAttributes(subCommandType, true).OfType<SubcommandAttribute>().ToList();
-                        stack.Push(new Tuple<List<CommandAttribute>, List<SubcommandAttribute>>(commandStack, subCommandList));
-                    }
-                }
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// Resolve a string into an enumeration value, returning the possible values for said string
-        /// </summary>
-        /// <param name="stringValue"></param>
-        /// <param name="enumValue"></param>
-        /// <param name="validValuesList"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        protected bool TryGetEnumValue<T>(string stringValue, out long enumValue, out List<string> validValuesList) {
-            bool found = false;
-            var outValidValuesList = new List<string>();
-            long outEnumValue = 0;
-            typeof(T).ForEach<T>((name, val) => {
-                if (name.Equals(stringValue)) {
-                    outEnumValue = val;
-                    found = true;
-                }
-                outValidValuesList.Add(name);
-            });
-            enumValue = outEnumValue;
-            validValuesList = outValidValuesList;
-            return found;
-        }
-        
         /// <summary>
         /// On CTRL+C
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         protected virtual void ConsoleOnCancelKeyPress(object sender, ConsoleCancelEventArgs e) {
-            _numberOfCancelKeyPress++;
-            Log.Warn($"CTRL+C pressed (press {4 - _numberOfCancelKeyPress} times more for emergency exit)");
-            Log.Warn("Cancelling execution, please be patient...");
-            Console.ResetColor();
-            _cancelSource.Cancel();
-
-            if (_numberOfCancelKeyPress < 4) {
-                e.Cancel = true;
+            if (Monitor.TryEnter(_lock, 500)) {
+                try {
+                    _numberOfCancelKeyPress++;
+                    Log.Warn($"CTRL+C pressed (press {4 - _numberOfCancelKeyPress} times more for emergency exit)");
+                    Log.Warn("Cancelling execution, please be patient...");
+                    Console.ResetColor();
+                    _cancelSource.Cancel();
+                    if (_numberOfCancelKeyPress < 4) {
+                        e.Cancel = true;
+                    }
+                } finally {
+                    Monitor.Exit(_lock);
+                }
             }
         }
     }

@@ -5,6 +5,7 @@ using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder.Project;
 using Oetools.Builder.Utilities;
 using Oetools.Sakoe.Command.Exceptions;
+using Oetools.Sakoe.Utilities.Extension;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge;
@@ -31,7 +32,7 @@ namespace Oetools.Sakoe.Command.Oe {
     internal class IniProjectCommand : BaseCommand {
         
         [DirectoryExists]
-        [Argument(0, Name = "<directory>", Description = "The directory in which to initialize the project. Default to the current directory.")]
+        [Argument(0, "<directory>", "The directory in which to initialize the project. Default to the current directory.")]
         public string SourceDirectory { get; set; }
         
         [LegalFilePath]
@@ -73,25 +74,24 @@ namespace Oetools.Sakoe.Command.Oe {
             project.Save(projectFilePath);
             
             Log.Info($"Project created: {projectFilePath.PrettyQuote()}.");
-            
-            Log.Warn(@"=============
 
-IMPORTANT README:
-
+            Out.WriteOnNewLine(@"
+IMPORTANT README:", ConsoleColor.Yellow, 1);
+            Out.WriteOnNewLine(@"
 The project file created (" + OeBuilderConstants.OeProjectExtension + @") is defined in XML format and has a provided XML schema definition file (Project.xsd).
 
 The project XML schema is fully documented and should be used to enable intellisense in your favorite editor.
 Example of xml editors with out-of-the-box intellisense (autocomplete) features for xml:
 
-- Progress Developer studio (eclipse)
-- Visual studio
-- Most jetbrain IDE
+ - Progress Developer studio (eclipse)
+ - Visual studio
+ - Most jetbrain IDE
 
 Drag and drop the created " + OeBuilderConstants.OeProjectExtension + @" file into the editor of your choice and start configuring your build.
 The file " + Path.Combine(OeBuilderConstants.GetProjectDirectory(""), $"{ProjectName}{OeBuilderConstants.OeProjectExtension}").PrettyQuote() + @" should be versioned in your source repository to allow anyone who clones it to build your application.
-If you need to have a project file containing build configurations specific to your local machine, you can use the option " + (GetCommandOptionFromPropertyName(nameof(IsLocalProject))?.Template ?? "").PrettyQuote() + @". This will create the project file into the directory " + OeBuilderConstants.GetProjectDirectoryLocal("").PrettyQuote() + @" which should not be versioned. 
-For git repositories, use the command " + GetCommandLineFromType(app, typeof(InitGitignoreCommand)).PrettyQuote() + @" to set up your .gitignore file for sakoe projects.
-");
+If you need to have a project file containing build configurations specific to your local machine, you can use the option " + (GetCommandOptionFromPropertyName(nameof(IsLocalProject))?.Template ?? "").PrettyQuote() + @". This will create the project file into the directory " + OeBuilderConstants.GetProjectDirectoryLocal("").PrettyQuote() + @" which should NOT be versioned. 
+For git repositories, use the command " + app.GetFullCommandLine().PrettyQuote() + @" to set up your .gitignore file for sakoe projects.
+", padding: 1);
             
             return 0;
         }
@@ -106,7 +106,7 @@ For git repositories, use the command " + GetCommandLineFromType(app, typeof(Ini
     internal class InitGitignoreCommand : BaseCommand {
 
         [DirectoryExists]
-        [Argument(0, Name = "<directory>", Description = "The repository base directory (source directory). Defaults to the current directory.")]
+        [Argument(0, "<directory>", "The repository base directory (source directory). Defaults to the current directory.")]
         public string SourceDirectory { get; set; }
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {

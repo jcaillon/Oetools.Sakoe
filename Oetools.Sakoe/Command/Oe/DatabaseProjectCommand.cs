@@ -27,7 +27,7 @@ namespace Oetools.Sakoe.Command.Oe {
         
         [Required]
         [LegalFilePath]
-        [Argument(0, Name = "Target database path", Description = "Path to the database to repair (.db extension is optional)")]
+        [Argument(0, "<target database path>", "Path to the database to repair (.db extension is optional)")]
         protected string TargetDatabasePath { get; set; }
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {

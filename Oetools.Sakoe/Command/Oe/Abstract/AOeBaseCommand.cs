@@ -31,7 +31,7 @@ namespace Oetools.Sakoe.Command.Oe.Abstract {
     public abstract class AOeBaseCommand : BaseCommand {
         
         [DirectoryExists]
-        [Option("-dlc|--dlc", "The path to the directory containing the Openedge installation.", CommandOptionType.SingleValue)]
+        [Option("-dl|--dlc", "The path to the directory containing the Openedge installation.", CommandOptionType.SingleValue)]
         public string DlcDirectoryPath { get; }
         
         /// <summary>

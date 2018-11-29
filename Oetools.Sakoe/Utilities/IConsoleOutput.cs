@@ -21,9 +21,11 @@
 using System;
 
 namespace Oetools.Sakoe.Utilities {
-    public interface IResultWriter {
-        void WriteResult(string result, ConsoleColor? color = null, int padding = 0);
-        void WriteResultOnNewLine(string result, ConsoleColor? color = null, int padding = 0);
-        void WriteNewLine();
+    public interface IConsoleOutput {
+        void WriteResult(string result, ConsoleColor? color = null);
+        void WriteResultOnNewLine(string result, ConsoleColor? color = null);
+        void Write(string result, ConsoleColor? color = null, int padding = 0);
+        void WriteOnNewLine(string result, ConsoleColor? color = null, int padding = 0);
+        void DrawLogo();
     }
 }

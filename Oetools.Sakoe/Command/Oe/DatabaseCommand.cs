@@ -25,6 +25,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Subcommand(typeof(KillAllDatabaseCommand))]
     [Subcommand(typeof(DeleteDatabaseCommand))]
     [Subcommand(typeof(RepairDatabaseCommand))]
+    // TODO : generate a delta .df
     internal class DatabaseCommand : BaseCommand {
     }
     
@@ -38,8 +39,8 @@ namespace Oetools.Sakoe.Command.Oe {
         
         [Required]
         [LegalFilePath]
-        [Argument(0, Name = "Target database path", Description = "Path to the database to repair (.db extension is optional)")]
-        protected string TargetDatabasePath { get; set; }
+        [Argument(0, "[<db path>]", "Path to the database to repair (.db extension is optional)")]
+        public string TargetDatabasePath { get; set; }
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             
@@ -64,8 +65,8 @@ namespace Oetools.Sakoe.Command.Oe {
         
         [Required]
         [LegalFilePath]
-        [Argument(0, Name = "Target database path", Description = "Path to the database to delete (.db extension is optional)")]
-        protected string TargetDatabasePath { get; set; }
+        [Argument(0, "[<db path>]", "Path to the database to delete (.db extension is optional)")]
+        public string TargetDatabasePath { get; set; }
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             
@@ -91,8 +92,8 @@ namespace Oetools.Sakoe.Command.Oe {
         
         [Required]
         [LegalFilePath]
-        [Argument(0, Name = "Target database path", Description = "Path to the database to stop (.db extension is optional)")]
-        protected string TargetDatabasePath { get; set; }
+        [Argument(0, "[<db path>]", "Path to the database to stop (.db extension is optional)")]
+        public string TargetDatabasePath { get; set; }
         
         public string[] RemainingArgs { get; set; }
         
@@ -136,20 +137,20 @@ namespace Oetools.Sakoe.Command.Oe {
         
         [Required]
         [LegalFilePath]
-        [Argument(0, Name = "Target database path", Description = "Path to the database to start (.db extension is optional)")]
-        protected string TargetDatabasePath { get; set; }
+        [Argument(0, "[<db path>]", "Path to the database to start (.db extension is optional)")]
+        public string TargetDatabasePath { get; set; }
         
-        [Option("-np|--nextport", "Port number, the next available port after this number will be used to start the database", CommandOptionType.SingleValue)]
-        protected (bool HasValue, int value) NextPortAvailable { get; set; }
+        [Option("-np|--next-port", "Port number, the next available port after this number will be used to start the database", CommandOptionType.SingleValue)]
+        public (bool HasValue, int value) NextPortAvailable { get; set; }
         
         [Option("-p|--port", "Port number that will be used by this database", CommandOptionType.SingleValue)]
-        protected (bool HasValue, int value) Port { get; set; }
+        public (bool HasValue, int value) Port { get; set; }
         
         [Option("-n|--nbusers", "Number of users that should be able to connect to this database simultaneously", CommandOptionType.SingleValue)]
-        protected (bool HasValue, int value) NbUsers { get; set; }
+        public (bool HasValue, int value) NbUsers { get; set; }
         
         [Option("-s|--service", "Service name for the database, an alternative to the port number", CommandOptionType.SingleValue)]
-        protected string ServiceName { get; set; }
+        public string ServiceName { get; set; }
         
         public string[] RemainingArgs { get; set; }
         
@@ -201,41 +202,32 @@ namespace Oetools.Sakoe.Command.Oe {
         
         [Required]
         [LegalFilePath]
-        [Argument(0, Name = "Target database path", Description = "Path to the database to create (.db extension is optional)")]
-        protected string TargetDatabasePath { get; set; }
+        [Argument(0, "[<db path>]", "Path to the database to create (.db extension is optional)")]
+        public string TargetDatabasePath { get; set; }
         
         [Option("-df|--df", "Path to the .df file containing the database schema definition", CommandOptionType.SingleValue)]
         [FileExists]
-        protected string SchemaDefinitionFilePath { get; set; }
+        public string SchemaDefinitionFilePath { get; set; }
         
         [Option("-st|--st", "Path to the .st file containing the database physical structure", CommandOptionType.SingleValue)]
         [FileExists]
-        protected string StuctureFilePath { get; set; }
-        
+        public string StuctureFilePath { get; set; }
+
         [Option("-bs|--blocksize", "The blocksize to use when creating the database", CommandOptionType.SingleValue)]
-        protected (bool HasValue, string value) BlockSize { get; }
+        public DatabaseBlockSize BlockSize { get; } = DatabaseBlockSize.DefaultForCurrentPlatform;
 
         [Option("-cp|--codepage", "Existing codepage in the openedge installation $DLC/prolang/(codepage)", CommandOptionType.SingleValue)]
-        protected string Codepage { get; } = null;
+        public string Codepage { get; } = null;
 
         [Option("-ni|--newinstance", "Use -newinstance in the procopy command", CommandOptionType.NoValue)]
-        protected bool NewInstance { get; } = false;
+        public bool NewInstance { get; } = false;
 
         [Option("-rp|--relativepath", "Use -relativepath in the procopy command", CommandOptionType.NoValue)]
-        protected bool RelativePath { get; } = false;
+        public bool RelativePath { get; } = false;
         
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
 
             using (var dbAdministrator = new UoeDatabaseAdministrator(GetDlcPath())) {
-
-                // get blocksize
-                var blockSize = DatabaseBlockSize.DefaultForCurrentPlatform;
-                if (BlockSize.HasValue) {
-                    if (!TryGetEnumValue<DatabaseBlockSize>($"{DatabaseBlockSize.S4096.ToString().Substring(0, 1)}{BlockSize.value}", out long blockSizeValue, out List<string> list)) {
-                        throw new CommandException($"Invalid value for {nameof(BlockSize)}, valid values are : {string.Join(", ", list.Select(s => s.Substring(1)))}");
-                    }
-                    blockSize = (DatabaseBlockSize) blockSizeValue;
-                }
 
                 // to absolute path
                 StuctureFilePath = !string.IsNullOrEmpty(StuctureFilePath) ? StuctureFilePath.MakePathAbsolute() : null;
@@ -265,14 +257,14 @@ namespace Oetools.Sakoe.Command.Oe {
 
                 // prostct create
                 if (!string.IsNullOrEmpty(StuctureFilePath)) {
-                    Log.Info($"Create database structure from structure file (.st) using {blockSize} blocksize");
-                    dbAdministrator.ProstrctCreate(TargetDatabasePath, StuctureFilePath, blockSize);
+                    Log.Info($"Create database structure from structure file (.st) using {BlockSize} blocksize");
+                    dbAdministrator.ProstrctCreate(TargetDatabasePath, StuctureFilePath, BlockSize);
                     Log.Debug(dbAdministrator.LastOperationOutput);
                 }
 
                 // procopy empty
-                Log.Info($"Procopy the empty database from the dlc folder corresponding to a {blockSize} blocksize");
-                dbAdministrator.Procopy(TargetDatabasePath, blockSize, Codepage, NewInstance, RelativePath);
+                Log.Info($"Procopy the empty database from the dlc folder corresponding to a {BlockSize} blocksize");
+                dbAdministrator.Procopy(TargetDatabasePath, BlockSize, Codepage, NewInstance, RelativePath);
                 Log.Debug(dbAdministrator.LastOperationOutput);
 
                 if (!UoeDatabaseOperator.DatabaseExists(TargetDatabasePath)) {

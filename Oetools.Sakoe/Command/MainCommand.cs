@@ -54,17 +54,15 @@ Response file parsing:
         public const string HelpLongName = "--help";
         
         public static int ExecuteMainCommand(string[] args) {
-            var console = PhysicalConsole.Singleton;
-            HelpGenerator.Console = console;
             try {
-                using (var app = new CommandLineApplicationCustomHint<MainCommand>(HelpGenerator, console, Directory.GetCurrentDirectory(), true)) {
+                using (var app = new CommandLineApplicationCustomHint<MainCommand>(HelpGenerator.Singleton, PhysicalConsole.Singleton, Directory.GetCurrentDirectory(), true)) {
                     app.Conventions.UseDefaultConventions();
                     app.ParserSettings.MakeSuggestionsInErrorMessage = true;
                     return app.Execute(args);
                 } 
             } catch (Exception ex) {
-                using (var log = new ConsoleIo(console, ConsoleIo.LogLvl.Info, true)) {
-                    log.Error(ex.Message);
+                using (var log = new ConsoleIo(PhysicalConsole.Singleton, ConsoleIo.LogLvl.Info, true)) {
+                    log.Error(ex.Message, ex);
 
                     if (ex is CommandParsingException) {
                         //if (ex is UnrecognizedCommandParsingException unrecognizedCommandParsingException) {
@@ -73,10 +71,8 @@ Response file parsing:
                         log.Info($"Specify {HelpLongName} for a list of available options and commands.");
                     }
 
-                    log.Fatal($"Exit code {FatalExitCode} - Error");
-                    
-                    log.WriteNewLine();
-                    console.ResetColor();
+                    log.Fatal($"Exit code {FatalExitCode}");
+                    log.WriteOnNewLine(null);
                     return FatalExitCode;
                 }
             }

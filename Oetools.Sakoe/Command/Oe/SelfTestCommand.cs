@@ -1,9 +1,11 @@
 ﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Threading;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.ShellProgressBar;
+using Oetools.Sakoe.Utilities.Extension;
 using Oetools.Utilities.Openedge.Database;
 
 namespace Oetools.Sakoe.Command.Oe {
@@ -109,7 +111,7 @@ nibh.") { Align = Align.Right ,Stroke = LineThickness.None },
             Out.WriteResultOnNewLine("  0123456789abcdefghijklmnopsqrstu\n          0123456789abcdefghijklmnopsqrstu");
             Out.WriteResultOnNewLine("012345");
             Out.WriteResult("  01234567\n89");
-            Out.WriteResultOnNewLine("012345", ConsoleColor.Gray, 5);
+            Out.WriteResultOnNewLine("012345", ConsoleColor.Gray);
             Out.WriteResultOnNewLine("012345");
             Out.WriteResultOnNewLine("0123456789abcdefghijklmnopsqrstu");
             
@@ -148,16 +150,19 @@ sakoe st input -b2 s1024",
         
         [Argument(0)]
         [LegalFilePath]
-        public string File { get; }
+        public string FileTruc { get; }
+        
+        [Argument(1)]
+        public string Folder { get; }
         
         [Option("--git-dir")]
         [DirectoryExists]
         public string GitDir { get; }
         
-        [Option("-X|--request", Description = "HTTP Method: GET or POST. Defaults to post.")]
+        [Option("-X|--request", Description = "HTTP Method: GET or POST. Defaults to post. HTTP Method: GET or POST. Defaults to post. HTTP Method: GET or POST. Defaults to post. HTTP Method: GET or POST. Defaults to post.")]
         public HttpMethod RequestMethod { get; } = HttpMethod.Post;
         
-        //[Required]
+        [Required]
         [Option(Description = "Required. The message")]
         public string Message { get; }
 
@@ -171,7 +176,7 @@ sakoe st input -b2 s1024",
         
         [Option]
         [AllowedValues("low", "normal", "high", IgnoreCase = true)]
-        public string Importance { get; } = "normal";
+        public string ImportanceFuck { get; } = "normal";
         
         [Option(Description = "The colors should be red or blue")]
         [RedOrBlue]
@@ -203,6 +208,7 @@ sakoe st input -b2 s1024",
         /// <summary>
         /// Holds the extra params given after --
         /// </summary>
+        [Description("[[--] <mon truc>...]")]
         public string[] RemainingArgs { get; }
 
         // You can use this pattern when the parent command may have options or methods you want to
@@ -211,7 +217,7 @@ sakoe st input -b2 s1024",
         private SelfTestCommand Parent { get; }
         
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            Log.Info($"File = {File ?? "null"}");
+            Log.Info($"File = {FileTruc ?? "null"}");
             Log.Info($"GitDir = {GitDir ?? "null"}");
             Log.Info($"RequestMethod = {RequestMethod}");
             Log.Info($"Message = {Message ?? "null"}");
@@ -221,7 +227,7 @@ sakoe st input -b2 s1024",
                     Log.Info($"Attachments = {attachment}");
                 }
             }
-            Log.Info($"Importance = {Importance ?? "null"}");
+            Log.Info($"Importance = {ImportanceFuck ?? "null"}");
             Log.Info($"Color = {Color ?? "null"}");
             Log.Info($"MaxSize = {MaxSize?.ToString() ?? "null"}");
             Log.Info($"Directories = {Directories ?? "null"}");
@@ -334,8 +340,8 @@ sakoe st input -b2 s1024",
     internal class LogSelfTestCommand : BaseCommand {
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            Out.WriteResultOnNewLine("this is an output, it will still be displayed if the verbosity is set to None");
-            Out.WriteResult(".");
+            Out.WriteOnNewLine("this is an output, it will still be displayed if the verbosity is set to None");
+            Out.Write(".");
             
             Log.ReportGlobalProgress(100, 5, "Logging 5% global progress");
             
@@ -351,7 +357,7 @@ sakoe st input -b2 s1024",
             Log.Error("Log error");
             Log.Fatal("Log fatal");
             Log.Done("Log success");
-            Log?.Info(GetTypeFromCommandLine(app).ToString());
+            Log?.Info(app.GetTypeFromCommandLine().ToString());
 
             for (var i = 0; i <= 90; i++) {
                 CancelToken?.ThrowIfCancellationRequested();
@@ -359,7 +365,7 @@ sakoe st input -b2 s1024",
                 Thread.Sleep(100);
             }
 
-            Out.WriteResultOnNewLine("another output!");
+            Out.WriteOnNewLine("another output!");
             Log.Done("Above task did not end completely");
 
             Log.ReportGlobalProgress(100, 30, "Logging 30% global progress");
@@ -370,7 +376,7 @@ sakoe st input -b2 s1024",
                 Thread.Sleep(100);
             }
 
-            Out.WriteResultOnNewLine("another output!");
+            Out.WriteOnNewLine("another output!");
             Log.Done("Task above ended well");
             
             Log.ReportGlobalProgress(100, 100, "Logging 100% global progress");
