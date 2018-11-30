@@ -27,31 +27,49 @@ using Oetools.Builder.Utilities;
 
 namespace Oetools.Sakoe.Utilities {
     
-    public class ConsoleIo : ConsoleOutput, ILogger, ITraceLogger, IDisposable {
+    public class ConsoleIo : ConsoleOutput, ILogger, ITraceLogger {
         
-        private readonly LogLvl _logLevel;
+        /// <summary>
+        /// A singleton instance of <see cref="HelpGenerator" />.
+        /// </summary>
+        public static ConsoleIo Singleton => _instance ?? (_instance = new ConsoleIo(PhysicalConsole.Singleton));
 
-        public ITraceLogger Trace { get; }
+        /// <summary>
+        /// Initializes a new instance of <see cref="ConsoleIo"/>.
+        /// </summary>
+        private ConsoleIo(IConsole console) : base(console) {
+            _stopwatch = Stopwatch.StartNew();
+            _console = console;
+        }
 
-        private bool _isProgressBarOff;
-
+        private static ConsoleIo _instance;
+        
         private Stopwatch _stopwatch;
 
         private ConsoleProgressBar _progressBar;
-
-        public ConsoleIo(IConsole console, LogLvl level, bool isProgressBarOff) : base(console) {
-            _stopwatch = Stopwatch.StartNew();
-            _console = console;
-            _logLevel = level;
-            _isProgressBarOff = isProgressBarOff;
-            if (_logLevel <= LogLvl.Debug) {
-                Trace = this;
+        
+        private LogLvl _logLevel = LogLvl.Info;     
+        
+        public LogLvl LogLevel {
+            get => _logLevel;
+            set {
+                _logLevel = value;
+                if (LogLevel <= LogLvl.Debug) {
+                    Trace = this;
+                } else {
+                    Trace = null;
+                }
             }
         }
 
-        public void Dispose() {
+        public ITraceLogger Trace { get; private set; }
+
+        public bool IsProgressBarOff { get; set; } = false;
+
+        public override void Dispose() {
             _progressBar?.Dispose();
-            _console.ResetColor();
+            _progressBar = null;
+            base.Dispose();
         }
         
         public void Fatal(string message, Exception e = null) {
@@ -88,7 +106,7 @@ namespace Oetools.Sakoe.Utilities {
         }
 
         public void ReportProgress(int max, int current, string message) {
-            if (_isProgressBarOff) {
+            if (IsProgressBarOff) {
                 return;
             }
 
@@ -106,7 +124,7 @@ namespace Oetools.Sakoe.Utilities {
                     };
                 }
                 if (!_progressBar.IsRunning) {
-                    WriteNewLine();
+                    base.WriteResultOnNewLine(null);
                 }
                 if (max > 0 && max != _progressBar.MaxTicks) {
                     _progressBar.MaxTicks = max;
@@ -122,7 +140,7 @@ namespace Oetools.Sakoe.Utilities {
 
         private void StopProgressBar() {
             if (_progressBar?.Stop() ?? false) {
-                _hasWroteToOuput = false;
+                WordWrapWriter.HasWroteToOuput = false;
             }
         }
 
@@ -149,12 +167,17 @@ namespace Oetools.Sakoe.Utilities {
             StopProgressBar();
             base.WriteOnNewLine(result, color, padding);
         }
-
-        protected override void WriteNewLine() {
-            StopProgressBar();
-            base.WriteNewLine();
-        }
         
+        public override void WriteError(string result, ConsoleColor? color = null, int padding = 0) {
+            StopProgressBar();
+            base.WriteError(result, color, padding);
+        }
+
+        public override void WriteErrorOnNewLine(string result, ConsoleColor? color = null, int padding = 0) {
+            StopProgressBar();
+            base.WriteErrorOnNewLine(result, color, padding);
+        }
+
         public enum LogLvl {
             Debug,
             Info,
@@ -168,28 +191,29 @@ namespace Oetools.Sakoe.Utilities {
         private void Log(LogLvl level, string message, Exception e = null) {
             StopProgressBar();
 
-            if (level < _logLevel) {
+            if (level < LogLevel) {
                 return;
             }
 
+            ConsoleColor outputColor;
             switch (level) {
                 case LogLvl.Debug:
-                    _console.ForegroundColor = ConsoleColor.DarkGray;
+                    outputColor = ConsoleColor.DarkGray;
                     break;
                 case LogLvl.Info:
-                    _console.ForegroundColor = ConsoleColor.Cyan;
+                    outputColor = ConsoleColor.Cyan;
                     break;
                 case LogLvl.Done:
-                    _console.ForegroundColor = ConsoleColor.Green;
+                    outputColor = ConsoleColor.Green;
                     break;
                 case LogLvl.Warn:
-                    _console.ForegroundColor = ConsoleColor.Yellow;
+                    outputColor = ConsoleColor.Yellow;
                     break;
                 case LogLvl.Error:
-                    _console.ForegroundColor = ConsoleColor.Red;
+                    outputColor = ConsoleColor.Red;
                     break;
                 case LogLvl.Fatal:
-                    _console.ForegroundColor = ConsoleColor.Magenta;
+                    outputColor = ConsoleColor.Magenta;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(level), level, null);
@@ -198,14 +222,13 @@ namespace Oetools.Sakoe.Utilities {
             var elapsed = _stopwatch.Elapsed;
             var outputMessage = $"{level.ToString().ToUpper().PadRight(5, ' ')} [{elapsed.Hours:D2}:{elapsed.Minutes:D2}:{elapsed.Seconds:D2}.{elapsed.Milliseconds:D3}] {message}";
             if (level >= LogLvl.Error) {
-                WriteToConsoleWithWordWrap(_console.Error, outputMessage, true, 0);
+                base.WriteErrorOnNewLine(outputMessage, outputColor);
             } else {
-                WriteToConsoleWithWordWrap(_console.Out, outputMessage, true, 0);
+                base.WriteOnNewLine(outputMessage, outputColor);
             }
 
             if (e != null) {
-                _console.ForegroundColor = ConsoleColor.DarkGray;
-                WriteToConsoleWithWordWrap(_console.Error, e.ToString(), true, 0);
+                base.WriteErrorOnNewLine(e.ToString(), ConsoleColor.DarkGray);
             }
         }
     }

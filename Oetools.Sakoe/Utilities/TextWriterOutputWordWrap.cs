@@ -26,13 +26,22 @@ namespace Oetools.Sakoe.Utilities {
     /// <summary>
     /// This class provides methods to output text to a <see cref="TextWriter"/> with word wrap.
     /// </summary>
-    public abstract class TextWriterWordWrap {
+    public class TextWriterOutputWordWrap {
+        
+        public TextWriter UnderLyingWriter { get; set; }
+
+        public TextWriterOutputWordWrap(TextWriter writer) {
+            if (writer == null) {
+                throw new NullReferenceException($"Can't be null {nameof(writer)}.");
+            }
+            UnderLyingWriter = writer;
+        }
 
         /// <summary>
         /// Returns the maximum length that a line can have.
         /// </summary>
         /// <returns></returns>
-        protected virtual int GetLineMaximumLength() {
+        private int GetLineMaximumLength() {
             try {
                 return Console.WindowWidth - 1;
             } catch (IOException) {
@@ -40,31 +49,47 @@ namespace Oetools.Sakoe.Utilities {
             }
         }
         
-        protected bool _hasWroteToOuput;
+        /// <summary>
+        /// Has this writer alright wrote thing to the output?
+        /// Allows to know when to write a new line.
+        /// </summary>
+        public bool HasWroteToOuput { get; set; }
 
         private int _currentConsoleLineSpaceTaken;
-        
+
+        /// <summary>
+        /// Write a new line char into the text writer
+        /// </summary>
+        /// <param name="underLyingWriter"></param>
+        /// <param name="newLine"></param>
+        public void WriteLine(TextWriter underLyingWriter = null, string newLine = null) {
+            (underLyingWriter ?? UnderLyingWriter).Write(newLine ?? Console.Out.NewLine);
+            _currentConsoleLineSpaceTaken = 0;
+            HasWroteToOuput = true;
+        }
+
         /// <summary>
         /// Writes a text to the console with word wrap.
         /// </summary>
-        /// <param name="textWriter">output text writer</param>
         /// <param name="message">the message to write</param>
         /// <param name="writeToNewLine">write the message to a separated line (otherwise continue to output on the same line)</param>
         /// <param name="indentation">the indentation to give to the message when written on a new line</param>
-        protected void WriteToConsoleWithWordWrap(TextWriter textWriter, string message, bool writeToNewLine, int indentation) {
+        /// <param name="underLyingWriter"></param>
+        /// <param name="maximumLineLength"></param>
+        public void Write(string message, bool writeToNewLine, int indentation, TextWriter underLyingWriter = null, int? maximumLineLength = null) {
             
             // check message
             if (message == null) {
                 // write a new line
-                if (writeToNewLine && _hasWroteToOuput) {
-                    WriteNewLine(textWriter);
+                if (writeToNewLine && HasWroteToOuput) {
+                    WriteLine(underLyingWriter);
                 }
-                _hasWroteToOuput = true;
+                HasWroteToOuput = true;
                 return;
             }
 
             // maximum length for a line
-            var maxLineWidth = GetLineMaximumLength();
+            var maxLineWidth = maximumLineLength ?? GetLineMaximumLength();
             if (maxLineWidth < 1) {
                 maxLineWidth = 1;
             }
@@ -93,8 +118,8 @@ namespace Oetools.Sakoe.Utilities {
                 if (eolPosition > lineStartPos) {
                     do {
                         // write a new line
-                        if (writeToNewLine && _hasWroteToOuput || _currentConsoleLineSpaceTaken >= maxLineWidth) {
-                            WriteNewLine(textWriter);
+                        if (writeToNewLine && HasWroteToOuput || _currentConsoleLineSpaceTaken >= maxLineWidth) {
+                            WriteLine(underLyingWriter);
                         }
                         
                         int lineLength = eolPosition - lineStartPos;
@@ -108,7 +133,7 @@ namespace Oetools.Sakoe.Utilities {
                         if (lineLength > 0) {
                             var line = message.Substring(lineStartPos, lineLength);
                             line = _currentConsoleLineSpaceTaken > 0 ? line : line.PadLeft(lineLength + indentation + paragraphIndent, ' ');
-                            textWriter.Write(line);
+                            (underLyingWriter ?? UnderLyingWriter).Write(line);
                             _currentConsoleLineSpaceTaken += line.Length;
                         }
                         
@@ -122,7 +147,7 @@ namespace Oetools.Sakoe.Utilities {
                         }
                         newInputLineStarting = false;
                         
-                        _hasWroteToOuput = true;
+                        HasWroteToOuput = true;
                         writeToNewLine = true;
 
                         // trim the whitespaces following a word break
@@ -167,17 +192,6 @@ namespace Oetools.Sakoe.Utilities {
 
             // Return length of text before whitespace
             return i + 1;
-        }
-
-        /// <summary>
-        /// Write a new line char into the text writer
-        /// </summary>
-        /// <param name="textWriter"></param>
-        /// <param name="newLine"></param>
-        protected void WriteNewLine(TextWriter textWriter, string newLine = null) {
-            textWriter.Write(newLine ?? Console.Out.NewLine);
-            _currentConsoleLineSpaceTaken = 0;
-            _hasWroteToOuput = true;
         }
     }
 }

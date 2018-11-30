@@ -19,16 +19,12 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder.Utilities;
 using Oetools.Sakoe.Command.Exceptions;
 using Oetools.Sakoe.Utilities;
-using Oetools.Utilities.Lib.Extension;
 
 namespace Oetools.Sakoe.Command {
     
@@ -61,8 +57,6 @@ namespace Oetools.Sakoe.Command {
         protected ILogger Log { get; private set; }
         
         protected IConsoleOutput Out { get; private set; }
-        
-        private IConsole Console { get; set; }
 
         protected CancellationToken? CancelToken => _cancelSource?.Token;
         
@@ -78,65 +72,62 @@ namespace Oetools.Sakoe.Command {
         
         // ReSharper disable once UnusedMember.Global
         protected int OnExecute(CommandLineApplication app, IConsole console) {
-            Console = console;
-            
-            using (var consoleIo = new ConsoleIo(console, Verbosity, IsProgressBarOff)) {
-                Log = consoleIo;
-                Out = consoleIo;
-                HelpGenerator.Singleton.Console = consoleIo;
-                
-                _cancelSource = new CancellationTokenSource();
-                console.CancelKeyPress += ConsoleOnCancelKeyPress;
-                
-                if (IsLogoOn) {
-                    Out.DrawLogo();
-                }
-                
-                int exitCode = FatalExitCode;
-                
-                try {
-                    Log.Debug($"Starting execution: {DateTime.Now:yy-MM-dd} @ {DateTime.Now:HH:mm:ss}.");
-                    ExecutePreCommand(app, console);
-                    exitCode = ExecuteCommand(app, console);
-                    ExecutePostCommand(app, console);
-                    if (exitCode.Equals(0)) {
-                        Log.Done("Exit code 0");
-                    } else {
-                        Log.Warn($"Exit code {exitCode}");
-                    }
-                    if (Verbosity < ConsoleIo.LogLvl.None) {
-                        Out.WriteOnNewLine(null);
-                    }
-                    return exitCode;
-                    
-                } catch (Exception e) {
-                    Log.Error(e.Message, e);
-                    if (Verbosity > ConsoleIo.LogLvl.Debug) {
-                        Log.Info(UseVerboseMessage);
-                    }
-                    if (e is CommandException ce) {
-                        exitCode = ce.ExitCode;
-                    }
-                }
+            Log = ConsoleIo.Singleton;
+            Out = ConsoleIo.Singleton;
+            ConsoleIo.Singleton.LogLevel = Verbosity;
+            ConsoleIo.Singleton.IsProgressBarOff = IsProgressBarOff;
 
-                Log.Fatal($"Exit code {exitCode}");
+            _cancelSource = new CancellationTokenSource();
+            console.CancelKeyPress += ConsoleOnCancelKeyPress;
+            
+            if (IsLogoOn) {
+                Out.DrawLogo();
+            }
+            
+            int exitCode = FatalExitCode;
+            
+            try {
+                Log.Debug($"Starting execution: {DateTime.Now:yy-MM-dd} @ {DateTime.Now:HH:mm:ss}.");
+                ExecutePreCommand(app, console);
+                exitCode = ExecuteCommand(app, console);
+                ExecutePostCommand(app, console);
+                if (exitCode.Equals(0)) {
+                    Log.Done("Exit code 0");
+                } else {
+                    Log.Warn($"Exit code {exitCode}");
+                }
                 if (Verbosity < ConsoleIo.LogLvl.None) {
-                    Out.WriteOnNewLine(null);
+                    Out.WriteOnNewLine(null);    
                 }
                 return exitCode;
+                
+            } catch (Exception e) {
+                Log.Error(e.Message, e);
+                if (Verbosity > ConsoleIo.LogLvl.Debug) {
+                    Log.Info(UseVerboseMessage);
+                }
+                if (e is CommandException ce) {
+                    exitCode = ce.ExitCode;
+                }
             }
+
+            Log.Fatal($"Exit code {exitCode}");
+            if (Verbosity < ConsoleIo.LogLvl.None) {
+                Out.WriteOnNewLine(null);
+            }
+            
+            return exitCode;
         }
         
         // ReSharper disable once UnusedMember.Global
         public int OnValidationError(ValidationResult r) {
-            using (var log = new ConsoleIo(PhysicalConsole.Singleton, ConsoleIo.LogLvl.Info, true)) {
-                var faultyMembers = string.Join(", ", r.MemberNames);
-                log.Error($"{(faultyMembers.Length > 0 ? $"{faultyMembers} : ": "")}{r.ErrorMessage}");
-                log.Info($"Specify {MainCommand.HelpLongName} for a list of available options and commands.");
-                log.Fatal($"Exit code {FatalExitCode}");
-                log.WriteOnNewLine(null);
-                return FatalExitCode;
-            }
+            var log = ConsoleIo.Singleton;
+            var faultyMembers = string.Join(", ", r.MemberNames);
+            log.Error($"{(faultyMembers.Length > 0 ? $"{faultyMembers} : ": "")}{r.ErrorMessage}");
+            log.Info($"Specify {MainCommand.HelpLongName} for a list of available options and commands.");
+            log.Fatal($"Exit code {FatalExitCode}");
+            log.WriteOnNewLine(null);
+            return FatalExitCode;
         }
 
         /// <summary>

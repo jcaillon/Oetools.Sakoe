@@ -35,7 +35,7 @@ namespace Oetools.Sakoe.Command.Oe {
         ExtendedHelpText = "TODO : database",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class RepairDatabaseCommand : AOeBaseCommand {
+    internal class RepairDatabaseCommand : AOeDlcCommand {
         
         [Required]
         [LegalFilePath]
@@ -61,7 +61,7 @@ namespace Oetools.Sakoe.Command.Oe {
         ExtendedHelpText = "TODO : database",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class DeleteDatabaseCommand : AOeBaseCommand {
+    internal class DeleteDatabaseCommand : AOeDlcCommand {
         
         [Required]
         [LegalFilePath]
@@ -88,7 +88,7 @@ namespace Oetools.Sakoe.Command.Oe {
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         AllowArgumentSeparator = true
     )]
-    internal class StopDatabaseCommand : AOeBaseCommand {
+    internal class StopDatabaseCommand : AOeDlcCommand {
         
         [Required]
         [LegalFilePath]
@@ -133,7 +133,7 @@ namespace Oetools.Sakoe.Command.Oe {
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         AllowArgumentSeparator = true
     )]
-    internal class StartDatabaseCommand : AOeBaseCommand {
+    internal class StartDatabaseCommand : AOeDlcCommand {
         
         [Required]
         [LegalFilePath]
@@ -198,7 +198,7 @@ namespace Oetools.Sakoe.Command.Oe {
         ExtendedHelpText = "TODO : extended database creation",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class CreateDatabaseCommand : AOeBaseCommand {
+    internal class CreateDatabaseCommand : AOeDlcCommand {
         
         [Required]
         [LegalFilePath]

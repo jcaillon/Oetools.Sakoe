@@ -23,7 +23,7 @@ namespace Oetools.Sakoe.Command.Oe {
         ExtendedHelpText = "TODO : database",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class ConnectDatabaseProjectCommand : AOeBaseCommand {
+    internal class ConnectDatabaseProjectCommand : AOeDlcCommand {
         
         [Required]
         [LegalFilePath]

@@ -12,24 +12,32 @@ namespace Oetools.Sakoe.Command {
     [Command(
         FullName = "SAKOE - a Swiss Army Knife for OpenEdge",
         Description = "SAKOE is a collection of tools aimed to simplify your work in Openedge environments.",
-        ExtendedHelpText = @"Website: 
-  https://jcaillon.github.io/Oetools.Sakoe/
+        ExtendedHelpText = @"GETTING STARTED 
+  The '" + ManCommand.Name + @"' command is a good place to start using this tool.
+  This tool has a lot of utility commands but the bread and butter command is '" + BuildCommand.Name + @"'. It allows you to do Openedge build automation.
 
-Get raw output:
+NOTES
+  - You can escape white spaces in argument and option values by using double quotes (i.e. "")
+  - In the 'USAGE' help, arguments between brackets (i.e. []) are optionals
+
+GET RAW OUTPUT
   If you want a raw output for each commands (without display the log lines), you can set the verbosity to ""None"" and use the no progress bars option.
-    sakoe [command] -vb None -nop
+    sakoe [command] -vb None -po
 
-Exit code:
+EXIT CODE
   The convention followed by this tool is the following.
     0 : used when a command completed successfully, without errors nor warnings.
     1-8 : used when a command completed but with warnings, the level can be used to pinpoint different kind of warnings.
     9 : used when a command does not complete and ends up in error.
 
-Response file parsing:
+RESPONSE FILE PARSING
   Instead of using a long command line, you can use a response file that contains each argument/option that should be used.
   Everything that is usually separated by a space in the command line should be separated by a new line in the file.
-  You do not have to double quote arguments containing spaces, they will be considered as a whole as long as they are on a separated line.
+  In response files, you do not have to double quote arguments containing spaces, they will be considered as a whole as long as they are on a separated line.
     sakoe @responsefile.txt
+
+WEBSITE 
+  https://jcaillon.github.io/Oetools.Sakoe/
 ",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         ResponseFileHandling = ResponseFileHandling.ParseArgsAsLineSeparated
@@ -38,11 +46,11 @@ Response file parsing:
 #if DEBUG
     [Subcommand(typeof(SelfTestCommand))]
 #endif
+    [Subcommand(typeof(ManCommand))]
     [Subcommand(typeof(DatabaseCommand))]
     [Subcommand(typeof(LintCommand))]
-    [Subcommand( typeof(ProjectCommand))]
+    [Subcommand(typeof(ProjectCommand))]
     [Subcommand(typeof(BuildCommand))]
-    [Subcommand(typeof(ManCommand))]
     [Subcommand(typeof(ShowVersionCommand))]
     [Subcommand(typeof(XcodeCommand))]
     [Subcommand(typeof(HashCommand))]
@@ -59,22 +67,24 @@ Response file parsing:
                     app.Conventions.UseDefaultConventions();
                     app.ParserSettings.MakeSuggestionsInErrorMessage = true;
                     return app.Execute(args);
-                } 
-            } catch (Exception ex) {
-                using (var log = new ConsoleIo(PhysicalConsole.Singleton, ConsoleIo.LogLvl.Info, true)) {
-                    log.Error(ex.Message, ex);
-
-                    if (ex is CommandParsingException) {
-                        //if (ex is UnrecognizedCommandParsingException unrecognizedCommandParsingException) {
-                        //    log.Info($"Did you mean {unrecognizedCommandParsingException.NearestMatch}?");
-                        //}
-                        log.Info($"Specify {HelpLongName} for a list of available options and commands.");
-                    }
-
-                    log.Fatal($"Exit code {FatalExitCode}");
-                    log.WriteOnNewLine(null);
-                    return FatalExitCode;
                 }
+            } catch (Exception ex) {
+                var log = ConsoleIo.Singleton;
+                log.LogLevel = ConsoleIo.LogLvl.Info;
+                log.Error(ex.Message, ex);
+                
+                if (ex is CommandParsingException) {
+                    //if (ex is UnrecognizedCommandParsingException unrecognizedCommandParsingException) {
+                    //    log.Info($"Did you mean {unrecognizedCommandParsingException.NearestMatch}?");
+                    //}
+                    log.Info($"Specify {HelpLongName} for a list of available options and commands.");
+                }
+
+                log.Fatal($"Exit code {FatalExitCode}");
+                log.WriteOnNewLine(null);
+                return FatalExitCode;
+            } finally {
+                ConsoleIo.Singleton.Dispose();
             }
         }
     }

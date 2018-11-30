@@ -61,15 +61,6 @@ namespace Oetools.Sakoe.Utilities.Extension {
         /// <param name="app"></param>
         /// <returns></returns>
         public static string GetFullCommandLine(this CommandLineApplication app) {
-            //var rootApp = app;
-            //while (rootApp.Parent != null) {
-            //    rootApp = rootApp.Parent;
-            //}
-            //var sb = new StringBuilder(rootApp.Name);
-            //foreach (var command in GetCommandStackFromType(type)) {
-            //    sb.Append(' ');
-            //    sb.Append(command.Name);
-            //}
             var sb = new StringBuilder();
             var stack = new Stack<string>();
             for (var cmd = app; cmd != null; cmd = cmd.Parent) {

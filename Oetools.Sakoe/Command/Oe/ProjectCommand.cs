@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder.Project;
@@ -18,10 +19,11 @@ namespace Oetools.Sakoe.Command.Oe {
         ExtendedHelpText = "",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    [Subcommand(typeof(IniProjectCommand))]
-    [Subcommand(typeof(InitGitignoreCommand))]
+    [Subcommand(typeof(ProjectInitCommand))]
+    [Subcommand(typeof(ProjectGitignoreCommand))]
+    [Subcommand(typeof(ProjectListCommand))]
     internal class ProjectCommand : BaseCommand {
-   }
+    }
     
     [Command(
         "init", "in",
@@ -29,7 +31,7 @@ namespace Oetools.Sakoe.Command.Oe {
         ExtendedHelpText = "",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class IniProjectCommand : BaseCommand {
+    internal class ProjectInitCommand : BaseCommand {
         
         [DirectoryExists]
         [Argument(0, "<directory>", "The directory in which to initialize the project. Default to the current directory.")]
@@ -98,12 +100,12 @@ For git repositories, use the command " + app.GetFullCommandLine().PrettyQuote()
     }
 
     [Command(
-        "gitinit", "gi", 
+        "gitignore", "gi", 
         Description = "Initialize a .gitignore file adapted for sakoe projects (or append to, if it exists).", 
         ExtendedHelpText = "", 
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase)
     ]
-    internal class InitGitignoreCommand : BaseCommand {
+    internal class ProjectGitignoreCommand : BaseCommand {
 
         [DirectoryExists]
         [Argument(0, "<directory>", "The repository base directory (source directory). Defaults to the current directory.")]
@@ -157,6 +159,49 @@ bin/
             
             Log?.Info($"File written: {gitIgnorePath}.");
 
+            return 0;
+        }
+    }
+    
+    [Command(
+        "list", "li", 
+        Description = "List all the project files or list the build configurations in a project file.", 
+        ExtendedHelpText = "", 
+        OptionsComparison = StringComparison.CurrentCultureIgnoreCase)
+    ]
+    internal class ProjectListCommand : AOeCommand {
+
+        [LegalFilePath]
+        [Argument(0, "<file or directory>", "The project file in which to list the build configurations or the project base directory (source directory) in which to list the project files. Defaults to the current directory.")]
+        public string PathToList { get; set; }
+
+        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
+            if (string.IsNullOrEmpty(PathToList)) {
+                PathToList = Directory.GetCurrentDirectory();
+            }
+
+            if (Directory.Exists(PathToList)) {
+                var files = Directory.EnumerateFiles(PathToList, $"*{OeBuilderConstants.OeProjectExtension}", SearchOption.TopDirectoryOnly).ToList();
+                files.AddRange(Directory.EnumerateFiles(Path.Combine(PathToList, OeBuilderConstants.OeProjectDirectory), $"*{OeBuilderConstants.OeProjectExtension}", SearchOption.TopDirectoryOnly).ToList());
+                if (files.Count == 0) {
+                    Log?.Warn($"No project file {OeBuilderConstants.OeProjectExtension} found.");
+                } else {
+                    foreach (var file in files) {
+                        Out.WriteResultOnNewLine(file.FromAbsolutePathToRelativePath(PathToList));
+                    }
+                }
+                return 0;
+            }
+
+            var projectFile = GetProjectFilePath(PathToList);
+            
+            var project = OeProject.Load(projectFile);
+
+            foreach (var buildConfiguration in project.GetAllBuildConfigurations()) {
+                Out.WriteResultOnNewLine((string.IsNullOrEmpty(buildConfiguration.Name) ? "Unnamed configuration" : "Named configuration").PadRight(30));
+                Out.WriteResult(string.IsNullOrEmpty(buildConfiguration.Name) ? buildConfiguration.GetId().ToString() : buildConfiguration.Name);
+            }
+            
             return 0;
         }
     }

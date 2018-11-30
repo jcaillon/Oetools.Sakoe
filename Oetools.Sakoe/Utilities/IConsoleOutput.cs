@@ -19,13 +19,62 @@
 #endregion
 
 using System;
+using System.IO;
 
 namespace Oetools.Sakoe.Utilities {
     public interface IConsoleOutput {
+        
+        /// <summary>
+        /// Writes a result (no word wrap), appending to the existing line.
+        /// </summary>
+        /// <param name="result"></param>
+        /// <param name="color"></param>
         void WriteResult(string result, ConsoleColor? color = null);
+        
+        /// <summary>
+        /// Writes a result (no word wrap) on a new line.
+        /// </summary>
+        /// <param name="result"></param>
+        /// <param name="color"></param>
         void WriteResultOnNewLine(string result, ConsoleColor? color = null);
+        
+        /// <summary>
+        /// Writes text, appending to the current line. Has word wrap.
+        /// </summary>
+        /// <param name="result"></param>
+        /// <param name="color"></param>
+        /// <param name="padding"></param>
         void Write(string result, ConsoleColor? color = null, int padding = 0);
+        
+        /// <summary>
+        /// Writes text on a new line. Has word wrap.
+        /// </summary>
+        /// <param name="result"></param>
+        /// <param name="color"></param>
+        /// <param name="padding"></param>
         void WriteOnNewLine(string result, ConsoleColor? color = null, int padding = 0);
+        
+        /// <summary>
+        /// Writes a new error, appending to the current line. Has word wrap.
+        /// </summary>
+        /// <param name="result"></param>
+        /// <param name="color"></param>
+        /// <param name="padding"></param>
+        void WriteError(string result, ConsoleColor? color = null, int padding = 0);
+        
+        /// <summary>
+        /// Writes an error on a new line. Has word wrap.
+        /// </summary>
+        /// <param name="result"></param>
+        /// <param name="color"></param>
+        /// <param name="padding"></param>
+        void WriteErrorOnNewLine(string result, ConsoleColor? color = null, int padding = 0);
+        
+        /// <summary>
+        /// Draw the logo.
+        /// </summary>
         void DrawLogo();
+        
+        TextWriter OutputTextWriter { get; set; }
     }
 }

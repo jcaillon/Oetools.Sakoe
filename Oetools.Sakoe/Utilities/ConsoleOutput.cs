@@ -19,51 +19,73 @@
 #endregion
 
 using System;
+using System.IO;
 using System.Reflection;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Utilities.Lib;
 
 namespace Oetools.Sakoe.Utilities {
     
-    public class ConsoleOutput : TextWriterWordWrap, IConsoleOutput {
+    public class ConsoleOutput : IConsoleOutput, IDisposable {
 
         private ConsoleColor _originalForegroundColor;
+
+        protected readonly TextWriterOutputWordWrap WordWrapWriter;
         
         protected IConsole _console;
-        
+
+        public TextWriter OutputTextWriter { get; set; }
+
         public ConsoleOutput(IConsole console) {
             _console = console;
             _console.ResetColor();
             _originalForegroundColor = _console.ForegroundColor;
+            WordWrapWriter = new TextWriterOutputWordWrap(_console.Out);
         }
 
+        public virtual void Dispose() {
+            _console.ResetColor();
+        }
+        
         /// <inheritdoc />
         public virtual void WriteResult(string result, ConsoleColor? color = null) {
             _console.ForegroundColor = color ?? _originalForegroundColor;
-            _console.Out.Write(result);
+            (OutputTextWriter ?? _console.Out).Write(result);
+            WordWrapWriter.HasWroteToOuput = true;
         }
 
         /// <inheritdoc />
         public virtual void WriteResultOnNewLine(string result, ConsoleColor? color = null) {
-            _console.ForegroundColor = color ?? _originalForegroundColor;
-            if (_hasWroteToOuput) {
-                WriteNewLine(_console.Out);
+            if (WordWrapWriter.HasWroteToOuput) {
+                WordWrapWriter.WriteLine(OutputTextWriter ?? _console.Out);
             }
-            _console.Out.Write(result);
+            WriteResult(result, color);
         }
         
         /// <inheritdoc />
         public virtual void Write(string result, ConsoleColor? color = null, int padding = 0) {
             _console.ForegroundColor = color ?? _originalForegroundColor;
-            WriteToConsoleWithWordWrap(_console.Out, result, false, padding);
+            WordWrapWriter.Write(result, false, padding, OutputTextWriter ?? _console.Out);
         }
 
         /// <inheritdoc />
         public virtual void WriteOnNewLine(string result, ConsoleColor? color = null, int padding = 0) {
             _console.ForegroundColor = color ?? _originalForegroundColor;
-            WriteToConsoleWithWordWrap(_console.Out, result, true, padding);
+            WordWrapWriter.Write(result, true, padding, OutputTextWriter ?? _console.Out);
         }
-        
+
+        /// <inheritdoc />
+        public virtual void WriteError(string result, ConsoleColor? color = null, int padding = 0) {
+            _console.ForegroundColor = color ?? _originalForegroundColor;
+            WordWrapWriter.Write(result, false, padding, OutputTextWriter ?? _console.Error);
+        }
+
+        /// <inheritdoc />
+        public virtual void WriteErrorOnNewLine(string result, ConsoleColor? color = null, int padding = 0) {
+            _console.ForegroundColor = color ?? _originalForegroundColor;
+            WordWrapWriter.Write(result, true, padding, OutputTextWriter ?? _console.Error);
+        }
+
         /// <summary>
         /// Draw the logo of this tool.
         /// </summary>
@@ -108,8 +130,5 @@ namespace Oetools.Sakoe.Utilities {
             WriteOnNewLine(null);
         }
 
-        protected virtual void WriteNewLine() {
-            WriteNewLine(_console.Out);
-        }
     }
 }

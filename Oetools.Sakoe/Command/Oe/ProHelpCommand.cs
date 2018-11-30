@@ -53,7 +53,7 @@ namespace Oetools.Sakoe.Command.Oe {
         ExtendedHelpText = "This command uses the content of files located in $DLC/prohelp/msgdata to display information.", 
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class ProMsgCommand : AOeBaseCommand {
+    internal class ProMsgCommand : AOeDlcCommand {
         
         [Required]
         [Argument(0, "<message number>", "The number of the error message to show.")]
@@ -79,7 +79,7 @@ namespace Oetools.Sakoe.Command.Oe {
     
 #if WINDOWSONLYBUILD
     
-    internal class ChmDisplayProHelpCommand : AOeBaseCommand {     
+    internal class ChmDisplayProHelpCommand : AOeDlcCommand {     
 
         protected void OpenChmAndWait(string toOpen, string topic) {
             var helpWhdl = HtmlHelpInterop.DisplayIndex(toOpen, topic ?? "");
@@ -154,7 +154,7 @@ namespace Oetools.Sakoe.Command.Oe {
         ExtendedHelpText = "", 
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class ListChmProHelpCommand : AOeBaseCommand {
+    internal class ListChmProHelpCommand : AOeDlcCommand {
         
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
 

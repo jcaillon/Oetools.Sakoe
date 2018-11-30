@@ -20,18 +20,16 @@
 
 using System;
 using System.IO;
-using System.Linq;
 using McMaster.Extensions.CommandLineUtils;
-using Oetools.Builder.Utilities;
-using Oetools.Sakoe.Command.Exceptions;
+using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge;
 
-namespace Oetools.Sakoe.Command.Oe.Abstract {
+namespace Oetools.Sakoe.Command.Oe {
     
-    public abstract class AOeBaseCommand : BaseCommand {
+    public abstract class AOeDlcCommand : AOeCommand {
         
         [DirectoryExists]
-        [Option("-dl|--dlc", "The path to the directory containing the Openedge installation.", CommandOptionType.SingleValue)]
+        [Option("-dl|--dlc", "The path to the directory containing the Openedge installation. Will default to the path found in the DLC environment variable if it exists.", CommandOptionType.SingleValue)]
         public string DlcDirectoryPath { get; }
         
         /// <summary>
@@ -47,24 +45,8 @@ namespace Oetools.Sakoe.Command.Oe.Abstract {
             if (string.IsNullOrEmpty(dlcPath) || !Directory.Exists(dlcPath)) {
                 throw new Exception("The path to the Openedge installation directory has not been found : either use the --dlc option or set a DLC environment variable.");
             }
-            Log.Info($"Using the DLC path found in the environment variable : {dlcPath}.");
+            Log.Info($"Using the DLC path found in the environment variable: {dlcPath.PrettyQuote()}.");
             return dlcPath;
-        }
-
-        /// <summary>
-        /// Returns the path of the unique project file in the current directory (if any)
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="CommandException"></exception>
-        protected string GetCurrentProjectFilePath() {
-            var list = Directory.EnumerateFiles(Path.Combine(Directory.GetCurrentDirectory(), OeBuilderConstants.OeProjectDirectory), $"*{OeBuilderConstants.OeProjectExtension}", SearchOption.TopDirectoryOnly).ToList();
-            if (list.Count == 0) {
-                throw new CommandException($"No project file ({OeBuilderConstants.OeProjectExtension}) found in the current folder {Directory.GetCurrentDirectory()}");
-            }
-            if (list.Count > 1) {
-                throw new CommandException($"Ambigous project, found {list.Count} project files in the current folder, specify the project file to use in the command line");
-            }
-            return list.First();
         }
     }
 }

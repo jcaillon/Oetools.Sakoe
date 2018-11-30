@@ -13,7 +13,7 @@ namespace Oetools.Sakoe.Command.Oe {
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         AllowArgumentSeparator = true
     )]
-    internal class LintCommand : AOeBaseCommand {
+    internal class LintCommand : AOeDlcCommand {
         [Option("-m")]
         public string Message { get; set; }
 
