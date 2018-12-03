@@ -24,6 +24,7 @@ using System.IO;
 using System.Linq;
 using Oetools.Builder.Utilities;
 using Oetools.Sakoe.Command.Exceptions;
+using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
 
 namespace Oetools.Sakoe.Command.Oe {
@@ -60,7 +61,7 @@ namespace Oetools.Sakoe.Command.Oe {
         /// <returns></returns>
         /// <exception cref="CommandException"></exception>
         protected string GetProjectFilePath(string projectFileName) {
-            if (Path.IsPathRooted(projectFileName) && File.Exists(projectFileName)) {
+            if (Utils.IsPathRooted(projectFileName) && File.Exists(projectFileName)) {
                 return projectFileName;
             }
             var path = Path.Combine(Directory.GetCurrentDirectory(), projectFileName);

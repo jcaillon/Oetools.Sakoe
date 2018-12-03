@@ -5,6 +5,7 @@ using System.IO;
 using System.Threading;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.ShellProgressBar;
+using Oetools.Sakoe.Utilities;
 using Oetools.Sakoe.Utilities.Extension;
 using Oetools.Utilities.Openedge.Database;
 
@@ -338,6 +339,11 @@ sakoe st input -b2 s1024",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
     internal class LogSelfTestCommand : BaseCommand {
+        
+        [Option("-l|--log <level>", "Sets the verbosity of this command line tool.", CommandOptionType.SingleOrNoValue)]
+        // ReSharper disable once UnassignedGetOnlyAutoProperty
+        // ReSharper disable once MemberCanBePrivate.Global
+        public (bool HasValue, ConsoleIo.LogLvl? Value) Derp2 { get; }
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             Out.WriteOnNewLine("this is an output, it will still be displayed if the verbosity is set to None");

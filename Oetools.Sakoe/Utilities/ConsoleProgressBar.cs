@@ -47,6 +47,7 @@ namespace Oetools.Sakoe.Utilities {
         public bool ClearProgressBarOnStop { get; set; }
 
         private Stopwatch _stopwatch;
+        private Stopwatch _drawStopWatch;
         private static object _lock = new object();
 
         private int _maxTicks;
@@ -75,7 +76,7 @@ namespace Oetools.Sakoe.Utilities {
         public int MaxTicks {
             get => _maxTicks;
             set {
-                if (Monitor.TryEnter(_lock, 500)) {
+                if (Monitor.TryEnter(_lock, 100)) {
                     _maxTicks = Math.Max(1, value);
                     Monitor.Exit(_lock);
                 }
@@ -98,32 +99,43 @@ namespace Oetools.Sakoe.Utilities {
                 ClearProgressBar();
                 Console.SetCursorPosition(0, Console.CursorTop - 2);
             } else {
-                if (Monitor.TryEnter(_lock)) {
+                if (Monitor.TryEnter(_lock, 500)) {
                     try {
-                        DrawProgressBar();
+                        DrawProgressBar(true);
                     } finally {
                         Monitor.Exit(_lock);
                     }
                 }
             }
-
+            
             _stopwatch = null;
             TaskbarProgress.SetState(TaskbarProgress.TaskbarStates.NoProgress);
             return true;
         }
 
         public void Tick(int newTickCount, string message = null) {
-            if (Monitor.TryEnter(_lock, 500)) {
-                _currentTick = newTickCount;
-                _message = message;
-                Monitor.Exit(_lock);
-            }
             if (_stopwatch == null) {
                 InitializeProgressBar();
             }
+            if (Monitor.TryEnter(_lock, 100)) {
+                _currentTick = newTickCount;
+                _message = message;
+                DrawProgressBar();
+                Monitor.Exit(_lock);
+            }
         }
 
-        private void DrawProgressBar() {
+        private void DrawProgressBar(bool forceRedraw = false) {
+            if (!forceRedraw) {
+                if (_drawStopWatch == null) {
+                    _drawStopWatch = Stopwatch.StartNew();
+                } else if (_drawStopWatch.ElapsedMilliseconds < 300) {
+                    return;
+                } else {
+                    _drawStopWatch?.Restart();
+                }
+            }
+            
             if (_currentTick.Equals(_maxTicks)) {
                 _stopwatch.Stop();
             }
@@ -200,7 +212,7 @@ namespace Oetools.Sakoe.Utilities {
             _lastWindowWidth = Console.WindowWidth;
             TaskbarProgress.SetState(TaskbarProgress.TaskbarStates.Normal);
 
-            _timer = new System.Timers.Timer(500);
+            _timer = new System.Timers.Timer(900);
             _timer.Elapsed += OnTimerElapsed;
             _timer.Enabled = true;
         }
@@ -215,7 +227,7 @@ namespace Oetools.Sakoe.Utilities {
 
             _timer.Enabled = false;
 
-            if (Monitor.TryEnter(_lock)) {
+            if (Monitor.TryEnter(_lock, 100)) {
                 try {
                     DrawProgressBar();
                 } finally {

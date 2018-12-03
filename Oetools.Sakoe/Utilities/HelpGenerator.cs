@@ -172,10 +172,11 @@ namespace Oetools.Sakoe.Utilities {
                 foreach (var opt in visibleOptions) {
                     var shortName = string.IsNullOrEmpty(opt.SymbolName) ? string.IsNullOrEmpty(opt.ShortName) ? "" : $"-{opt.ShortName}, " : $"-{opt.SymbolName}, ";
                     var longName = string.IsNullOrEmpty(opt.LongName) ? "" : $"--{opt.LongName}";
+                    string valueName = "";
                     if (!string.IsNullOrEmpty(opt.ValueName)) {
-                        longName = string.IsNullOrEmpty(longName) ? opt.ValueName : $"{longName} <{opt.ValueName.Replace("_", " ")}>";
+                        valueName = opt.OptionType == CommandOptionType.SingleOrNoValue ? $"[:{opt.ValueName.Replace("_", " ")}]" : $" <{opt.ValueName.Replace("_", " ")}>";
                     }
-                    var firstColumn = $"{shortName.PadRight(optionShortNameColumnWidth)}{longName.PadRight(optionLongNameColumnWidth)}";
+                    var firstColumn = $"{shortName.PadRight(optionShortNameColumnWidth)}{$"{longName}{valueName}".PadRight(optionLongNameColumnWidth)}";
                     _console.WriteOnNewLine(firstColumn.PadRight(firstColumnWidth + 2), padding: 3);
                     if (firstColumn.Length > firstColumnWidth) {
                         _console.WriteOnNewLine(opt.Description, padding: firstColumnWidth + 5);

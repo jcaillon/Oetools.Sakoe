@@ -6,6 +6,7 @@ using System.Xml.Serialization;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder;
 using Oetools.Builder.Project;
+using Oetools.Builder.Project.Properties;
 using Oetools.Builder.Utilities;
 using Oetools.Sakoe.Command.Exceptions;
 using Oetools.Sakoe.Utilities;
@@ -115,8 +116,6 @@ namespace Oetools.Sakoe.Command.Oe {
                 builder.CancelToken = CancelToken;
                 builder.Log = Log;
                 builder.Build();
-                //var task = Task.Factory.StartNew(builder.Build);
-                //task.Wait();
             }
             return 0;
         }
@@ -134,11 +133,7 @@ namespace Oetools.Sakoe.Command.Oe {
 
         private static HashSet<string> GetAvailableBuildProperties() {
             var properties = new HashSet<string>();
-            var nameSpace = $"{nameof(Oetools)}.{nameof(Builder)}.{nameof(Builder.Project)}.{nameof(Builder.Project.Properties)}";
-            foreach (var type in AppDomain.CurrentDomain.GetAssemblies()
-                .Where(a => a.FullName.StartsWith(nameof(Oetools)))
-                .SelectMany(t => t.GetTypes())
-                .Where(t => t.Namespace?.StartsWith(nameSpace, StringComparison.OrdinalIgnoreCase) ?? false)) {
+            foreach (var type in new List<Type> { typeof(OeProperties), typeof(OeSourceFilterOptions), typeof(OePropathFilterOptions), typeof(OeIncrementalBuildOptions), typeof(OeGitFilterOptions), typeof(OeCompilationOptions), typeof(OeBuildOptions) }) {
                 if (!type.IsPublic || type.IsAbstract) {
                     continue;
                 }

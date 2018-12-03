@@ -22,6 +22,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder.Utilities;
 
@@ -61,10 +62,11 @@ namespace Oetools.Sakoe.Utilities {
                 }
             }
         }
-
+        
+        /// <inheritdoc />
         public ITraceLogger Trace { get; private set; }
 
-        public bool IsProgressBarOff { get; set; } = false;
+        public bool IsProgressBarOff { get; set; }
 
         public override void Dispose() {
             _progressBar?.Dispose();
@@ -72,26 +74,32 @@ namespace Oetools.Sakoe.Utilities {
             base.Dispose();
         }
         
+        /// <inheritdoc />
         public void Fatal(string message, Exception e = null) {
             Log(LogLvl.Fatal, message, e);
         }
 
+        /// <inheritdoc />
         public void Error(string message, Exception e = null) {
             Log(LogLvl.Error, message, e);
         }
 
+        /// <inheritdoc />
         public void Warn(string message, Exception e = null) {
             Log(LogLvl.Warn, message, e);
         }
-
+        
+        /// <inheritdoc />
         public void Info(string message, Exception e = null) {
             Log(LogLvl.Info, message, e);
         }
 
+        /// <inheritdoc />
         public void Done(string message, Exception e = null) {
             Log(LogLvl.Done, message, e);
         }
 
+        /// <inheritdoc />
         public void Debug(string message, Exception e = null) {
             Log(LogLvl.Debug, message, e);
         }
@@ -105,6 +113,12 @@ namespace Oetools.Sakoe.Utilities {
             Log(LogLvl.Debug, message, e);
         }
 
+        /// <inheritdoc />
+        public ILogger If(bool condition) {
+            return condition ? this : null;
+        }
+
+        /// <inheritdoc cref="ILogger.ReportProgress"/>
         public void ReportProgress(int max, int current, string message) {
             if (IsProgressBarOff) {
                 return;
@@ -112,7 +126,7 @@ namespace Oetools.Sakoe.Utilities {
 
             if (_console.IsOutputRedirected) {
                 // cannot use the progress bar
-                Log(LogLvl.Debug, $"{Math.Round((decimal) current / max * 100, 2)}% : {message}");
+                Log(LogLvl.Debug, $"{$"{Math.Round((decimal) current / max * 100, 2)}%".PadLeft(4)} {message}");
                 return;
             }
             
@@ -144,40 +158,48 @@ namespace Oetools.Sakoe.Utilities {
             }
         }
 
+        /// <inheritdoc />
         public void ReportGlobalProgress(int max, int current, string message) {
-            Log(LogLvl.Info, $"global progress : {message}");
+            Log(LogLvl.Info, $"@ {$"{Math.Round((decimal) current / max * 100, 2)}%".PadRight(4)} - {message}");
         }
 
+        /// <inheritdoc />
         public override void WriteResult(string result, ConsoleColor? color = null) {
             StopProgressBar();
             base.WriteResult(result, color);
         }
 
+        /// <inheritdoc />
         public override void WriteResultOnNewLine(string result, ConsoleColor? color = null) {
             StopProgressBar();
             base.WriteResultOnNewLine(result, color);
         }
         
+        /// <inheritdoc />
         public override void Write(string result, ConsoleColor? color = null, int padding = 0) {
             StopProgressBar();
             base.Write(result, color, padding);
         }
 
+        /// <inheritdoc />
         public override void WriteOnNewLine(string result, ConsoleColor? color = null, int padding = 0) {
             StopProgressBar();
             base.WriteOnNewLine(result, color, padding);
         }
         
+        /// <inheritdoc />
         public override void WriteError(string result, ConsoleColor? color = null, int padding = 0) {
             StopProgressBar();
             base.WriteError(result, color, padding);
         }
 
+        /// <inheritdoc />
         public override void WriteErrorOnNewLine(string result, ConsoleColor? color = null, int padding = 0) {
             StopProgressBar();
             base.WriteErrorOnNewLine(result, color, padding);
         }
 
+        /// <inheritdoc />
         public enum LogLvl {
             Debug,
             Info,
@@ -227,7 +249,7 @@ namespace Oetools.Sakoe.Utilities {
                 base.WriteOnNewLine(outputMessage, outputColor);
             }
 
-            if (e != null) {
+            if (e != null && LogLevel <= LogLvl.Debug) {
                 base.WriteErrorOnNewLine(e.ToString(), ConsoleColor.DarkGray);
             }
         }

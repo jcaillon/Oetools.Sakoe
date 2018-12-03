@@ -70,14 +70,18 @@ WEBSITE
                 }
             } catch (Exception ex) {
                 var log = ConsoleIo.Singleton;
-                log.LogLevel = ConsoleIo.LogLvl.Info;
-                log.Error(ex.Message, ex);
+                log.LogLevel = ConsoleIo.LogLvl.Debug;
                 
                 if (ex is CommandParsingException) {
+                    var bb = ex.GetType()?.GetProperty("NearestMatch")?.GetValue(ex);
+                    
                     //if (ex is UnrecognizedCommandParsingException unrecognizedCommandParsingException) {
                     //    log.Info($"Did you mean {unrecognizedCommandParsingException.NearestMatch}?");
                     //}
-                    log.Info($"Specify {HelpLongName} for a list of available options and commands.");
+                    log.Error(ex.Message);
+                    log.Info($"Specify {HelpLongName} for a list of available options and commands. {bb}");
+                } else {
+                    log.Error(ex.Message, ex);
                 }
 
                 log.Fatal($"Exit code {FatalExitCode}");

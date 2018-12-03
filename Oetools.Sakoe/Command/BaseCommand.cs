@@ -49,6 +49,9 @@ namespace Oetools.Sakoe.Command {
         // ReSharper disable once MemberCanBePrivate.Global
         public bool IsProgressBarOff { get; }
         
+        [Option("-do|--debug-output <path>", "Output debug level log to a file.", CommandOptionType.SingleOrNoValue)]
+        public (bool HasValue, string path) LogOutputFilePath { get; set; }
+        
         [Option("-wl|--with-logo", "Always show the logo on start.", CommandOptionType.NoValue)]
         // ReSharper disable once UnassignedGetOnlyAutoProperty
         // ReSharper disable once MemberCanBePrivate.Global
