@@ -26,7 +26,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Subcommand(typeof(DeleteDatabaseCommand))]
     [Subcommand(typeof(RepairDatabaseCommand))]
     // TODO : generate a delta .df
-    internal class DatabaseCommand : BaseCommand {
+    internal class DatabaseCommand : ABaseCommand {
     }
     
     [Command(
@@ -119,7 +119,7 @@ namespace Oetools.Sakoe.Command.Oe {
         "kill", "ki",
         Description = "Kill all the _mprosrv process"
     )]
-    internal class KillAllDatabaseCommand : BaseCommand {
+    internal class KillAllDatabaseCommand : ABaseCommand {
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             UoeDatabaseOperator.KillAllMproSrv();
             return 0;

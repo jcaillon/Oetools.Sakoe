@@ -44,7 +44,22 @@ namespace Oetools.Sakoe.Utilities {
 
         public char BackgroundCharacter { get; set; } = '■';
 
+        /// <summary>
+        /// Clear the progress bar when it stops.
+        /// </summary>
         public bool ClearProgressBarOnStop { get; set; }
+
+        /// <summary>
+        /// The minimum time interval that should elapse between 2 refresh of the progress bar.
+        /// The lower the smoother the animation. But low value degrade performances.
+        /// </summary>
+        public int MinimumRefreshRateInMilliseconds { get; set; } = 100;
+        
+        /// <summary>
+        /// The maximum time interval that should elapse between 2 refresh of the progress bar.
+        /// Should be less than 1s to correctly display the clock.
+        /// </summary>
+        public int MaximumRefreshRateInMilliseconds { get; set; } = 900;
 
         private Stopwatch _stopwatch;
         private Stopwatch _drawStopWatch;
@@ -59,6 +74,11 @@ namespace Oetools.Sakoe.Utilities {
 
         private System.Timers.Timer _timer;
 
+        /// <summary>
+        /// New progress bar.
+        /// </summary>
+        /// <param name="maxTicks"></param>
+        /// <param name="message"></param>
         public ConsoleProgressBar(int maxTicks, string message) {
             TextColor = Console.ForegroundColor;
             _maxTicks = Math.Max(1, maxTicks);
@@ -69,10 +89,19 @@ namespace Oetools.Sakoe.Utilities {
             Stop();
         }
 
+        /// <summary>
+        /// Is the progress bar running?
+        /// </summary>
         public bool IsRunning => _stopwatch != null;
 
+        /// <summary>
+        /// Current progress value.
+        /// </summary>
         public int CurrentTick => _currentTick;
 
+        /// <summary>
+        /// Maximum value = the value of the <see cref="CurrentTick"/> when the progress bar is shown as full.
+        /// </summary>
         public int MaxTicks {
             get => _maxTicks;
             set {
@@ -83,6 +112,10 @@ namespace Oetools.Sakoe.Utilities {
             }
         }
 
+        /// <summary>
+        /// Stop the progress bar, resetting the console state as it was before displaying the bar.
+        /// </summary>
+        /// <returns></returns>
         public bool Stop() {
             if (_stopwatch == null) {
                 return false;
@@ -113,23 +146,32 @@ namespace Oetools.Sakoe.Utilities {
             return true;
         }
 
+        /// <summary>
+        /// Report a progression that should be displayed.
+        /// </summary>
+        /// <param name="newTickCount">The value should be between 0 and <see cref="MaxTicks"/>.</param>
+        /// <param name="message"></param>
         public void Tick(int newTickCount, string message = null) {
             if (_stopwatch == null) {
                 InitializeProgressBar();
             }
             if (Monitor.TryEnter(_lock, 100)) {
-                _currentTick = newTickCount;
+                _currentTick = Math.Min(Math.Max(newTickCount, 0), _maxTicks);
                 _message = message;
                 DrawProgressBar();
                 Monitor.Exit(_lock);
             }
         }
 
+        /// <summary>
+        /// Draw / update the progress bar on the console.
+        /// </summary>
+        /// <param name="forceRedraw"></param>
         private void DrawProgressBar(bool forceRedraw = false) {
             if (!forceRedraw) {
                 if (_drawStopWatch == null) {
                     _drawStopWatch = Stopwatch.StartNew();
-                } else if (_drawStopWatch.ElapsedMilliseconds < 300) {
+                } else if (_drawStopWatch.ElapsedMilliseconds < MinimumRefreshRateInMilliseconds) {
                     return;
                 } else {
                     _drawStopWatch?.Restart();
@@ -173,9 +215,11 @@ namespace Oetools.Sakoe.Utilities {
                 line2 = $"[{elapsed.Hours:D2}:{elapsed.Minutes:D2}:{elapsed.Seconds:D2}] {line2}";
             }
 
-            line2 = $"{line2} {_message}";
-            if (line2.Length > maxWidth) {
-                line2 = $"{line2.Substring(0, maxWidth - 3)}...";
+            if (!string.IsNullOrEmpty(_message)) {
+                line2 = $"{line2} {_message}";
+                if (line2.Length > maxWidth) {
+                    line2 = $"{line2.Substring(0, maxWidth - 3)}...";
+                }
             }
 
             _lastLine2Width = line2.Length;
@@ -188,6 +232,9 @@ namespace Oetools.Sakoe.Utilities {
             _lastWindowWidth = Console.WindowWidth;
         }
 
+        /// <summary>
+        /// Clear the progress bar from the console.
+        /// </summary>
         private void ClearProgressBar() {
             int nbLines = _lastWindowWidth <= 0 ? 0 : (int) Math.Ceiling((double) (_lastWindowWidth - 1) / Console.WindowWidth);
             if (_lastLine2Width > 0) {
@@ -204,6 +251,9 @@ namespace Oetools.Sakoe.Utilities {
             _lastWindowWidth = Console.WindowWidth;
         }
 
+        /// <summary>
+        /// Initialize progress bar.
+        /// </summary>
         private void InitializeProgressBar() {
             Console.CursorVisible = false;
             _stopwatch = Stopwatch.StartNew();
@@ -212,7 +262,7 @@ namespace Oetools.Sakoe.Utilities {
             _lastWindowWidth = Console.WindowWidth;
             TaskbarProgress.SetState(TaskbarProgress.TaskbarStates.Normal);
 
-            _timer = new System.Timers.Timer(900);
+            _timer = new System.Timers.Timer(MaximumRefreshRateInMilliseconds);
             _timer.Elapsed += OnTimerElapsed;
             _timer.Enabled = true;
         }

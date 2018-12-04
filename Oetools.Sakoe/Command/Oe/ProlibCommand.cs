@@ -47,7 +47,7 @@ namespace Oetools.Sakoe.Command.Oe {
         ExtendedHelpText = "", 
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class ListProlibCommand : BaseCommand {
+    internal class ListProlibCommand : ABaseCommand {
         
         [Required]
         [Argument(0, "<string>", "The string to hash.")]

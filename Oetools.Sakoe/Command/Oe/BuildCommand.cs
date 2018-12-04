@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using McMaster.Extensions.CommandLineUtils;
@@ -10,6 +12,7 @@ using Oetools.Builder.Project.Properties;
 using Oetools.Builder.Utilities;
 using Oetools.Sakoe.Command.Exceptions;
 using Oetools.Sakoe.Utilities;
+using Oetools.Utilities.Lib.Attributes;
 using Oetools.Utilities.Lib.Extension;
 
 namespace Oetools.Sakoe.Command.Oe {
@@ -21,18 +24,19 @@ namespace Oetools.Sakoe.Command.Oe {
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
     internal class BuildCommand : AOeCommand {
+        
         public const string Name = "build";
         private const string PropertyHelpLongName = "--property-help";
         private const string ConfigurationNameLongName = "--config-name";
         
         [LegalFilePath]
-        [Argument(0, "[<project file>]", "Path or name of the project file. The " + OeBuilderConstants.OeProjectExtension + " extension is optional. Defaults to the " + OeBuilderConstants.OeProjectExtension + " file found. The search is done in the current directory and in the " + OeBuilderConstants.OeProjectDirectory + " directory when it exists.")]
+        [Argument(0, "[<project>]", "Path or name of the project file. The " + OeBuilderConstants.OeProjectExtension + " extension is optional. Defaults to the " + OeBuilderConstants.OeProjectExtension + " file found. The search is done in the current directory and in the " + OeBuilderConstants.OeProjectDirectory + " directory when it exists.")]
         public string ProjectFile { get; set; }
 
-        [Option("-c|" + ConfigurationNameLongName + " <config_name>", "The name of the build configuration to use for the build. This name is found in the " + OeBuilderConstants.OeProjectExtension + " file.\nDefaults to the first build configuration found in the project file.", CommandOptionType.SingleValue)]
+        [Option("-c|" + ConfigurationNameLongName + " <config>", "The name of the build configuration to use for the build. This name is found in the " + OeBuilderConstants.OeProjectExtension + " file.\nDefaults to the first build configuration found in the project file.", CommandOptionType.SingleValue)]
         public string ConfigurationName { get; set; }
         
-        [Option(CommandOptionType.MultipleValue, ShortName = "e", LongName = "extra-config", ValueName = "project file=config name", Description = "In addition to the base build configuration specified by <project file> and " + ConfigurationNameLongName + ", you can dynamically add a child configuration to the base configuration with this option. This option can be used multiple times, each new configuration will be added as a child of the previously defined configuration.\nThis option allows you to share, with your colleagues, a common project file that holds the property of your application and have an extra configuration in local (just for you) which you can use to build the project in a specific local directory.\nFor each extra configuration, specify the path or the name of the project file and the configuration name to use. If the project file name if empty, the main <project file> is used.")]
+        [Option(CommandOptionType.MultipleValue, ShortName = "e", LongName = "extra-config", ValueName = "project=config", Description = "In addition to the base build configuration specified by <project> and " + ConfigurationNameLongName + ", you can dynamically add a child configuration to the base configuration with this option. This option can be used multiple times, each new configuration will be added as a child of the previously defined configuration.\nThis option allows you to share, with your colleagues, a common project file that holds the property of your application and have an extra configuration in local (just for you) which you can use to build the project in a specific local directory.\nFor each extra configuration, specify the path or the name of the project file and the configuration name to use. If the project file name if empty, the main <project> is used.")]
         public string[] ExtraConfigurations { get; set; }
 
         [Option(CommandOptionType.MultipleValue, ShortName = "p", LongName = "property", ValueName = "key=value", Description = "A pair of key/value to dynamically set a property for this build.\nEach pair should specify the name of the property to set and the value that should be used.\nUse the option " + PropertyHelpLongName + " to see the full list of properties available as well as their documentation.")]
@@ -46,9 +50,9 @@ namespace Oetools.Sakoe.Command.Oe {
                 Out.WriteOnNewLine(null);
                 Out.WriteOnNewLine("BUILD PROPERTIES", ConsoleColor.Cyan, 1);
             
-                foreach (var property in GetAvailableBuildProperties().OrderBy(p => p)) {
-                    Out.WriteOnNewLine(property, padding: 3);
-                    Out.WriteOnNewLine(BuilderHelp.GetPropertyDocumentation(property), padding: 20);
+                foreach (var property in GetAvailableBuildProperties().OrderBy(p => p.Key)) {
+                    Out.WriteOnNewLine(property.Key, padding: 3);
+                    Out.WriteOnNewLine(BuilderHelp.GetPropertyDocumentation(property.Key), padding: 20);
                     Out.WriteOnNewLine(null);
                 }
                 return 0;
@@ -98,7 +102,7 @@ namespace Oetools.Sakoe.Command.Oe {
                     if (split.Length != 2) {
                         throw new CommandValidationException($"There should be exactly one character '=' in the property {buildProperty.PrettyQuote()}.");
                     }
-                    if (!availableBuildProperties.Contains(split[0])) {
+                    if (!availableBuildProperties.ContainsKey(split[0])) {
                         throw new CommandValidationException($"The property {split[0].PrettyQuote()} does not exist, use the option {PropertyHelpLongName} to list the available properties.");
                     }
                     if (!keyValueProperties.ContainsKey(split[0])) {
@@ -124,15 +128,15 @@ namespace Oetools.Sakoe.Command.Oe {
             console.WriteOnNewLine(null);
             console.WriteOnNewLine("BUILD PROPERTIES", ConsoleColor.Cyan, 1);
             
-            foreach (var property in GetAvailableBuildProperties().OrderBy(p => p)) {
-                console.WriteOnNewLine(property, padding: 3);
+            foreach (var property in GetAvailableBuildProperties().OrderBy(p => p.Key)) {
+                console.WriteOnNewLine($"-p \"{property.Key}={property.Value ?? ""}\"", padding: 3);
             }
             console.WriteOnNewLine(null);
             console.WriteOnNewLine($"Display the full documentation of each build property by specifying the option {PropertyHelpLongName}.", padding: 3);
         }
 
-        private static HashSet<string> GetAvailableBuildProperties() {
-            var properties = new HashSet<string>();
+        private static Dictionary<string, string> GetAvailableBuildProperties() {
+            var properties = new Dictionary<string, string>();
             foreach (var type in new List<Type> { typeof(OeProperties), typeof(OeSourceFilterOptions), typeof(OePropathFilterOptions), typeof(OeIncrementalBuildOptions), typeof(OeGitFilterOptions), typeof(OeCompilationOptions), typeof(OeBuildOptions) }) {
                 if (!type.IsPublic || type.IsAbstract) {
                     continue;
@@ -149,9 +153,23 @@ namespace Oetools.Sakoe.Command.Oe {
                         if (string.IsNullOrEmpty(name) || name.Equals("Name")) {
                             continue;
                         }
-                        if (!properties.Contains(name)) {
-                            properties.Add(name);
+                        if (!properties.ContainsKey(name)) {
+                            string defaultValue = null;
+                            if (Attribute.GetCustomAttribute(propertyInfo, typeof(DefaultValueMethodAttribute), true) is DefaultValueMethodAttribute attribute) {
+                                if (!string.IsNullOrEmpty(attribute.MethodName)) {
+                                    var methodInfo = type.GetMethod(attribute.MethodName, BindingFlags.Public | BindingFlags.Static| BindingFlags.FlattenHierarchy);
+                                    if (methodInfo != null) {
+                                        if (Attribute.GetCustomAttribute(methodInfo, typeof(DescriptionAttribute), true) is DescriptionAttribute description) {
+                                            defaultValue = description.Description;
+                                        } else if (!propertyInfo.PropertyType.IsClass || propertyInfo.PropertyType == typeof(string)) {
+                                            defaultValue = methodInfo.Invoke(null, null).ToString();
+                                        }
+                                    }
+                                }
+                            }
+                            properties.Add(name, defaultValue);
                         }
+                        
                     }
                 }
             }

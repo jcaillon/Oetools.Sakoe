@@ -22,7 +22,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Subcommand(typeof(ProjectInitCommand))]
     [Subcommand(typeof(ProjectGitignoreCommand))]
     [Subcommand(typeof(ProjectListCommand))]
-    internal class ProjectCommand : BaseCommand {
+    internal class ProjectCommand : ABaseCommand {
     }
     
     [Command(
@@ -31,7 +31,7 @@ namespace Oetools.Sakoe.Command.Oe {
         ExtendedHelpText = "",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class ProjectInitCommand : BaseCommand {
+    internal class ProjectInitCommand : ABaseCommand {
         
         [DirectoryExists]
         [Argument(0, "<directory>", "The directory in which to initialize the project. Default to the current directory.")]
@@ -105,7 +105,7 @@ For git repositories, use the command " + app.GetFullCommandLine().PrettyQuote()
         ExtendedHelpText = "", 
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase)
     ]
-    internal class ProjectGitignoreCommand : BaseCommand {
+    internal class ProjectGitignoreCommand : ABaseCommand {
 
         [DirectoryExists]
         [Argument(0, "<directory>", "The repository base directory (source directory). Defaults to the current directory.")]

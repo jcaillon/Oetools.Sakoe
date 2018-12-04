@@ -11,7 +11,7 @@ namespace Oetools.Sakoe.Command.Oe {
         ExtendedHelpText = "",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class ShowVersionCommand : BaseCommand {
+    internal class ShowVersionCommand : ABaseCommand {
         
         [Option("-b|--bare", "Only output the version, no logo.", CommandOptionType.NoValue)]
         public bool BareVersion { get; }

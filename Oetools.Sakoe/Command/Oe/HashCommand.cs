@@ -38,7 +38,7 @@ namespace Oetools.Sakoe.Command.Oe {
     )]
     [Subcommand(typeof(HashStringCommand))]
     [Subcommand(typeof(HashFilesCommand))]
-    internal class HashCommand : BaseCommand {
+    internal class HashCommand : ABaseCommand {
     }
     
     [Command(
@@ -47,7 +47,7 @@ namespace Oetools.Sakoe.Command.Oe {
         ExtendedHelpText = "", 
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class HashStringCommand : BaseCommand {
+    internal class HashStringCommand : ABaseCommand {
         
         [Required]
         [Argument(0, "<string>", "The string to hash.")]

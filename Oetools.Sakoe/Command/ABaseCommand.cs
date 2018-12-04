@@ -20,6 +20,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Threading;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder.Utilities;
@@ -31,31 +32,25 @@ namespace Oetools.Sakoe.Command {
     /// <summary>
     /// Defines options that will be inherited by all the commands
     /// </summary>
-    public abstract class BaseCommand {
+    public abstract class ABaseCommand {
 
-        protected const int FatalExitCode = 9;
+        public const int FatalExitCode = 9;
         
-        private const string VerbosityTemplate = "-vb|--verbosity";
+        private const string VerbosityShortName = "-vb";
         
-        private string UseVerboseMessage => $"Get more details on this error by activating the debug verbosity : {VerbosityTemplate} debug";
-
-        [Option(VerbosityTemplate + " <level>", "Sets the verbosity of this command line tool.", CommandOptionType.SingleValue)]
-        // ReSharper disable once UnassignedGetOnlyAutoProperty
-        // ReSharper disable once MemberCanBePrivate.Global
-        public ConsoleIo.LogLvl Verbosity { get; } = ConsoleIo.LogLvl.Info;
+        [Option(VerbosityShortName + "|--verbosity <level>", "Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to 'none'. Specifying this option without a level value sets the verbosity to 'debug'. Not specifying the option defaults to 'info'.", CommandOptionType.SingleOrNoValue)]
+        public (bool HasValue, ConsoleLogThreshold? Value) VerbosityThreshold { get; set; }
         
-        [Option("-po|--progress-off", "Never show progress bars.", CommandOptionType.NoValue)]
-        // ReSharper disable once UnassignedGetOnlyAutoProperty
-        // ReSharper disable once MemberCanBePrivate.Global
-        public bool IsProgressBarOff { get; }
+        [Option("-pm|--progress-mode <mode>", "Sets the display mode of progress bars. Specify 'off' to hide progress bars and 'stay' to make them persistent. Defaults to 'on', which show progress bars but hide them when done.", CommandOptionType.SingleValue)]
+        public ConsoleProgressBarDisplayMode? ProgressBarDisplayMode { get; set; }
         
-        [Option("-do|--debug-output <path>", "Output debug level log to a file.", CommandOptionType.SingleOrNoValue)]
-        public (bool HasValue, string path) LogOutputFilePath { get; set; }
+        [Option("-do|--debug-output <file>", "Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file 'sakoe.log'.", CommandOptionType.SingleOrNoValue)]
+        public (bool HasValue, string Value) LogOutputFilePath { get; set; }
         
         [Option("-wl|--with-logo", "Always show the logo on start.", CommandOptionType.NoValue)]
-        // ReSharper disable once UnassignedGetOnlyAutoProperty
-        // ReSharper disable once MemberCanBePrivate.Global
-        public bool IsLogoOn { get; }
+        public bool IsLogoOn { get; set; }
+
+        protected ConsoleLogThreshold Verbosity => VerbosityThreshold.HasValue ? VerbosityThreshold.Value ?? ConsoleLogThreshold.Debug : ConsoleLogThreshold.Info;
         
         protected ILogger Log { get; private set; }
         
@@ -73,13 +68,31 @@ namespace Oetools.Sakoe.Command {
         
         protected CancellationTokenSource _cancelSource;
         
+        /// <summary>
+        /// Called when the command is executed.
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="console"></param>
+        /// <returns></returns>
         // ReSharper disable once UnusedMember.Global
         protected int OnExecute(CommandLineApplication app, IConsole console) {
             Log = ConsoleIo.Singleton;
             Out = ConsoleIo.Singleton;
-            ConsoleIo.Singleton.LogLevel = Verbosity;
-            ConsoleIo.Singleton.IsProgressBarOff = IsProgressBarOff;
-
+            ConsoleIo.Singleton.LogTheshold = Verbosity;
+            ConsoleIo.Singleton.ProgressBarDisplayMode = ProgressBarDisplayMode ?? ConsoleProgressBarDisplayMode.On;
+            if (LogOutputFilePath.HasValue) {
+                var logFilePath = LogOutputFilePath.Value;
+                if (string.IsNullOrEmpty(logFilePath)) {
+                    if (Directory.Exists(OeBuilderConstants.GetProjectDirectory(Directory.GetCurrentDirectory()))) {
+                        logFilePath = Path.Combine(OeBuilderConstants.GetProjectDirectoryLocal(Directory.GetCurrentDirectory()), "logs", "sakoe.log");
+                    } else {
+                        logFilePath = Path.Combine(Directory.GetCurrentDirectory(), "sakoe.log");
+                    }
+                }
+                ConsoleIo.Singleton.LogOutputFilePath = logFilePath;
+            }
+            
+            
             _cancelSource = new CancellationTokenSource();
             console.CancelKeyPress += ConsoleOnCancelKeyPress;
             
@@ -90,7 +103,7 @@ namespace Oetools.Sakoe.Command {
             int exitCode = FatalExitCode;
             
             try {
-                Log.Debug($"Starting execution: {DateTime.Now:yy-MM-dd} @ {DateTime.Now:HH:mm:ss}.");
+                Log.Debug($"Starting execution: {DateTime.Now:yyyy MMM dd} @ {DateTime.Now:HH:mm:ss}.");
                 ExecutePreCommand(app, console);
                 exitCode = ExecuteCommand(app, console);
                 ExecutePostCommand(app, console);
@@ -99,29 +112,33 @@ namespace Oetools.Sakoe.Command {
                 } else {
                     Log.Warn($"Exit code {exitCode}");
                 }
-                if (Verbosity < ConsoleIo.LogLvl.None) {
+                if (Verbosity < ConsoleLogThreshold.None) {
                     Out.WriteOnNewLine(null);    
                 }
                 return exitCode;
                 
             } catch (Exception e) {
                 Log.Error(e.Message, e);
-                if (Verbosity > ConsoleIo.LogLvl.Debug) {
-                    Log.Info(UseVerboseMessage);
+                if (Verbosity > ConsoleLogThreshold.Debug) {
+                    Log.Info($"Get more details on this error by switching to debug verbosity: {VerbosityShortName}.");
                 }
                 if (e is CommandException ce) {
                     exitCode = ce.ExitCode;
                 }
             }
-
             Log.Fatal($"Exit code {exitCode}");
-            if (Verbosity < ConsoleIo.LogLvl.None) {
+            if (Verbosity < ConsoleLogThreshold.None) {
                 Out.WriteOnNewLine(null);
             }
             
             return exitCode;
         }
         
+        /// <summary>
+        /// Called when the options of the command line are not validated correctly.
+        /// </summary>
+        /// <param name="r"></param>
+        /// <returns></returns>
         // ReSharper disable once UnusedMember.Global
         public int OnValidationError(ValidationResult r) {
             var log = ConsoleIo.Singleton;
@@ -144,7 +161,7 @@ namespace Oetools.Sakoe.Command {
                 Out.DrawLogo();
             }
             app.ShowHelp();
-            Log.Warn("You must provide a command.");
+            Log.Warn(HelpGenerator.GetHelpProvideCommand(app));
             return 1;
         }
 

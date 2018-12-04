@@ -24,7 +24,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Subcommand(typeof(ResponseFileSelfTestCommand))]
     [Subcommand(typeof(WrapSelfTestCommand))]
     [Subcommand(typeof(ConsoleFormatSelfTestCommand))]
-    internal class SelfTestCommand : BaseCommand {
+    internal class SelfTestCommand : ABaseCommand {
         
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             
@@ -41,7 +41,7 @@ namespace Oetools.Sakoe.Command.Oe {
         ExtendedHelpText = "sakoe selftest consoleformat",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class ConsoleFormatSelfTestCommand : BaseCommand {
+    internal class ConsoleFormatSelfTestCommand : ABaseCommand {
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
 
@@ -106,7 +106,7 @@ nibh.") { Align = Align.Right ,Stroke = LineThickness.None },
         ExtendedHelpText = "sakoe selftest wrap",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class WrapSelfTestCommand : BaseCommand {
+    internal class WrapSelfTestCommand : ABaseCommand {
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             Out.WriteResultOnNewLine("  0123456789abcdefghijklmnopsqrstu\n          0123456789abcdefghijklmnopsqrstu");
@@ -147,7 +147,7 @@ sakoe st input -b2 s1024",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         AllowArgumentSeparator = true
     )]
-    internal class InputSelfTestCommand : BaseCommand {
+    internal class InputSelfTestCommand : ABaseCommand {
         
         [Argument(0)]
         [LegalFilePath]
@@ -239,7 +239,7 @@ sakoe st input -b2 s1024",
                     Log.Info($"RemainingArgs = {remainingArg}");
                 }
             }
-            Log.Info($"Parent.Verbosity = {Parent.Verbosity}");
+            Log.Info($"Parent.Verbosity = {Verbosity}");
             
             return 1;
         }
@@ -273,7 +273,7 @@ sakoe st input -b2 s1024",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         AllowArgumentSeparator = true
     )]
-    internal class ResponseFileSelfTestCommand : BaseCommand {
+    internal class ResponseFileSelfTestCommand : ABaseCommand {
         
         [Option("-c|--create", "Create the response file", CommandOptionType.NoValue)]
         public bool Create { get; }
@@ -304,7 +304,7 @@ sakoe st input -b2 s1024",
         ExtendedHelpText = "sakoe selftest prompt",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class PromptSelfTestCommand : BaseCommand {
+    internal class PromptSelfTestCommand : ABaseCommand {
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             
@@ -338,14 +338,10 @@ sakoe st input -b2 s1024",
         ExtendedHelpText = "sakoe selftest log",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class LogSelfTestCommand : BaseCommand {
-        
-        [Option("-l|--log <level>", "Sets the verbosity of this command line tool.", CommandOptionType.SingleOrNoValue)]
-        // ReSharper disable once UnassignedGetOnlyAutoProperty
-        // ReSharper disable once MemberCanBePrivate.Global
-        public (bool HasValue, ConsoleIo.LogLvl? Value) Derp2 { get; }
+    internal class LogSelfTestCommand : ABaseCommand {
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
+            Log.Info("Log\n\nnew line  \r\n   \ndebug");
             Out.WriteOnNewLine("this is an output, it will still be displayed if the verbosity is set to None");
             Out.Write(".");
             
@@ -367,7 +363,7 @@ sakoe st input -b2 s1024",
 
             for (var i = 0; i <= 90; i++) {
                 CancelToken?.ThrowIfCancellationRequested();
-                Log.ReportProgress(100, i, $"Executing task {i}");
+                Log.ReportProgress(100, i, null);
                 Thread.Sleep(100);
             }
 

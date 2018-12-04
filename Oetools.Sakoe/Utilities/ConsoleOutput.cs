@@ -92,25 +92,29 @@ namespace Oetools.Sakoe.Utilities {
         public void DrawLogo() {
             WriteOnNewLine(null);
             WriteOnNewLine(@"                '`.        ", ConsoleColor.DarkGray);
-            Write(@"== SAKOE ==");
+            Write(@"============ ", ConsoleColor.DarkGray);
+            Write(@"SAKOE", ConsoleColor.Yellow);
+            Write(@" ============", ConsoleColor.DarkGray);
             WriteOnNewLine(@" '`.    ", ConsoleColor.DarkGray);
             Write(@".^", ConsoleColor.Gray);
             Write(@"      \  \       ", ConsoleColor.DarkGray);
             Write(@"A ");
-            Write(@"S", ConsoleColor.Cyan);
+            Write(@"S", ConsoleColor.Yellow);
             Write(@"wiss ");
-            Write(@"A", ConsoleColor.Cyan);
+            Write(@"A", ConsoleColor.Yellow);
             Write(@"rmy ");
-            Write(@"K", ConsoleColor.Cyan);
+            Write(@"K", ConsoleColor.Yellow);
             Write(@"nife for ");
-            Write(@"O", ConsoleColor.Cyan);
+            Write(@"O", ConsoleColor.Yellow);
             Write(@"pen");
-            Write(@"E", ConsoleColor.Cyan);
+            Write(@"E", ConsoleColor.Yellow);
             Write(@"dge.");
             WriteOnNewLine(@"  \ \", ConsoleColor.DarkGray);
             Write(@"  /;/", ConsoleColor.Gray);
             Write(@"       \ \\      ", ConsoleColor.DarkGray);
-            Write($"Version {typeof(HelpGenerator).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}.", ConsoleColor.Gray);
+            Write("Version ", ConsoleColor.DarkGray);
+            Write(typeof(HelpGenerator).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion, ConsoleColor.Gray);
+            Write(".", ConsoleColor.DarkGray);
             WriteOnNewLine(@"   \ \", ConsoleColor.DarkGray);
             Write(@"/", ConsoleColor.Gray);
             Write(@"_", ConsoleColor.Red);
@@ -119,14 +123,18 @@ namespace Oetools.Sakoe.Utilities {
             Write(@"\", ConsoleColor.DarkGray);
             Write(@"__", ConsoleColor.Red);
             Write(@"\     ", ConsoleColor.DarkGray);
-            Write($"Running with {(Utils.IsNetFrameworkBuild ? ".netframework" : $".netcore-{(Utils.IsRuntimeWindowsPlatform ? "win" : "unix")}")}.", ConsoleColor.Gray);
+            Write($"Running with {(Utils.IsNetFrameworkBuild ? ".netframework" : $".netcore-{(Utils.IsRuntimeWindowsPlatform ? "win" : "unix")}")}.", ConsoleColor.DarkGray);
             WriteOnNewLine(@"    `", ConsoleColor.DarkGray);
             Write(@"/ ", ConsoleColor.Red);
             Write(@".           _", ConsoleColor.White);
             Write(@"  \    ", ConsoleColor.Red);
-            Write($"Session started on {DateTime.Now:yy-MM-dd} at {DateTime.Now:HH:mm:ss}.", ConsoleColor.Gray);
+            Write("Session started on .", ConsoleColor.DarkGray);
+            Write($"{DateTime.Now:yy-MM-dd} at {DateTime.Now:HH:mm:ss}", ConsoleColor.Gray);
+            Write(".", ConsoleColor.DarkGray);
             WriteOnNewLine(@"     \________________/    ", ConsoleColor.Red);
-            Write(@"https://github.com/jcaillon", ConsoleColor.Gray);
+            Write(@"Source code on ", ConsoleColor.DarkGray);
+            Write(@"github.com/jcaillon", ConsoleColor.Gray);
+            Write(@".", ConsoleColor.DarkGray);
             WriteOnNewLine(null);
         }
 

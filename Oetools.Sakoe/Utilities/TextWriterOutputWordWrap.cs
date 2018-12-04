@@ -84,7 +84,6 @@ namespace Oetools.Sakoe.Utilities {
                 if (writeToNewLine && HasWroteToOuput) {
                     WriteLine(underLyingWriter);
                 }
-                HasWroteToOuput = true;
                 return;
             }
 
@@ -108,6 +107,11 @@ namespace Oetools.Sakoe.Utilities {
                     nextLineStartPos = eolPosition = message.Length;
                 } else {
                     nextLineStartPos = eolPosition + 1;
+                    if (eolPosition == lineStartPos) {
+                        // found a new line
+                        WriteLine(underLyingWriter);
+                        continue;
+                    }
                 }
 
                 // an input line can have indentation; if we split this input line into several lines (because it is too long),
@@ -135,6 +139,7 @@ namespace Oetools.Sakoe.Utilities {
                             line = _currentConsoleLineSpaceTaken > 0 ? line : line.PadLeft(lineLength + indentation + paragraphIndent, ' ');
                             (underLyingWriter ?? UnderLyingWriter).Write(line);
                             _currentConsoleLineSpaceTaken += line.Length;
+                            HasWroteToOuput = true;
                         }
                         
                         if (newInputLineStarting && writeToNewLine) {
@@ -146,13 +151,11 @@ namespace Oetools.Sakoe.Utilities {
                             }
                         }
                         newInputLineStarting = false;
-                        
-                        HasWroteToOuput = true;
                         writeToNewLine = true;
 
                         // trim the whitespaces following a word break
                         lineStartPos += lineLength;
-                        while (lineStartPos < eolPosition && char.IsWhiteSpace(message[lineStartPos])) {
+                        while (lineStartPos < eolPosition && message[lineStartPos] != '\n' && char.IsWhiteSpace(message[lineStartPos])) {
                             lineStartPos++;
                         }
                     } while (eolPosition > lineStartPos);

@@ -14,7 +14,7 @@ namespace Oetools.Sakoe.Command.Oe {
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
     [Subcommand(typeof(ConnectDatabaseProjectCommand))]
-    internal class DatabaseProjectCommand : BaseCommand {
+    internal class DatabaseProjectCommand : ABaseCommand {
     }
     
     [Command(

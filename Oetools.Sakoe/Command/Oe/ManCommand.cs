@@ -10,7 +10,7 @@ namespace Oetools.Sakoe.Command.Oe {
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
     [Subcommand(typeof(FiltersHelpCommand))]
-    internal class ManCommand : BaseCommand {
+    internal class ManCommand : ABaseCommand {
         public const string Name = "manual";
         
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
@@ -32,7 +32,7 @@ namespace Oetools.Sakoe.Command.Oe {
         ExtendedHelpText = "TODO",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class FiltersHelpCommand : BaseCommand {
+    internal class FiltersHelpCommand : ABaseCommand {
         public const string Name = "filters";
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             Out.WriteResultOnNewLine("Write something about the filters.");

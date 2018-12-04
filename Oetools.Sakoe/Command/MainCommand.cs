@@ -3,6 +3,7 @@ using System.IO;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Command.Oe;
 using Oetools.Sakoe.Utilities;
+using Oetools.Sakoe.Utilities.Extension;
 
 namespace Oetools.Sakoe.Command {
     
@@ -19,10 +20,6 @@ namespace Oetools.Sakoe.Command {
 NOTES
   - You can escape white spaces in argument and option values by using double quotes (i.e. "")
   - In the 'USAGE' help, arguments between brackets (i.e. []) are optionals
-
-GET RAW OUTPUT
-  If you want a raw output for each commands (without display the log lines), you can set the verbosity to ""None"" and use the no progress bars option.
-    sakoe [command] -vb None -po
 
 EXIT CODE
   The convention followed by this tool is the following.
@@ -57,12 +54,14 @@ WEBSITE
     [Subcommand(typeof(ProHelpCommand))]
     [Subcommand(typeof(UtilitiesCommand))]
     [Subcommand(typeof(ProlibCommand))]
-    internal class MainCommand : BaseCommand {
+    internal class MainCommand {
 
         public const string HelpLongName = "--help";
         
         public static int ExecuteMainCommand(string[] args) {
+            // TODO: global configuration in an .xml next to sakoe.exe that store default verbosity, log path, http proxy and so on...
             try {
+                Console.CursorVisible = false;
                 using (var app = new CommandLineApplicationCustomHint<MainCommand>(HelpGenerator.Singleton, PhysicalConsole.Singleton, Directory.GetCurrentDirectory(), true)) {
                     app.Conventions.UseDefaultConventions();
                     app.ParserSettings.MakeSuggestionsInErrorMessage = true;
@@ -70,26 +69,37 @@ WEBSITE
                 }
             } catch (Exception ex) {
                 var log = ConsoleIo.Singleton;
-                log.LogLevel = ConsoleIo.LogLvl.Debug;
+                log.LogTheshold = ConsoleLogThreshold.Debug;
                 
                 if (ex is CommandParsingException) {
-                    var bb = ex.GetType()?.GetProperty("NearestMatch")?.GetValue(ex);
-                    
                     //if (ex is UnrecognizedCommandParsingException unrecognizedCommandParsingException) {
                     //    log.Info($"Did you mean {unrecognizedCommandParsingException.NearestMatch}?");
                     //}
+                    var nearestMatch = ex.GetType()?.GetProperty("NearestMatch")?.GetValue(ex) as string;
                     log.Error(ex.Message);
-                    log.Info($"Specify {HelpLongName} for a list of available options and commands. {bb}");
+                    log.If(!string.IsNullOrEmpty(nearestMatch))?.Info($"Did you mean {nearestMatch}?");
+                    log.Info($"Specify {HelpLongName} for a list of available options and commands.");
                 } else {
                     log.Error(ex.Message, ex);
                 }
 
-                log.Fatal($"Exit code {FatalExitCode}");
+                log.Fatal($"Exit code {ABaseCommand.FatalExitCode}");
                 log.WriteOnNewLine(null);
-                return FatalExitCode;
+                return ABaseCommand.FatalExitCode;
             } finally {
                 ConsoleIo.Singleton.Dispose();
+                Console.CursorVisible = true;
             }
+        }
+
+        private int OnExecute(CommandLineApplication app, IConsole console) {
+            var log = ConsoleIo.Singleton;
+            log.DrawLogo();
+            app.ShowHelp();
+            log.Warn(HelpGenerator.GetHelpProvideCommand(app));
+            log.Warn($"Exit code {1}");
+            log.WriteOnNewLine(null);
+            return 1;
         }
     }
 }

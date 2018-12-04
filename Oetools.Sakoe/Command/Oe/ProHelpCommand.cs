@@ -44,7 +44,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Subcommand(typeof(ChmProHelpCommand))]
     [Subcommand(typeof(KeywordProHelpCommand))]
 #endif
-    internal class ProHelpCommand : BaseCommand {
+    internal class ProHelpCommand : ABaseCommand {
     }
     
     [Command(

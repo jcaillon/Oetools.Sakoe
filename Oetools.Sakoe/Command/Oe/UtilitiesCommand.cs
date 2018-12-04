@@ -38,7 +38,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Subcommand(typeof(GetProExecPathUtilitiesCommand))]
     [Subcommand(typeof(GetPropathFromIniUtilitiesCommand))]
     [Subcommand(typeof(GetProVersionUtilitiesCommand))]
-    internal class UtilitiesCommand : BaseCommand {
+    internal class UtilitiesCommand : ABaseCommand {
     }
     
     [Command(
@@ -48,7 +48,7 @@ namespace Oetools.Sakoe.Command.Oe {
 It will also ignore comment lines starting with #.", 
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
-    internal class GetConnectionStringUtilitiesCommand : BaseCommand {
+    internal class GetConnectionStringUtilitiesCommand : ABaseCommand {
         
         [Required]
         [FileExists]

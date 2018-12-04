@@ -25,7 +25,7 @@ using Oetools.Utilities.Lib;
 
 namespace Oetools.Sakoe.Command.Oe.Abstract {
     
-    internal abstract class ArchiverBaseCommand : BaseCommand {
+    internal abstract class ArchiverBaseCommand : ABaseCommand {
         
         public abstract IArchiver GetArchiver();
         

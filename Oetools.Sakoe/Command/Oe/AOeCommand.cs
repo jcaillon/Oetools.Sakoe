@@ -28,7 +28,7 @@ using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
 
 namespace Oetools.Sakoe.Command.Oe {
-    public abstract class AOeCommand : BaseCommand {
+    public abstract class AOeCommand : ABaseCommand {
         
         /// <summary>
         /// Returns the path of the unique project file in the current directory (if any)
@@ -38,7 +38,7 @@ namespace Oetools.Sakoe.Command.Oe {
         protected string GetCurrentProjectFilePath() {
             var list = Directory.EnumerateFiles(Directory.GetCurrentDirectory(), $"*{OeBuilderConstants.OeProjectExtension}", SearchOption.TopDirectoryOnly).ToList();
             if (list.Count == 0) {
-                list = Directory.EnumerateFiles(Path.Combine(Directory.GetCurrentDirectory(), OeBuilderConstants.OeProjectDirectory), $"*{OeBuilderConstants.OeProjectExtension}", SearchOption.TopDirectoryOnly).ToList();
+                list = Directory.EnumerateFiles(OeBuilderConstants.GetProjectDirectory(Directory.GetCurrentDirectory()), $"*{OeBuilderConstants.OeProjectExtension}", SearchOption.TopDirectoryOnly).ToList();
                 if (list.Count == 0) {
                     throw new CommandException($"No project file ({OeBuilderConstants.OeProjectExtension}) found in the current folder {Directory.GetCurrentDirectory().PrettyQuote()} nor the {OeBuilderConstants.OeProjectDirectory} directory.");
                 }

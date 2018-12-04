@@ -29,6 +29,7 @@ using System.Reflection;
 using McMaster.Extensions.CommandLineUtils;
 using McMaster.Extensions.CommandLineUtils.HelpText;
 using Oetools.Sakoe.Utilities.Extension;
+using Oetools.Utilities.Lib.Extension;
 
 namespace Oetools.Sakoe.Utilities {
     
@@ -49,6 +50,10 @@ namespace Oetools.Sakoe.Utilities {
         private static HelpGenerator _instance;
 
         private IConsoleOutput _console;
+
+        public static string GetHelpProvideCommand(CommandLineApplication application) {
+            return $"You must provide a command: {$"{application.GetFullCommandLine()} [command]".PrettyQuote()}.";
+        }
 
         /// <inheritdoc />
         public void Generate(CommandLineApplication application, TextWriter output) {
@@ -80,7 +85,7 @@ namespace Oetools.Sakoe.Utilities {
                 optionLongNameColumnWidth += 2; // --name
             }
             var firstColumnWidth = Math.Max(Math.Max(arguments.Count > 0 ? arguments.Max(a => a.Name.IndexOf('[') < 0 ? a.Name.Length : a.Name.Length - 2) : 0, Math.Max(optionShortNameColumnWidth + optionLongNameColumnWidth, commands.Count > 0 ? commands.Max(c => c.Name?.Length ?? 0) : 0)), 20);
-            firstColumnWidth = Math.Min(firstColumnWidth, 40);
+            firstColumnWidth = Math.Min(firstColumnWidth, 35);
             
             if (firstColumnWidth != optionShortNameColumnWidth + optionLongNameColumnWidth) {
                 optionLongNameColumnWidth = firstColumnWidth - optionShortNameColumnWidth;
@@ -178,13 +183,14 @@ namespace Oetools.Sakoe.Utilities {
                     }
                     var firstColumn = $"{shortName.PadRight(optionShortNameColumnWidth)}{$"{longName}{valueName}".PadRight(optionLongNameColumnWidth)}";
                     _console.WriteOnNewLine(firstColumn.PadRight(firstColumnWidth + 2), padding: 3);
-                    if (firstColumn.Length > firstColumnWidth) {
-                        _console.WriteOnNewLine(opt.Description, padding: firstColumnWidth + 5);
-                    } else {
-                        _console.Write(opt.Description, padding: firstColumnWidth + 5);
-                    }
+                    var text = opt.Description;
                     if (opt.OptionType == CommandOptionType.MultipleValue) {
-                        _console.WriteOnNewLine("This option can be used multiple times.", padding: firstColumnWidth + 5);
+                        text = $"(Can be used multiple times) {text}";
+                    }
+                    if (firstColumn.Length > firstColumnWidth) {
+                        _console.WriteOnNewLine(text, padding: firstColumnWidth + 5);
+                    } else {
+                        _console.Write(text, padding: firstColumnWidth + 5);
                     }
                 }
             }
