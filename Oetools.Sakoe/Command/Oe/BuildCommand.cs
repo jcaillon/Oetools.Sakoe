@@ -36,15 +36,30 @@ namespace Oetools.Sakoe.Command.Oe {
         [Option("-c|" + ConfigurationNameLongName + " <config>", "The name of the build configuration to use for the build. This name is found in the " + OeBuilderConstants.OeProjectExtension + " file.\nDefaults to the first build configuration found in the project file.", CommandOptionType.SingleValue)]
         public string ConfigurationName { get; set; }
         
-        [Option(CommandOptionType.MultipleValue, ShortName = "e", LongName = "extra-config", ValueName = "project=config", Description = "In addition to the base build configuration specified by <project> and " + ConfigurationNameLongName + ", you can dynamically add a child configuration to the base configuration with this option. This option can be used multiple times, each new configuration will be added as a child of the previously defined configuration.\nThis option allows you to share, with your colleagues, a common project file that holds the property of your application and have an extra configuration in local (just for you) which you can use to build the project in a specific local directory.\nFor each extra configuration, specify the path or the name of the project file and the configuration name to use. If the project file name if empty, the main <project> is used.")]
+        [Option(CommandOptionType.MultipleValue, ShortName = "e", LongName = "extra-proj", ValueName = "project=config", Description = "In addition to the base build configuration specified by <project> and " + ConfigurationNameLongName + ", you can dynamically add a child configuration to the base configuration with this option. This option can be used multiple times, each new configuration will be added as a child of the previously defined configuration.\nThis option allows you to share, with your colleagues, a common project file that holds the property of your application and have an extra configuration in local (just for you) which you can use to build the project in a specific local directory.\nFor each extra configuration, specify the path or the name of the project file and the configuration name to use. If the project file name if empty, the main <project> is used.")]
         public string[] ExtraConfigurations { get; set; }
 
-        [Option(CommandOptionType.MultipleValue, ShortName = "p", LongName = "property", ValueName = "key=value", Description = "A pair of key/value to dynamically set a property for this build.\nEach pair should specify the name of the property to set and the value that should be used.\nUse the option " + PropertyHelpLongName + " to see the full list of properties available as well as their documentation.")]
+        [Option(CommandOptionType.MultipleValue, ShortName = "p", LongName = "property", ValueName = "key=value", Description = "A pair of key/value to dynamically set a property for this build. The value set this way will prevail over the value defined in the project file.\nEach pair should specify the name of the property to set and the value that should be used.\nUse the option " + PropertyHelpLongName + " to see the full list of properties available as well as their documentation.")]
         public string[] BuildProperties { get; set; }
         
         [Option("-ph|" + PropertyHelpLongName, "Shows the list of each build property usable with its full documentation.", CommandOptionType.NoValue)]
         public bool ShowBuildPropertyHelp { get; set; }
 
+        public static void GetAdditionalHelpText(IHelpFormatter formatter, CommandLineApplication application, int firstColumnWidth) {
+            formatter.WriteOnNewLine(null);
+            formatter.WriteSectionTitle("BUILD PROPERTIES");
+            
+            foreach (var property in GetAvailableBuildProperties().OrderBy(p => p.Key)) {
+                formatter.WriteOnNewLine($"-p \"{property.Key}={property.Value ?? ""}\"");
+            }
+            formatter.WriteOnNewLine(null);
+            formatter.WriteTip($"Display the full documentation of each build property by running '{application.GetFullCommandLine()} {PropertyHelpLongName}'.");
+            
+            formatter.WriteOnNewLine(null);
+            formatter.WriteSectionTitle("LEARN MORE");
+            formatter.WriteOnNewLine($"Use the command {typeof(BuildManCommand).GetFullCommandLine().PrettyQuote()} for an in-depth help of this command.");
+        }
+        
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             if (ShowBuildPropertyHelp) {
                 HelpFormatter.WriteOnNewLine(null);
@@ -122,21 +137,6 @@ namespace Oetools.Sakoe.Command.Oe {
                 builder.Build();
             }
             return 0;
-        }
-
-        public static void GetAdditionalHelpText(IHelpFormatter formatter, CommandLineApplication application, int firstColumnWidth) {
-            formatter.WriteOnNewLine(null);
-            formatter.WriteSectionTitle("BUILD PROPERTIES");
-            
-            foreach (var property in GetAvailableBuildProperties().OrderBy(p => p.Key)) {
-                formatter.WriteOnNewLine($"-p \"{property.Key}={property.Value ?? ""}\"");
-            }
-            formatter.WriteOnNewLine(null);
-            formatter.WriteOnNewLine($"Display the full documentation of each build property by specifying the option {PropertyHelpLongName}.");
-            
-            formatter.WriteOnNewLine(null);
-            formatter.WriteSectionTitle("LEARN MORE");
-            formatter.WriteOnNewLine($"Use the command {typeof(BuildManCommand).GetFullCommandLine().PrettyQuote()} for an in-depth help of this command.");
         }
 
         private static Dictionary<string, string> GetAvailableBuildProperties() {

@@ -16,7 +16,7 @@ namespace Oetools.Sakoe.Command.Oe {
         
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
 
-            Out.WriteOnNewLine(@"USAGE
+            HelpFormatter.WriteOnNewLine(@"USAGE
   - You can escape white spaces in argument and option values by using double quotes (i.e. "")
   - In the 'USAGE' help, arguments between brackets (i.e. []) are optionals
 
@@ -34,10 +34,10 @@ RESPONSE FILE PARSING
 
 WEBSITE 
   https://jcaillon.github.io/Oetools.Sakoe/", padding: 1);
-            Out.WriteOnNewLine(null);
-            Out.WriteOnNewLine("Topics :");
+            HelpFormatter.WriteOnNewLine(null);
+            HelpFormatter.WriteOnNewLine("Topics :");
             foreach (var command in app.Commands) {
-                Out.WriteOnNewLine($"  {command.Name} {command.Description}.");
+                HelpFormatter.WriteOnNewLine($"  {command.Name} {command.Description}.");
             }
             
             return 0;
@@ -64,6 +64,7 @@ WEBSITE
     )]
     internal class BuildManCommand : ABaseCommand {
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
+            // TODO: help on build!
             Out.WriteResultOnNewLine("Write something about the build.");
             return 0;
         }

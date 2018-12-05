@@ -98,10 +98,8 @@ Example of xml editors with out-of-the-box intellisense (autocomplete) features 
 Drag and drop the created " + OeBuilderConstants.OeProjectExtension + @" file into the editor of your choice and start configuring your build.
 The file " + Path.Combine(OeBuilderConstants.GetProjectDirectory(""), $"{ProjectName}{OeBuilderConstants.OeProjectExtension}").PrettyQuote() + @" should be versioned in your source repository to allow anyone who clones your application to build it.
 If you need to have a project file containing build configurations specific to your local machine, you can use the option " + (GetCommandOptionFromPropertyName(nameof(IsLocalProject))?.Template ?? "").PrettyQuote() + @". This will create the project file into the directory " + OeBuilderConstants.GetProjectDirectoryLocal("").PrettyQuote() + @" which should NOT be versioned. 
-For git repositories, use the command " + typeof(ProjectGitignoreCommand).GetFullCommandLine().PrettyQuote() + @" to set up your .gitignore file for sakoe projects.
-
-");
-            
+For git repositories, use the command " + typeof(ProjectGitignoreCommand).GetFullCommandLine().PrettyQuote() + @" to set up your .gitignore file for sakoe projects.");
+            HelpFormatter.WriteOnNewLine(null);
             return 0;
         }
     }

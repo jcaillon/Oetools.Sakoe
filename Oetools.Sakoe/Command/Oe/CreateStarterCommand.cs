@@ -61,15 +61,16 @@ It allows you to call this tool in a more natural way: 'sakoe [command]'. This s
 
 The directory containing the starter script created should be added to your system PATH in order to be able to call 'sakoe [command]' from anywhere on your system.
 
-The command to add this directory to your path is:
-
-");
-
+The command to add this directory to your path is:");
+            HelpFormatter.WriteOnNewLine(null);
+            
             if (Utils.IsRuntimeWindowsPlatform) {
                 Out.WriteResultOnNewLine("for /f \"usebackq tokens=2,*\" %A in (`reg query HKCU\\Environment /v PATH`) do set my_user_path=%B && SetX Path \"%my_user_path%;" + Path.GetDirectoryName(starterFilePath) + "\"");
             } else {
                 Out.WriteResultOnNewLine("echo $\"export PATH=\\$PATH:" + Path.GetDirectoryName(starterFilePath) + "\" >> ~/.bashrc && source ~/.bashrc && chmod +x \"" + starterFilePath + "\"");
             }
+            
+            HelpFormatter.WriteOnNewLine(null);
             
             return 0;
         }
