@@ -63,7 +63,7 @@ namespace Oetools.Sakoe.Utilities {
         /// <param name="underLyingWriter"></param>
         /// <param name="newLine"></param>
         public void WriteLine(TextWriter underLyingWriter = null, string newLine = null) {
-            (underLyingWriter ?? UnderLyingWriter).Write(newLine ?? Console.Out.NewLine);
+            (underLyingWriter ?? UnderLyingWriter).Write(newLine ?? UnderLyingWriter.NewLine);
             _currentConsoleLineSpaceTaken = 0;
             HasWroteToOuput = true;
         }
@@ -84,6 +84,7 @@ namespace Oetools.Sakoe.Utilities {
                 if (writeToNewLine && HasWroteToOuput) {
                     WriteLine(underLyingWriter);
                 }
+                HasWroteToOuput = true;
                 return;
             }
 

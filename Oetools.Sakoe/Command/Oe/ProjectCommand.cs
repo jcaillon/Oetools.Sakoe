@@ -22,7 +22,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Subcommand(typeof(ProjectInitCommand))]
     [Subcommand(typeof(ProjectGitignoreCommand))]
     [Subcommand(typeof(ProjectListCommand))]
-    internal class ProjectCommand : ABaseCommand {
+    internal class ProjectCommand : AExpectSubCommand {
     }
     
     [Command(
@@ -34,16 +34,18 @@ namespace Oetools.Sakoe.Command.Oe {
     internal class ProjectInitCommand : ABaseCommand {
         
         [DirectoryExists]
-        [Argument(0, "<directory>", "The directory in which to initialize the project. Default to the current directory.")]
+        [Argument(0, "<directory>", "The directory in which to initialize the project. Defaults to the current directory.")]
         public string SourceDirectory { get; set; }
         
         [LegalFilePath]
-        [Option("-p|--project-name <name>", "The name of the project to create. Default to the current directory name.", CommandOptionType.SingleValue)]
+        [Option("-p|--project-name <name>", "The name of the project to create. Defaults to the current directory name.", CommandOptionType.SingleValue)]
         public string ProjectName { get; set; }
         
-        
-        [Option("-l|--local", "Create the new project file for local use only.", CommandOptionType.NoValue)]
+        [Option("-l|--local", "Create the new project file for local use only. A local project should contain build configurations specific to your machine and thus should not be shared or versioned in your source control system.", CommandOptionType.NoValue)]
         public bool IsLocalProject { get; set; }
+        
+        [Option("-f|--force", "Force the creation of the project file by replacing an older project file, if it exists. By default, the command will fail if the project file already exists.", CommandOptionType.NoValue)]
+        public bool Force { get; set; }
         
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             
@@ -69,7 +71,11 @@ namespace Oetools.Sakoe.Command.Oe {
             
             var projectFilePath = Path.Combine(projectDirectory, $"{ProjectName}{OeBuilderConstants.OeProjectExtension}");
             if (File.Exists(projectFilePath)) {
-                throw new CommandValidationException($"The project file already exists, delete it first: {projectFilePath.PrettyQuote()}.");
+                if (Force) {
+                    File.Delete(projectFilePath);
+                } else {
+                    throw new CommandValidationException($"The project file already exists, delete it first: {projectFilePath.PrettyQuote()}.");
+                }
             }
             
             Log.Info($"Creating Openedge project file: {projectFilePath.PrettyQuote()}.");
@@ -77,9 +83,9 @@ namespace Oetools.Sakoe.Command.Oe {
             
             Log.Info($"Project created: {projectFilePath.PrettyQuote()}.");
 
-            Out.WriteOnNewLine(@"
-IMPORTANT README:", ConsoleColor.Yellow, 1);
-            Out.WriteOnNewLine(@"
+            HelpFormatter.WriteOnNewLine(null);
+            HelpFormatter.WriteSectionTitle("IMPORTANT README:");
+            HelpFormatter.WriteOnNewLine(@"
 The project file created (" + OeBuilderConstants.OeProjectExtension + @") is defined in XML format and has a provided XML schema definition file (Project.xsd).
 
 The project XML schema is fully documented and should be used to enable intellisense in your favorite editor.
@@ -90,10 +96,11 @@ Example of xml editors with out-of-the-box intellisense (autocomplete) features 
  - Most jetbrain IDE
 
 Drag and drop the created " + OeBuilderConstants.OeProjectExtension + @" file into the editor of your choice and start configuring your build.
-The file " + Path.Combine(OeBuilderConstants.GetProjectDirectory(""), $"{ProjectName}{OeBuilderConstants.OeProjectExtension}").PrettyQuote() + @" should be versioned in your source repository to allow anyone who clones it to build your application.
+The file " + Path.Combine(OeBuilderConstants.GetProjectDirectory(""), $"{ProjectName}{OeBuilderConstants.OeProjectExtension}").PrettyQuote() + @" should be versioned in your source repository to allow anyone who clones your application to build it.
 If you need to have a project file containing build configurations specific to your local machine, you can use the option " + (GetCommandOptionFromPropertyName(nameof(IsLocalProject))?.Template ?? "").PrettyQuote() + @". This will create the project file into the directory " + OeBuilderConstants.GetProjectDirectoryLocal("").PrettyQuote() + @" which should NOT be versioned. 
-For git repositories, use the command " + app.GetFullCommandLine().PrettyQuote() + @" to set up your .gitignore file for sakoe projects.
-", padding: 1);
+For git repositories, use the command " + typeof(ProjectGitignoreCommand).GetFullCommandLine().PrettyQuote() + @" to set up your .gitignore file for sakoe projects.
+
+");
             
             return 0;
         }

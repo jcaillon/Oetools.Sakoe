@@ -74,6 +74,25 @@ namespace Oetools.Sakoe.Utilities.Extension {
             }
             return sb.ToString();
         }
+
+        /// <summary>
+        /// Get the command line that calls the given type.
+        /// For instance, it will return "sakoe project init" if the type given is the command for init.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static string GetFullCommandLine(this Type type) {
+            var sb = new StringBuilder();
+            var i = 0;
+            foreach (var attribute in GetCommandStackFromType(type)) {
+                if (i > 0) {
+                    sb.Append(" ");
+                }
+                sb.Append(attribute.Name);
+                i++;
+            }
+            return sb.ToString();
+        }
         
         /// <summary>
         /// Returns a "stack" of <see cref="CommandAttribute"/> to reach the given type.
@@ -83,7 +102,9 @@ namespace Oetools.Sakoe.Utilities.Extension {
         public static List<CommandAttribute> GetCommandStackFromType(this Type type) {
             var subCommands = Attribute.GetCustomAttributes(typeof(MainCommand), typeof(SubcommandAttribute), true).OfType<SubcommandAttribute>().ToList();
             var stack = new Stack<Tuple<List<CommandAttribute>, List<SubcommandAttribute>>>();
-            stack.Push(new Tuple<List<CommandAttribute>, List<SubcommandAttribute>>(new List<CommandAttribute>(), subCommands));
+            stack.Push(new Tuple<List<CommandAttribute>, List<SubcommandAttribute>>(new List<CommandAttribute>{
+                (CommandAttribute) Attribute.GetCustomAttribute(typeof(MainCommand), typeof(CommandAttribute))
+            }, subCommands));
             while (stack.Count > 0) {
                 var tuple = stack.Pop();
                 subCommands = tuple.Item2;

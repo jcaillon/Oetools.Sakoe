@@ -38,7 +38,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Subcommand(typeof(GetProExecPathUtilitiesCommand))]
     [Subcommand(typeof(GetPropathFromIniUtilitiesCommand))]
     [Subcommand(typeof(GetProVersionUtilitiesCommand))]
-    internal class UtilitiesCommand : ABaseCommand {
+    internal class ProUtilitiesCommand : AExpectSubCommand {
     }
     
     [Command(

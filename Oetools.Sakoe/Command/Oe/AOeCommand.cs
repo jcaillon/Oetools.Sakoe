@@ -24,6 +24,7 @@ using System.IO;
 using System.Linq;
 using Oetools.Builder.Utilities;
 using Oetools.Sakoe.Command.Exceptions;
+using Oetools.Sakoe.Utilities.Extension;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
 
@@ -38,9 +39,12 @@ namespace Oetools.Sakoe.Command.Oe {
         protected string GetCurrentProjectFilePath() {
             var list = Directory.EnumerateFiles(Directory.GetCurrentDirectory(), $"*{OeBuilderConstants.OeProjectExtension}", SearchOption.TopDirectoryOnly).ToList();
             if (list.Count == 0) {
-                list = Directory.EnumerateFiles(OeBuilderConstants.GetProjectDirectory(Directory.GetCurrentDirectory()), $"*{OeBuilderConstants.OeProjectExtension}", SearchOption.TopDirectoryOnly).ToList();
+                var oeDir = OeBuilderConstants.GetProjectDirectory(Directory.GetCurrentDirectory());
+                if (Directory.Exists(oeDir)) {
+                    list = Directory.EnumerateFiles(oeDir, $"*{OeBuilderConstants.OeProjectExtension}", SearchOption.TopDirectoryOnly).ToList();
+                }
                 if (list.Count == 0) {
-                    throw new CommandException($"No project file ({OeBuilderConstants.OeProjectExtension}) found in the current folder {Directory.GetCurrentDirectory().PrettyQuote()} nor the {OeBuilderConstants.OeProjectDirectory} directory.");
+                    throw new CommandException($"No project file ({OeBuilderConstants.OeProjectExtension}) found in the current folder {Directory.GetCurrentDirectory().PrettyQuote()} nor the {OeBuilderConstants.OeProjectDirectory} directory. Initialize a new project file using the command: {typeof(ProjectInitCommand).GetFullCommandLine().PrettyQuote()}.");
                 }
 
                 if (list.Count > 1) {
@@ -51,7 +55,6 @@ namespace Oetools.Sakoe.Command.Oe {
             if (list.Count > 1) {
                 throw new CommandException($"Ambiguous project, found {list.Count} project files in the current folder, specify the project file to use in the command line.");
             }
-
             return list.First();
         }
         

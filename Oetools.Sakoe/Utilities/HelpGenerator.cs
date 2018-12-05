@@ -31,9 +31,13 @@ using McMaster.Extensions.CommandLineUtils.HelpText;
 using Oetools.Sakoe.Utilities.Extension;
 using Oetools.Utilities.Lib.Extension;
 
+#if !WINDOWSONLYBUILD
+using Oetools.Sakoe.Command.Oe;
+#endif
+
 namespace Oetools.Sakoe.Utilities {
     
-    public class HelpGenerator : IHelpTextGenerator {
+    public class HelpGenerator : IHelpTextGenerator, IHelpFormatter {
         
         /// <summary>
         /// A singleton instance of <see cref="HelpGenerator" />.
@@ -84,7 +88,10 @@ namespace Oetools.Sakoe.Utilities {
             if (optionLongNameColumnWidth > 0) {
                 optionLongNameColumnWidth += 2; // --name
             }
-            var firstColumnWidth = Math.Max(Math.Max(arguments.Count > 0 ? arguments.Max(a => a.Name.IndexOf('[') < 0 ? a.Name.Length : a.Name.Length - 2) : 0, Math.Max(optionShortNameColumnWidth + optionLongNameColumnWidth, commands.Count > 0 ? commands.Max(c => c.Name?.Length ?? 0) : 0)), 20);
+
+            var firstColumnWidth = Math.Max(optionShortNameColumnWidth + optionLongNameColumnWidth, commands.Count > 0 ? commands.Max(c => c.Name?.Length ?? 0) : 0);
+            firstColumnWidth = Math.Max(firstColumnWidth, arguments.Count > 0 ? arguments.Max(a => a.Name.IndexOf('[') < 0 ? a.Name.Length : a.Name.Length - 2) : 0);
+            firstColumnWidth = Math.Max(firstColumnWidth, 20);
             firstColumnWidth = Math.Min(firstColumnWidth, 35);
             
             if (firstColumnWidth != optionShortNameColumnWidth + optionLongNameColumnWidth) {
@@ -94,9 +101,9 @@ namespace Oetools.Sakoe.Utilities {
             var fullCommandLine = application.GetFullCommandLine();
 
             if (!string.IsNullOrEmpty(application.Description)) {
-                _console.WriteOnNewLine(null);
-                _console.WriteOnNewLine("SYNOPSIS", ConsoleColor.Cyan, 1);
-                _console.WriteOnNewLine(application.Description, padding: 3);
+                WriteOnNewLine(null);
+                WriteSectionTitle("SYNOPSIS");
+                WriteOnNewLine(application.Description);
             }
             
             var commandType = application.GetTypeFromCommandLine();
@@ -105,42 +112,52 @@ namespace Oetools.Sakoe.Utilities {
             GenerateArguments(arguments, firstColumnWidth);
             GenerateOptions(options, optionShortNameColumnWidth, optionLongNameColumnWidth);
             GenerateCommands(application, fullCommandLine, commands, firstColumnWidth);
-            
-            var methodInfo = commandType.GetMethod("GetAdditionalHelpText", BindingFlags.Public | BindingFlags.Static);
-            if (methodInfo != null) {
-                methodInfo.Invoke(null, new object[]{ _console, application, firstColumnWidth });
+
+            var additionalHelpTextAttribute = (CommandAdditionalHelpTextAttribute) Attribute.GetCustomAttribute(commandType, typeof(CommandAdditionalHelpTextAttribute), true);
+            if (additionalHelpTextAttribute != null) {
+            var methodInfo = commandType.GetMethod(additionalHelpTextAttribute.MethodName, BindingFlags.Public | BindingFlags.Static);
+                if (methodInfo != null) {
+                    methodInfo.Invoke(null, new object[]{ this, application, firstColumnWidth });
+                }
             }
             
             if (!string.IsNullOrEmpty(application.ExtendedHelpText)) {
-                _console.WriteOnNewLine(null);
-                _console.WriteOnNewLine("DESCRIPTION", ConsoleColor.Cyan, 1);
-                _console.WriteOnNewLine(application.ExtendedHelpText, padding: 3);
+                WriteOnNewLine(null);
+                WriteSectionTitle("DESCRIPTION");
+                WriteOnNewLine(application.ExtendedHelpText);
             }
             
-            _console.WriteOnNewLine(null);
+            WriteOnNewLine(null);
         }
 
         /// <summary>
         /// Generate the line that shows usage
         /// </summary>
         protected virtual void GenerateUsage(string thisCommandLine, IReadOnlyList<CommandArgument> visibleArguments, IReadOnlyList<CommandOption> visibleOptions, IReadOnlyList<CommandLineApplication> visibleCommands, PropertyInfo remainingArgs) {
-            _console.WriteOnNewLine(null);
-            _console.WriteOnNewLine("USAGE", ConsoleColor.Cyan, 1);
-            _console.WriteOnNewLine(thisCommandLine, padding: 3);
+            WriteOnNewLine(null);
+            WriteSectionTitle("USAGE");
+            WriteOnNewLine(thisCommandLine);
+            #if !WINDOWSONLYBUILD
+            if (!File.Exists(CreateStarterCommand.StartScriptFilePath)) {
+                WriteOnNewLine(null);
+                WriteTip($"Tip: use the command '{typeof(CreateStarterCommand).GetFullCommandLine()}' to simplify your invocation of sakoe.");
+            }
+            #endif
+            
             foreach (var argument in visibleArguments) {
-                Console.Write($" {argument.Name}");
+                Write($" {argument.Name}");
             }
             if (visibleOptions.Any()) {
-                _console.Write(" [options]");
+                Write(" [options]");
             }
             if (visibleCommands.Any()) {
-                _console.Write(" [command]");
+                Write(" [command]");
             }
             if (remainingArgs != null) {
                 if (Attribute.GetCustomAttribute(remainingArgs, typeof(DescriptionAttribute), true) is DescriptionAttribute description) {
-                    _console.Write($" {description.Description}");
+                    Write($" {description.Description}");
                 } else {
-                    _console.Write(" [[--] <arg>...]");
+                    Write(" [[--] <arg>...]");
                 }
             }
         }
@@ -150,16 +167,16 @@ namespace Oetools.Sakoe.Utilities {
         /// </summary>
         protected virtual void GenerateArguments(IReadOnlyList<CommandArgument> visibleArguments, int firstColumnWidth) {
             if (visibleArguments.Any()) {
-                _console.WriteOnNewLine(null);
-                _console.WriteOnNewLine("ARGUMENTS", ConsoleColor.Cyan, 1);
+                WriteOnNewLine(null);
+                WriteSectionTitle("ARGUMENTS");
                 
                 foreach (var arg in visibleArguments) {
                     var name = arg.Name.Replace("[", "").Replace("]", "");
-                    _console.WriteOnNewLine(name.PadRight(firstColumnWidth + 2), padding: 3);
+                    WriteOnNewLine(name.PadRight(firstColumnWidth + 2));
                     if (name.Length > firstColumnWidth) {
-                        _console.WriteOnNewLine(arg.Description, padding: firstColumnWidth + 5);
+                        WriteOnNewLine(arg.Description, padding: firstColumnWidth + 2);
                     } else {
-                        _console.Write(arg.Description, padding: firstColumnWidth + 5);
+                        Write(arg.Description, padding: firstColumnWidth + 2);
                     }
                 }
             }
@@ -171,8 +188,8 @@ namespace Oetools.Sakoe.Utilities {
         protected virtual void GenerateOptions(IReadOnlyList<CommandOption> visibleOptions, int optionShortNameColumnWidth, int optionLongNameColumnWidth) {
             var firstColumnWidth = optionShortNameColumnWidth + optionLongNameColumnWidth;
             if (visibleOptions.Any()) {
-                _console.WriteOnNewLine(null);
-                _console.WriteOnNewLine("OPTIONS", ConsoleColor.Cyan, 1);
+                WriteOnNewLine(null);
+                WriteSectionTitle("OPTIONS");
                 
                 foreach (var opt in visibleOptions) {
                     var shortName = string.IsNullOrEmpty(opt.SymbolName) ? string.IsNullOrEmpty(opt.ShortName) ? "" : $"-{opt.ShortName}, " : $"-{opt.SymbolName}, ";
@@ -182,15 +199,15 @@ namespace Oetools.Sakoe.Utilities {
                         valueName = opt.OptionType == CommandOptionType.SingleOrNoValue ? $"[:{opt.ValueName.Replace("_", " ")}]" : $" <{opt.ValueName.Replace("_", " ")}>";
                     }
                     var firstColumn = $"{shortName.PadRight(optionShortNameColumnWidth)}{$"{longName}{valueName}".PadRight(optionLongNameColumnWidth)}";
-                    _console.WriteOnNewLine(firstColumn.PadRight(firstColumnWidth + 2), padding: 3);
+                    WriteOnNewLine(firstColumn.PadRight(firstColumnWidth + 2));
                     var text = opt.Description;
                     if (opt.OptionType == CommandOptionType.MultipleValue) {
                         text = $"(Can be used multiple times) {text}";
                     }
                     if (firstColumn.Length > firstColumnWidth) {
-                        _console.WriteOnNewLine(text, padding: firstColumnWidth + 5);
+                        WriteOnNewLine(text, padding: firstColumnWidth + 2);
                     } else {
-                        _console.Write(text, padding: firstColumnWidth + 5);
+                        Write(text, padding: firstColumnWidth + 2);
                     }
                 }
             }
@@ -201,21 +218,41 @@ namespace Oetools.Sakoe.Utilities {
         /// </summary>
         protected virtual void GenerateCommands(CommandLineApplication application, string thisCommandLine, IReadOnlyList<CommandLineApplication> visibleCommands, int firstColumnWidth) {
             if (visibleCommands.Any()) {
-                _console.WriteOnNewLine(null);
-                _console.WriteOnNewLine("COMMANDS", ConsoleColor.Cyan, 1);
+                WriteOnNewLine(null);
+                WriteSectionTitle("COMMANDS");
 
                 foreach (var cmd in visibleCommands.OrderBy(c => c.Name)) {
-                    _console.WriteOnNewLine(cmd.Name.PadRight(firstColumnWidth + 2), padding: 3);
+                    WriteOnNewLine(cmd.Name.PadRight(firstColumnWidth + 2));
                     if (cmd.Name.Length > firstColumnWidth) {
-                        _console.WriteOnNewLine(cmd.Description, padding: firstColumnWidth + 5);
+                        WriteOnNewLine(cmd.Description, padding: firstColumnWidth + 2);
                     } else {
-                        _console.Write(cmd.Description, padding: firstColumnWidth + 5);
+                        Write(cmd.Description, padding: firstColumnWidth + 2);
                     }
                 }
 
-                _console.WriteOnNewLine(null);
-                _console.WriteOnNewLine($"Run '{thisCommandLine} [command] --{application.OptionHelp.LongName}' for more information about a command.", padding: 3);
+                WriteOnNewLine(null);
+                WriteTip($"Tip: run '{thisCommandLine} [command] --{application.OptionHelp.LongName}' for more information about a command.");
             }
+        }
+
+        protected const int DefaultPadding = 1;
+        protected const int SectionPadding = 2;
+
+        private int _currentPadding;
+
+        public virtual void WriteOnNewLine(string result, ConsoleColor? color = null, int padding = 0) {
+            _console.WriteOnNewLine(result, color, padding + DefaultPadding + _currentPadding);
+        }
+        public virtual void Write(string result, ConsoleColor? color = null, int padding = 0) {
+            _console.Write(result, color, padding + DefaultPadding + _currentPadding);
+        }
+        public virtual void WriteSectionTitle(string result) {
+            _currentPadding = 0;
+            _console.WriteOnNewLine(result, ConsoleColor.Cyan, DefaultPadding + _currentPadding);
+            _currentPadding = SectionPadding;
+        }
+        public virtual void WriteTip(string result, int padding = 0) {
+            _console.WriteOnNewLine(result, ConsoleColor.Gray, padding + DefaultPadding + _currentPadding);
         }
 
     }

@@ -38,7 +38,7 @@ namespace Oetools.Sakoe.Command.Oe {
     )]
     [Subcommand(typeof(HashStringCommand))]
     [Subcommand(typeof(HashFilesCommand))]
-    internal class HashCommand : ABaseCommand {
+    internal class HashCommand : AExpectSubCommand {
     }
     
     [Command(

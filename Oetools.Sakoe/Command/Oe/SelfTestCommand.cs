@@ -24,16 +24,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Subcommand(typeof(ResponseFileSelfTestCommand))]
     [Subcommand(typeof(WrapSelfTestCommand))]
     [Subcommand(typeof(ConsoleFormatSelfTestCommand))]
-    internal class SelfTestCommand : ABaseCommand {
-        
-        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            
-            Log.Info("Dummy command.");
-            
-            return 0;
-        }
-
-    }
+    internal class SelfTestCommand : AExpectSubCommand {}
     
     [Command(
         "consoleformat", "cf",

@@ -26,7 +26,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Subcommand(typeof(DeleteDatabaseCommand))]
     [Subcommand(typeof(RepairDatabaseCommand))]
     // TODO : generate a delta .df
-    internal class DatabaseCommand : ABaseCommand {
+    internal class DatabaseCommand : AExpectSubCommand {
     }
     
     [Command(

@@ -40,17 +40,20 @@ namespace Oetools.Sakoe.Utilities {
         /// <summary>
         /// A singleton instance of <see cref="HelpGenerator" />.
         /// </summary>
-        public static ConsoleIo Singleton => _instance ?? (_instance = new ConsoleIo(PhysicalConsole.Singleton));
+        public static ConsoleIo Singleton => _instance ?? (_instance = new ConsoleIo(ConsoleImplementation.Singleton));
 
         #endregion
 
         /// <summary>
         /// Initializes a new instance of <see cref="ConsoleIo"/>.
         /// </summary>
-        private ConsoleIo(IConsole console) : base(console) {
+        private ConsoleIo(IConsoleImplementation console) : base(console) {
             _stopwatch = Stopwatch.StartNew();
             _console = console;
         }
+        
+        private readonly IConsoleImplementation _console;
+        
         private Stopwatch _stopwatch;
 
         private ConsoleProgressBar _progressBar;
@@ -178,7 +181,7 @@ namespace Oetools.Sakoe.Utilities {
             
             try {
                 if (_progressBar == null) {
-                    _progressBar = new ConsoleProgressBar(max, message) {
+                    _progressBar = new ConsoleProgressBar(_console, max, message) {
                         ClearProgressBarOnStop = ProgressBarDisplayMode == ConsoleProgressBarDisplayMode.On,
                         TextColor = ConsoleColor.DarkGray
                     };

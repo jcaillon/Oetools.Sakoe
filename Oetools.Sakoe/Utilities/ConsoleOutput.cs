@@ -32,7 +32,7 @@ namespace Oetools.Sakoe.Utilities {
 
         protected readonly TextWriterOutputWordWrap WordWrapWriter;
         
-        protected IConsole _console;
+        private readonly IConsole _console;
 
         public TextWriter OutputTextWriter { get; set; }
 

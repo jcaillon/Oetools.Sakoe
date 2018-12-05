@@ -74,13 +74,17 @@ namespace Oetools.Sakoe.Utilities {
 
         private System.Timers.Timer _timer;
 
+        private readonly IConsoleImplementation _console;
+
         /// <summary>
         /// New progress bar.
         /// </summary>
+        /// <param name="console"></param>
         /// <param name="maxTicks"></param>
         /// <param name="message"></param>
-        public ConsoleProgressBar(int maxTicks, string message) {
-            TextColor = Console.ForegroundColor;
+        public ConsoleProgressBar(IConsoleImplementation console, int maxTicks, string message) {
+            _console = console;
+            TextColor = _console.ForegroundColor;
             _maxTicks = Math.Max(1, maxTicks);
             _message = message;
         }
@@ -121,8 +125,8 @@ namespace Oetools.Sakoe.Utilities {
                 return false;
             }
             
-            Console.CursorVisible = true;
-            Console.ResetColor();
+            _console.CursorVisible = true;
+            _console.ResetColor();
             _timer?.Close();
             _timer?.Dispose();
             _timer = null;
@@ -130,7 +134,7 @@ namespace Oetools.Sakoe.Utilities {
             // make sure to draw the latest state
             if (ClearProgressBarOnStop) {
                 ClearProgressBar();
-                Console.SetCursorPosition(0, Console.CursorTop - 2);
+                _console.SetCursorPosition(0, _console.CursorTop - 2);
             } else {
                 if (Monitor.TryEnter(_lock, 500)) {
                     try {
@@ -182,33 +186,33 @@ namespace Oetools.Sakoe.Utilities {
                 _stopwatch.Stop();
             }
 
-            if (_lastWindowWidth != Console.WindowWidth) {
-                Console.CursorVisible = false;
+            if (_lastWindowWidth != _console.WindowWidth) {
+                _console.CursorVisible = false;
                 ClearProgressBar();
             }
 
-            Console.SetCursorPosition(0, Console.CursorTop - 2);
+            _console.SetCursorPosition(0, _console.CursorTop - 2);
 
             var maxWidth = _lastWindowWidth - 1;
 
             // line1, progress bar
-            Console.ForegroundColor = _timer == null ? (_maxTicks == _currentTick ? ForegroundColorDone : ForegroundColorUncomplete) ?? ForegroundColor : ForegroundColor;
+            _console.ForegroundColor = _timer == null ? (_maxTicks == _currentTick ? ForegroundColorDone : ForegroundColorUncomplete) ?? ForegroundColor : ForegroundColor;
             var progress = Math.Min(1, (double) _currentTick / _maxTicks);
             TaskbarProgress.SetValue(progress * 100, 100);
             var progressWidth = (int) Math.Round(progress * maxWidth);
             if (progressWidth < maxWidth) {
-                Console.Write(new string(ForegroundCharacter, progressWidth));
+                _console.Write(new string(ForegroundCharacter, progressWidth));
                 if (BackgroundColor != null) {
-                    Console.ForegroundColor = (ConsoleColor) BackgroundColor;
+                    _console.ForegroundColor = (ConsoleColor) BackgroundColor;
                 }
 
-                Console.WriteLine(new string(BackgroundCharacter, maxWidth - progressWidth));
+                _console.WriteLine(new string(BackgroundCharacter, maxWidth - progressWidth));
             } else {
-                Console.WriteLine(new string(ForegroundCharacter, maxWidth));
+                _console.WriteLine(new string(ForegroundCharacter, maxWidth));
             }
 
             // line2, info
-            Console.ForegroundColor = TextColor;
+            _console.ForegroundColor = TextColor;
             var line2 = $"{(int) (progress * 100)}%".PadRight(4, ' ');
             if (maxWidth > 15) {
                 var elapsed = _stopwatch.Elapsed;
@@ -227,39 +231,39 @@ namespace Oetools.Sakoe.Utilities {
                 line2 = line2.PadRight(maxWidth, ' ');
             }
 
-            Console.WriteLine(line2);
+            _console.WriteLine(line2);
 
-            _lastWindowWidth = Console.WindowWidth;
+            _lastWindowWidth = _console.WindowWidth;
         }
 
         /// <summary>
         /// Clear the progress bar from the console.
         /// </summary>
         private void ClearProgressBar() {
-            int nbLines = _lastWindowWidth <= 0 ? 0 : (int) Math.Ceiling((double) (_lastWindowWidth - 1) / Console.WindowWidth);
+            int nbLines = _lastWindowWidth <= 0 ? 0 : (int) Math.Ceiling((double) (_lastWindowWidth - 1) / _console.WindowWidth);
             if (_lastLine2Width > 0) {
-                nbLines += (int) Math.Ceiling((double) _lastLine2Width / Console.WindowWidth);
+                nbLines += (int) Math.Ceiling((double) _lastLine2Width / _console.WindowWidth);
             }
 
             if (nbLines > 1) {
-                Console.SetCursorPosition(0, Console.CursorTop - nbLines);
-                Console.ResetColor();
-                Console.Write(new string(' ', Console.WindowWidth * nbLines));
-                Console.SetCursorPosition(0, Console.CursorTop - nbLines + 2);
+                _console.SetCursorPosition(0, _console.CursorTop - nbLines);
+                _console.ResetColor();
+                _console.Write(new string(' ', _console.WindowWidth * nbLines));
+                _console.SetCursorPosition(0, _console.CursorTop - nbLines + 2);
             }
 
-            _lastWindowWidth = Console.WindowWidth;
+            _lastWindowWidth = _console.WindowWidth;
         }
 
         /// <summary>
         /// Initialize progress bar.
         /// </summary>
         private void InitializeProgressBar() {
-            Console.CursorVisible = false;
+            _console.CursorVisible = false;
             _stopwatch = Stopwatch.StartNew();
-            Console.WriteLine();
-            Console.WriteLine();
-            _lastWindowWidth = Console.WindowWidth;
+            _console.WriteLine();
+            _console.WriteLine();
+            _lastWindowWidth = _console.WindowWidth;
             TaskbarProgress.SetState(TaskbarProgress.TaskbarStates.Normal);
 
             _timer = new System.Timers.Timer(MaximumRefreshRateInMilliseconds);

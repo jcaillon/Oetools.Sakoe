@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder;
@@ -12,6 +11,7 @@ using Oetools.Builder.Project.Properties;
 using Oetools.Builder.Utilities;
 using Oetools.Sakoe.Command.Exceptions;
 using Oetools.Sakoe.Utilities;
+using Oetools.Sakoe.Utilities.Extension;
 using Oetools.Utilities.Lib.Attributes;
 using Oetools.Utilities.Lib.Extension;
 
@@ -20,9 +20,9 @@ namespace Oetools.Sakoe.Command.Oe {
     [Command(
         Name, "bu",
         Description = "Build automation for Openedge projects. This command is the bread and butter of this tool.",
-        ExtendedHelpText = "Disclaimer: this command will not make your coffee... Yet!",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
+    [CommandAdditionalHelpTextAttribute(nameof(GetAdditionalHelpText))]
     internal class BuildCommand : AOeCommand {
         
         public const string Name = "build";
@@ -47,13 +47,13 @@ namespace Oetools.Sakoe.Command.Oe {
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             if (ShowBuildPropertyHelp) {
-                Out.WriteOnNewLine(null);
-                Out.WriteOnNewLine("BUILD PROPERTIES", ConsoleColor.Cyan, 1);
+                HelpFormatter.WriteOnNewLine(null);
+                HelpFormatter.WriteSectionTitle("BUILD PROPERTIES");
             
                 foreach (var property in GetAvailableBuildProperties().OrderBy(p => p.Key)) {
-                    Out.WriteOnNewLine(property.Key, padding: 3);
-                    Out.WriteOnNewLine(BuilderHelp.GetPropertyDocumentation(property.Key), padding: 20);
-                    Out.WriteOnNewLine(null);
+                    HelpFormatter.WriteOnNewLine(property.Key);
+                    HelpFormatter.WriteOnNewLine(BuilderHelp.GetPropertyDocumentation(property.Key), padding: 20);
+                    HelpFormatter.WriteOnNewLine(null);
                 }
                 return 0;
             }
@@ -124,15 +124,19 @@ namespace Oetools.Sakoe.Command.Oe {
             return 0;
         }
 
-        public static void GetAdditionalHelpText(IConsoleOutput console, CommandLineApplication application, int firstColumnWidth) {
-            console.WriteOnNewLine(null);
-            console.WriteOnNewLine("BUILD PROPERTIES", ConsoleColor.Cyan, 1);
+        public static void GetAdditionalHelpText(IHelpFormatter formatter, CommandLineApplication application, int firstColumnWidth) {
+            formatter.WriteOnNewLine(null);
+            formatter.WriteSectionTitle("BUILD PROPERTIES");
             
             foreach (var property in GetAvailableBuildProperties().OrderBy(p => p.Key)) {
-                console.WriteOnNewLine($"-p \"{property.Key}={property.Value ?? ""}\"", padding: 3);
+                formatter.WriteOnNewLine($"-p \"{property.Key}={property.Value ?? ""}\"");
             }
-            console.WriteOnNewLine(null);
-            console.WriteOnNewLine($"Display the full documentation of each build property by specifying the option {PropertyHelpLongName}.", padding: 3);
+            formatter.WriteOnNewLine(null);
+            formatter.WriteOnNewLine($"Display the full documentation of each build property by specifying the option {PropertyHelpLongName}.");
+            
+            formatter.WriteOnNewLine(null);
+            formatter.WriteSectionTitle("LEARN MORE");
+            formatter.WriteOnNewLine($"Use the command {typeof(BuildManCommand).GetFullCommandLine().PrettyQuote()} for an in-depth help of this command.");
         }
 
         private static Dictionary<string, string> GetAvailableBuildProperties() {

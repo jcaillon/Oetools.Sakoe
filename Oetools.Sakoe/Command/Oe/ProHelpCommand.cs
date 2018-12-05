@@ -39,12 +39,10 @@ namespace Oetools.Sakoe.Command.Oe {
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase
     )]
     [Subcommand(typeof(ProMsgCommand))]
-#if WINDOWSONLYBUILD
     [Subcommand(typeof(ListChmProHelpCommand))]
     [Subcommand(typeof(ChmProHelpCommand))]
     [Subcommand(typeof(KeywordProHelpCommand))]
-#endif
-    internal class ProHelpCommand : ABaseCommand {
+    internal class ProHelpCommand : AExpectSubCommand {
     }
     
     [Command(
@@ -76,8 +74,6 @@ namespace Oetools.Sakoe.Command.Oe {
             return 0;
         }
     }
-    
-#if WINDOWSONLYBUILD
     
     internal class ChmDisplayProHelpCommand : AOeDlcCommand {     
 
@@ -114,6 +110,10 @@ namespace Oetools.Sakoe.Command.Oe {
         
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
 
+            if (!Utils.IsRuntimeWindowsPlatform) {
+                throw new CommandException("This command is windows specific and can't be run on the current platform.");
+            }
+            
             var toOpen = Path.Combine(GetDlcPath(), "prohelp", ChmFileName);
 
             if (!File.Exists(toOpen)) {
@@ -141,6 +141,10 @@ namespace Oetools.Sakoe.Command.Oe {
         
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
            
+            if (!Utils.IsRuntimeWindowsPlatform) {
+                throw new CommandException("This command is windows specific and can't be run on the current platform.");
+            }
+            
             OpenChmAndWait(Path.Combine(GetDlcPath(), "prohelp", DefaultChmFileName), Keyword);
             
             return 0;
@@ -158,6 +162,10 @@ namespace Oetools.Sakoe.Command.Oe {
         
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
 
+            if (!Utils.IsRuntimeWindowsPlatform) {
+                throw new CommandException("This command is windows specific and can't be run on the current platform.");
+            }
+            
             foreach (var chmPath in Directory.EnumerateFiles(Path.Combine(GetDlcPath(), "prohelp"), "*.chm", SearchOption.TopDirectoryOnly)) {
                 Out.WriteResultOnNewLine(Path.GetFileName(chmPath));
             }
@@ -166,5 +174,4 @@ namespace Oetools.Sakoe.Command.Oe {
         }
     }
     
-#endif
 }

@@ -55,6 +55,8 @@ namespace Oetools.Sakoe.Command {
         protected ILogger Log { get; private set; }
         
         protected IConsoleOutput Out { get; private set; }
+        
+        protected IHelpFormatter HelpFormatter { get; private set; }
 
         protected CancellationToken? CancelToken => _cancelSource?.Token;
         
@@ -78,6 +80,7 @@ namespace Oetools.Sakoe.Command {
         protected int OnExecute(CommandLineApplication app, IConsole console) {
             Log = ConsoleIo.Singleton;
             Out = ConsoleIo.Singleton;
+            HelpFormatter = HelpGenerator.Singleton;
             ConsoleIo.Singleton.LogTheshold = Verbosity;
             ConsoleIo.Singleton.ProgressBarDisplayMode = ProgressBarDisplayMode ?? ConsoleProgressBarDisplayMode.On;
             if (LogOutputFilePath.HasValue) {
@@ -189,7 +192,7 @@ namespace Oetools.Sakoe.Command {
                     _numberOfCancelKeyPress++;
                     Log.Warn($"CTRL+C pressed (press {4 - _numberOfCancelKeyPress} times more for emergency exit)");
                     Log.Warn("Cancelling execution, please be patient...");
-                    Console.ResetColor();
+                    ConsoleImplementation.Singleton.ResetColor();
                     _cancelSource.Cancel();
                     if (_numberOfCancelKeyPress < 4) {
                         e.Cancel = true;

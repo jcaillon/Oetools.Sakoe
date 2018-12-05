@@ -11,35 +11,14 @@ namespace Oetools.Sakoe.Command {
     /// The main command of the application, called when the user passes no arguments/commands
     /// </summary>
     [Command(
+        Name = "sakoe",
         FullName = "SAKOE - a Swiss Army Knife for OpenEdge",
         Description = "SAKOE is a collection of tools aimed to simplify your work in Openedge environments.",
-        ExtendedHelpText = @"GETTING STARTED 
-  The '" + ManCommand.Name + @"' command is a good place to start using this tool.
-  This tool has a lot of utility commands but the bread and butter command is '" + BuildCommand.Name + @"'. It allows you to do Openedge build automation.
-
-NOTES
-  - You can escape white spaces in argument and option values by using double quotes (i.e. "")
-  - In the 'USAGE' help, arguments between brackets (i.e. []) are optionals
-
-EXIT CODE
-  The convention followed by this tool is the following.
-    0 : used when a command completed successfully, without errors nor warnings.
-    1-8 : used when a command completed but with warnings, the level can be used to pinpoint different kind of warnings.
-    9 : used when a command does not complete and ends up in error.
-
-RESPONSE FILE PARSING
-  Instead of using a long command line, you can use a response file that contains each argument/option that should be used.
-  Everything that is usually separated by a space in the command line should be separated by a new line in the file.
-  In response files, you do not have to double quote arguments containing spaces, they will be considered as a whole as long as they are on a separated line.
-    sakoe @responsefile.txt
-
-WEBSITE 
-  https://jcaillon.github.io/Oetools.Sakoe/
-",
+        ExtendedHelpText = @"The 'sakoe " + ManCommand.Name + @"' command is the best place to learn about this tool.",
         OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         ResponseFileHandling = ResponseFileHandling.ParseArgsAsLineSeparated
     )]
-    [HelpOption("-?|-h|" + HelpLongName, Description = "Show help information.", Inherited = true)]
+    [HelpOption("-?|-h|" + HelpLongName, Description = "Show this help text.", Inherited = true)]
 #if DEBUG
     [Subcommand(typeof(SelfTestCommand))]
 #endif
@@ -52,19 +31,24 @@ WEBSITE
     [Subcommand(typeof(XcodeCommand))]
     [Subcommand(typeof(HashCommand))]
     [Subcommand(typeof(ProHelpCommand))]
-    [Subcommand(typeof(UtilitiesCommand))]
+    [Subcommand(typeof(ProUtilitiesCommand))]
     [Subcommand(typeof(ProlibCommand))]
-    internal class MainCommand {
+#if !WINDOWSONLYBUILD
+    [Subcommand(typeof(CreateStarterCommand))]
+#endif
+    internal class MainCommand : AExpectSubCommand {
 
         public const string HelpLongName = "--help";
         
         public static int ExecuteMainCommand(string[] args) {
             // TODO: global configuration in an .xml next to sakoe.exe that store default verbosity, log path, http proxy and so on...
+            var console = ConsoleImplementation.Singleton;
             try {
-                Console.CursorVisible = false;
-                using (var app = new CommandLineApplicationCustomHint<MainCommand>(HelpGenerator.Singleton, PhysicalConsole.Singleton, Directory.GetCurrentDirectory(), true)) {
+                console.CursorVisible = false;
+                using (var app = new CommandLineApplicationCustomHint<MainCommand>(HelpGenerator.Singleton, console, Directory.GetCurrentDirectory(), true)) {
                     app.Conventions.UseDefaultConventions();
                     app.ParserSettings.MakeSuggestionsInErrorMessage = true;
+                    app.OptionsComparison = StringComparison.CurrentCultureIgnoreCase;
                     return app.Execute(args);
                 }
             } catch (Exception ex) {
@@ -75,7 +59,7 @@ WEBSITE
                     //if (ex is UnrecognizedCommandParsingException unrecognizedCommandParsingException) {
                     //    log.Info($"Did you mean {unrecognizedCommandParsingException.NearestMatch}?");
                     //}
-                    var nearestMatch = ex.GetType()?.GetProperty("NearestMatch")?.GetValue(ex) as string;
+                    var nearestMatch = ex.GetType().GetProperty("NearestMatch")?.GetValue(ex) as string;
                     log.Error(ex.Message);
                     log.If(!string.IsNullOrEmpty(nearestMatch))?.Info($"Did you mean {nearestMatch}?");
                     log.Info($"Specify {HelpLongName} for a list of available options and commands.");
@@ -88,18 +72,8 @@ WEBSITE
                 return ABaseCommand.FatalExitCode;
             } finally {
                 ConsoleIo.Singleton.Dispose();
-                Console.CursorVisible = true;
+                console.CursorVisible = true;
             }
-        }
-
-        private int OnExecute(CommandLineApplication app, IConsole console) {
-            var log = ConsoleIo.Singleton;
-            log.DrawLogo();
-            app.ShowHelp();
-            log.Warn(HelpGenerator.GetHelpProvideCommand(app));
-            log.Warn($"Exit code {1}");
-            log.WriteOnNewLine(null);
-            return 1;
         }
     }
 }
