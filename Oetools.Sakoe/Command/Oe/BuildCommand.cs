@@ -8,12 +8,14 @@ using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder;
 using Oetools.Builder.Project;
 using Oetools.Builder.Project.Properties;
+using Oetools.Builder.Project.Task;
 using Oetools.Builder.Utilities;
 using Oetools.Sakoe.Command.Exceptions;
 using Oetools.Sakoe.Utilities;
 using Oetools.Sakoe.Utilities.Extension;
 using Oetools.Utilities.Lib.Attributes;
 using Oetools.Utilities.Lib.Extension;
+using Oetools.Utilities.Openedge.Execution;
 
 namespace Oetools.Sakoe.Command.Oe {
     
@@ -104,6 +106,8 @@ This allow a lot of flexibility for organizing and partitioning your build proce
 
         /// <inheritdoc />
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
+            // TODO: show task error and compilation error
+            
             // show help.
             if (ShowBuildPropertyHelp) {
                 HelpFormatter.WriteOnNewLine(null);
@@ -198,6 +202,34 @@ This allow a lot of flexibility for organizing and partitioning your build proce
                 builder.CancelToken = CancelToken;
                 builder.Log = Log;
                 builder.Build();
+
+                
+                // display compilation error.
+                var compilationProblems = builder.BuildStepExecutors
+                    .Where(te => te is BuildStepExecutorBuildSource)
+                    .SelectMany(exec => exec.Tasks.ToNonNullEnumerable())
+                    .OfType<IOeTaskCompile>()
+                    .SelectMany(task => task.GetCompiledFiles().ToNonNullEnumerable())
+                    .SelectMany(file => file.CompilationProblems.ToNonNullEnumerable())
+                    .ToList();
+                if (compilationProblems.Count > 0) {
+                    Out.WriteErrorOnNewLine("Compilation errors:", indentation: 1);
+                    foreach (var filePathGrouped in compilationProblems.GroupBy(cp => cp.FilePath)) {
+                        Out.WriteErrorOnNewLine($"In {filePathGrouped.Key}:", indentation: 3);
+                        foreach (var problem in filePathGrouped) {
+                            Out.WriteErrorOnNewLine($"- {problem}", problem is UoeCompilationWarning ? ConsoleColor.Yellow : ConsoleColor.Red, 5);
+                        }
+                    }
+                }
+                
+                // display exceptions.
+                var taskExceptions = builder.TaskExecutionExceptions;
+                if (taskExceptions.Count > 0) {
+                    Out.WriteErrorOnNewLine("Task exceptions:", indentation: 1);
+                    foreach (var exception in taskExceptions) {
+                        Out.WriteErrorOnNewLine(exception.Message, exception.IsWarning ? ConsoleColor.Yellow : ConsoleColor.Red, 3);
+                    }
+                }
             }
             return 0;
         }
