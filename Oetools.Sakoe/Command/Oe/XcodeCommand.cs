@@ -17,8 +17,7 @@ namespace Oetools.Sakoe.Command.Oe {
   The original idea of the XCODE utility is to obfuscate your Openedge code before making it available.
   This is an encryption feature which uses a ASCII key/password of a maximum of 8 characters.
   The original XCODE utility uses the default key ""Progress"" if no custom key is supplied (so does this command).
-  The encryption process does not use a standard cryptography method, it uses a 16-bits CRC inside a custom algorithm.",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+  The encryption process does not use a standard cryptography method, it uses a 16-bits CRC inside a custom algorithm."
     )]
     [Subcommand(typeof(ListXcodeCommand))]
     [Subcommand(typeof(EncryptXcodeCommand))]
@@ -29,8 +28,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Command(
         "encrypt", "en",
         Description = "Encrypt files using the XCODE algorithm. Output the list of processed files.",
-        ExtendedHelpText = "",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+        ExtendedHelpText = ""
     )]
     internal class EncryptXcodeCommand : ProcessFileListBaseCommand {
         

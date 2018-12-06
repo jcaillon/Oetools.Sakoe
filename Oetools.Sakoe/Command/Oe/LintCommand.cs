@@ -10,7 +10,6 @@ namespace Oetools.Sakoe.Command.Oe {
         "lint", "li",
         Description = "TODO : prolint",
         ExtendedHelpText = "TODO : prolint",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         AllowArgumentSeparator = true
     )]
     internal class LintCommand : AOeDlcCommand {

@@ -45,7 +45,7 @@ namespace Oetools.Sakoe.Command.Oe {
             if (string.IsNullOrEmpty(dlcPath) || !Directory.Exists(dlcPath)) {
                 throw new Exception("The path to the Openedge installation directory has not been found : either use the --dlc option or set a DLC environment variable.");
             }
-            Log.Info($"Using the DLC path found in the environment variable: {dlcPath.PrettyQuote()}.");
+            Log.Debug($"Using the DLC path found in the environment variable: {dlcPath.PrettyQuote()}.");
             return dlcPath;
         }
     }

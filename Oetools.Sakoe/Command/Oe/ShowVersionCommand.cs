@@ -8,8 +8,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Command(
         "version", "ve",
         Description = "Show the version information of this tool.",
-        ExtendedHelpText = "",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+        ExtendedHelpText = ""
     )]
     internal class ShowVersionCommand : ABaseCommand {
         

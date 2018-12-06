@@ -10,8 +10,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Command(
         "project", "pr",
         Description = "TODO : db",
-        ExtendedHelpText = "TODO : db",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+        ExtendedHelpText = "TODO : db"
     )]
     [Subcommand(typeof(ConnectDatabaseProjectCommand))]
     internal class DatabaseProjectCommand : ABaseCommand {
@@ -20,8 +19,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Command(
         "create", "cr",
         Description = "TODO : repair database",
-        ExtendedHelpText = "TODO : database",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+        ExtendedHelpText = "TODO : database"
     )]
     internal class ConnectDatabaseProjectCommand : AOeDlcCommand {
         

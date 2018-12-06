@@ -15,8 +15,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Command(
         "database", "db", "da",
         Description = "TODO : db",
-        ExtendedHelpText = "TODO : db",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+        ExtendedHelpText = "TODO : db"
     )]
     [Subcommand(typeof(DatabaseProjectCommand))]
     [Subcommand(typeof(CreateDatabaseCommand))]
@@ -32,8 +31,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Command(
         "repair", "re",
         Description = "TODO : repair database",
-        ExtendedHelpText = "TODO : database",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+        ExtendedHelpText = "TODO : database"
     )]
     internal class RepairDatabaseCommand : AOeDlcCommand {
         
@@ -58,8 +56,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Command(
         "delete", "de",
         Description = "TODO : delete database",
-        ExtendedHelpText = "TODO : database",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+        ExtendedHelpText = "TODO : database"
     )]
     internal class DeleteDatabaseCommand : AOeDlcCommand {
         
@@ -85,7 +82,6 @@ namespace Oetools.Sakoe.Command.Oe {
         "stop", "sto", "proshut",
         Description = "TODO : stop database",
         ExtendedHelpText = "TODO : database",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         AllowArgumentSeparator = true
     )]
     internal class StopDatabaseCommand : AOeDlcCommand {
@@ -130,7 +126,6 @@ namespace Oetools.Sakoe.Command.Oe {
         "start", "sta", "proserve",
         Description = "TODO : database proserve",
         ExtendedHelpText = "TODO : database proserve",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         AllowArgumentSeparator = true
     )]
     internal class StartDatabaseCommand : AOeDlcCommand {
@@ -195,8 +190,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Command(
         "create", "cr",
         Description = "TODO : database creation",
-        ExtendedHelpText = "TODO : extended database creation",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+        ExtendedHelpText = "TODO : extended database creation"
     )]
     internal class CreateDatabaseCommand : AOeDlcCommand {
         

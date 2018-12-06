@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <AssemblyName>sakoe</AssemblyName>
     <RootNamespace>Oetools.Sakoe</RootNamespace>
-    <Version>0.2.0-beta</Version>
+    <Version>0.9.0-beta</Version>
     <!-- Assembly.GetExecutingAssembly().GetName().Version = $(Version) but completed if necessary to make a 4 digit version and without what is after the dash -->
     <!-- FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductVersion = $(Version) -->
     <!-- FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion = $(FileVersion) -->

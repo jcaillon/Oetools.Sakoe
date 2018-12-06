@@ -22,9 +22,9 @@ using System;
 
 namespace Oetools.Sakoe.Utilities {
     public interface IHelpFormatter {
-        void WriteOnNewLine(string result, ConsoleColor? color = null, int padding = 0);
-        void Write(string result, ConsoleColor? color = null, int padding = 0);
-        void WriteSectionTitle(string result);
-        void WriteTip(string result, int padding = 0);
+        void WriteOnNewLine(string result, ConsoleColor? color = null, int padding = 0, string prefixForNewLines = null);
+        void Write(string result, ConsoleColor? color = null, int padding = 0, string prefixForNewLines = null);
+        void WriteSectionTitle(string result, int padding = 0);
+        void WriteTip(string result, int padding = 0, string prefixForNewLines = null);
     }
 }

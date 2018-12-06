@@ -73,10 +73,11 @@ namespace Oetools.Sakoe.Utilities {
         /// </summary>
         /// <param name="message">the message to write</param>
         /// <param name="writeToNewLine">write the message to a separated line (otherwise continue to output on the same line)</param>
-        /// <param name="indentation">the indentation to give to the message when written on a new line</param>
+        /// <param name="indentation">Apply indentation when writing on a new line.</param>
         /// <param name="underLyingWriter"></param>
+        /// <param name="prefixForNewLines">The text to put at the beginning of each new line that need to be created because of word wrap.</param>
         /// <param name="maximumLineLength"></param>
-        public void Write(string message, bool writeToNewLine, int indentation, TextWriter underLyingWriter = null, int? maximumLineLength = null) {
+        public void Write(string message, bool writeToNewLine, int indentation, TextWriter underLyingWriter = null, string prefixForNewLines = null, int? maximumLineLength = null) {
             
             // check message
             if (message == null) {
@@ -124,7 +125,13 @@ namespace Oetools.Sakoe.Utilities {
                     do {
                         // write a new line
                         if (writeToNewLine && HasWroteToOuput || _currentConsoleLineSpaceTaken >= maxLineWidth) {
-                            WriteLine(underLyingWriter);
+                            if (newInputLineStarting || string.IsNullOrEmpty(prefixForNewLines)) {
+                                WriteLine(underLyingWriter);
+                            } else {
+                                var newLinePrefix = prefixForNewLines.PadRight(Math.Max(0, indentation + paragraphIndent));
+                                WriteLine(underLyingWriter, $"{UnderLyingWriter.NewLine}{newLinePrefix}");
+                                _currentConsoleLineSpaceTaken += newLinePrefix.Length;
+                            }
                         }
                         
                         int lineLength = eolPosition - lineStartPos;

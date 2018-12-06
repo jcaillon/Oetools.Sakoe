@@ -24,7 +24,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder.Utilities;
 using Oetools.Utilities.Lib.Extension;
 using Utils = Oetools.Utilities.Lib.Utils;
@@ -213,39 +212,39 @@ namespace Oetools.Sakoe.Utilities {
         }
 
         /// <inheritdoc />
-        public override void WriteResult(string result, ConsoleColor? color = null) {
+        public override void WriteResult(string text, ConsoleColor? color = null) {
             StopProgressBar();
-            base.WriteResult(result, color);
+            base.WriteResult(text, color);
         }
 
         /// <inheritdoc />
-        public override void WriteResultOnNewLine(string result, ConsoleColor? color = null) {
+        public override void WriteResultOnNewLine(string text, ConsoleColor? color = null) {
             StopProgressBar();
-            base.WriteResultOnNewLine(result, color);
+            base.WriteResultOnNewLine(text, color);
         }
         
         /// <inheritdoc />
-        public override void Write(string result, ConsoleColor? color = null, int padding = 0) {
+        public override void Write(string text, ConsoleColor? color = null, int indentation = 0, string prefixForNewLines = null) {
             StopProgressBar();
-            base.Write(result, color, padding);
+            base.Write(text, color, indentation, prefixForNewLines);
         }
 
         /// <inheritdoc />
-        public override void WriteOnNewLine(string result, ConsoleColor? color = null, int padding = 0) {
+        public override void WriteOnNewLine(string text, ConsoleColor? color = null, int indentation = 0, string prefixForNewLines = null) {
             StopProgressBar();
-            base.WriteOnNewLine(result, color, padding);
+            base.WriteOnNewLine(text, color, indentation, prefixForNewLines);
         }
         
         /// <inheritdoc />
-        public override void WriteError(string result, ConsoleColor? color = null, int padding = 0) {
+        public override void WriteError(string text, ConsoleColor? color = null, int indentation = 0, string prefixForNewLines = null) {
             StopProgressBar();
-            base.WriteError(result, color, padding);
+            base.WriteError(text, color, indentation, prefixForNewLines);
         }
 
         /// <inheritdoc />
-        public override void WriteErrorOnNewLine(string result, ConsoleColor? color = null, int padding = 0) {
+        public override void WriteErrorOnNewLine(string text, ConsoleColor? color = null, int indentation = 0, string prefixForNewLines = null) {
             StopProgressBar();
-            base.WriteErrorOnNewLine(result, color, padding);
+            base.WriteErrorOnNewLine(text, color, indentation, prefixForNewLines);
         }
 
 

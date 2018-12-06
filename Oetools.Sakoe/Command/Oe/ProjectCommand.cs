@@ -16,8 +16,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Command(
         "project", "pr",
         Description = "Commands related to an Openedge project (.oe directory).",
-        ExtendedHelpText = "",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+        ExtendedHelpText = ""
     )]
     [Subcommand(typeof(ProjectInitCommand))]
     [Subcommand(typeof(ProjectGitignoreCommand))]
@@ -28,8 +27,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Command(
         "init", "in",
         Description = "Initialize a new Openedge project file (" + OeBuilderConstants.OeProjectExtension + ").",
-        ExtendedHelpText = "",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+        ExtendedHelpText = ""
     )]
     internal class ProjectInitCommand : ABaseCommand {
         

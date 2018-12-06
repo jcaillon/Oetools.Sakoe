@@ -19,8 +19,7 @@ namespace Oetools.Sakoe.Command.Oe {
     
     [Command(
         Name, "bu",
-        Description = "Build automation for Openedge projects. This command is the bread and butter of this tool.",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+        Description = "Build automation for Openedge projects. This command is the bread and butter of this tool."
     )]
     [CommandAdditionalHelpTextAttribute(nameof(GetAdditionalHelpText))]
     internal class BuildCommand : AOeCommand {
@@ -28,23 +27,35 @@ namespace Oetools.Sakoe.Command.Oe {
         public const string Name = "build";
         private const string PropertyHelpLongName = "--property-help";
         private const string ConfigurationNameLongName = "--config-name";
+        private const string ExtraConfigOption = "extra-config";
         
         [LegalFilePath]
-        [Argument(0, "[<project>]", "Path or name of the project file. The " + OeBuilderConstants.OeProjectExtension + " extension is optional. Defaults to the " + OeBuilderConstants.OeProjectExtension + " file found. The search is done in the current directory and in the " + OeBuilderConstants.OeProjectDirectory + " directory when it exists.")]
+        [Argument(0, "[<project>]", "Path or name of the project file. The " + OeBuilderConstants.OeProjectExtension + " extension is optional. Defaults to the " + OeBuilderConstants.OeProjectExtension + " file found.\nThe search is done in the current directory and in the " + OeBuilderConstants.OeProjectDirectory + " directory when it exists.")]
         public string ProjectFile { get; set; }
 
         [Option("-c|" + ConfigurationNameLongName + " <config>", "The name of the build configuration to use for the build. This name is found in the " + OeBuilderConstants.OeProjectExtension + " file.\nDefaults to the first build configuration found in the project file.", CommandOptionType.SingleValue)]
         public string ConfigurationName { get; set; }
         
-        [Option(CommandOptionType.MultipleValue, ShortName = "e", LongName = "extra-proj", ValueName = "project=config", Description = "In addition to the base build configuration specified by <project> and " + ConfigurationNameLongName + ", you can dynamically add a child configuration to the base configuration with this option. This option can be used multiple times, each new configuration will be added as a child of the previously defined configuration.\nThis option allows you to share, with your colleagues, a common project file that holds the property of your application and have an extra configuration in local (just for you) which you can use to build the project in a specific local directory.\nFor each extra configuration, specify the path or the name of the project file and the configuration name to use. If the project file name if empty, the main <project> is used.")]
+        [Option(CommandOptionType.MultipleValue, ShortName = "e", LongName = ExtraConfigOption, ValueName = "project=config", Description = @"In addition to the base build configuration specified by <project> and " + ConfigurationNameLongName + @", you can dynamically add a child configuration to the base configuration with this option. This option can be used multiple times, each new configuration will be added as a child of the previously defined configuration.
+This option allows you to share, with your colleagues, a common project file that holds the property of your application and have an extra configuration in local (just for you) which you can use to build the project in a specific local directory.
+For each extra configuration, specify the path or the name of the project file and the configuration name to use. If the project file name if empty, the main <project> is used.")]
         public string[] ExtraConfigurations { get; set; }
 
-        [Option(CommandOptionType.MultipleValue, ShortName = "p", LongName = "property", ValueName = "key=value", Description = "A pair of key/value to dynamically set a property for this build. The value set this way will prevail over the value defined in the project file.\nEach pair should specify the name of the property to set and the value that should be used.\nUse the option " + PropertyHelpLongName + " to see the full list of properties available as well as their documentation.")]
+        [Option(CommandOptionType.MultipleValue, ShortName = "p", LongName = "property", ValueName = "key=value", Description = @"A pair of key/value to dynamically set a property for this build. The value set this way will prevail over the value defined in a project file.
+Each pair should specify the name of the property to set and the value that should be used.
+Use the option " + PropertyHelpLongName + " to see the full list of properties available as well as their documentation.")]
         public string[] BuildProperties { get; set; }
+
+        [Option(CommandOptionType.MultipleValue, ShortName = "v", LongName = "variable", ValueName = "key=value", Description = @"A pair of key/value to dynamically set a variable for this build. A variable set this way will prevail over a variable with the same name defined in a project file.
+Each pair should specify the name of the variable to set and the value that should be used.")]
+        public string[] BuildVariables { get; set; }
         
         [Option("-ph|" + PropertyHelpLongName, "Shows the list of each build property usable with its full documentation.", CommandOptionType.NoValue)]
         public bool ShowBuildPropertyHelp { get; set; }
 
+        /// <summary>
+        /// Additional help
+        /// </summary>
         public static void GetAdditionalHelpText(IHelpFormatter formatter, CommandLineApplication application, int firstColumnWidth) {
             formatter.WriteOnNewLine(null);
             formatter.WriteSectionTitle("BUILD PROPERTIES");
@@ -56,11 +67,44 @@ namespace Oetools.Sakoe.Command.Oe {
             formatter.WriteTip($"Display the full documentation of each build property by running '{application.GetFullCommandLine()} {PropertyHelpLongName}'.");
             
             formatter.WriteOnNewLine(null);
-            formatter.WriteSectionTitle("LEARN MORE");
-            formatter.WriteOnNewLine($"Use the command {typeof(BuildManCommand).GetFullCommandLine().PrettyQuote()} for an in-depth help of this command.");
+            formatter.WriteSectionTitle("EXTRA CONFIG");
+            formatter.WriteOnNewLine($"The example below illustrate the usage of the --{ExtraConfigOption} option:");
+            formatter.WriteOnNewLine(@"We have 2 project files (p1 and p2) containing build configurations as described below:
+
+p1" + OeBuilderConstants.OeProjectExtension + @"
+├─ Configuration1
+└─ Configuration2
+
+p2" + OeBuilderConstants.OeProjectExtension + @"
+└─ Configuration3
+   ├─ Configuration4
+   │  ├─ Configuration5
+   │  └─ Configuration6
+   └─ Configuration7
+
+We use the following command line to start a build:", padding: 2);
+            formatter.WriteOnNewLine(null);
+            formatter.WriteOnNewLine($"{application.GetFullCommandLine()} p1 {ConfigurationNameLongName} Configuration1 --{ExtraConfigOption} p2=Configuration6 --{ExtraConfigOption} Configuration2 ", padding: 4);
+            formatter.WriteOnNewLine(null);
+            formatter.WriteOnNewLine(@"Below is the equivalent of how build configurations are nested in this scenario:
+
+Configuration1
+└─ Configuration3
+   └─ Configuration4
+      └─ Configuration6
+         └─ Configuration2
+
+This allow a lot of flexibility for organizing and partitioning your build process.", padding: 2);
+            
+            formatter.WriteOnNewLine(null);
+            formatter.WriteSectionTitle("NOTES");
+            formatter.WriteOnNewLine($"Create a new project file using the command: {typeof(ProjectInitCommand).GetFullCommandLine().PrettyQuote()}.");
+            formatter.WriteOnNewLine($"Get a more in-depth help and learn about the concept of a build (in sakoe) using the command: {typeof(BuildManCommand).GetFullCommandLine().PrettyQuote()}.");
         }
-        
+
+        /// <inheritdoc />
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
+            // show help.
             if (ShowBuildPropertyHelp) {
                 HelpFormatter.WriteOnNewLine(null);
                 HelpFormatter.WriteSectionTitle("BUILD PROPERTIES");
@@ -129,9 +173,28 @@ namespace Oetools.Sakoe.Command.Oe {
                 }
             }
             
+            // check variables
+            List<OeVariable> addedVariables = null;
+            if (BuildVariables != null) {
+                addedVariables = new List<OeVariable>();
+                foreach (var kpv in BuildVariables) {
+                    var split = kpv.Split('=');
+                    if (split.Length != 2) {
+                        throw new CommandValidationException($"There should be exactly one character '=' in the variable definition {kpv.PrettyQuote()}.");
+                    }
+                    addedVariables.Add(new OeVariable {
+                        Name = split[0],
+                        Value = split[1]
+                    });
+                }
+            }
+            
             var config = OeProject.GetBuildConfigurationCopy(configQueue);
             using (var builder = new BuilderAuto(config)) {
                 builder.BuildConfiguration.Properties.SetPropertiesFromKeyValuePairs(keyValueProperties);
+                if (addedVariables != null) {
+                    builder.BuildConfiguration.Variables.AddRange(addedVariables);
+                }
                 builder.CancelToken = CancelToken;
                 builder.Log = Log;
                 builder.Build();
@@ -139,6 +202,10 @@ namespace Oetools.Sakoe.Command.Oe {
             return 0;
         }
 
+        /// <summary>
+        /// Returns a dictionary of property NAME -> DEFAULT VALUE for all the available properties.
+        /// </summary>
+        /// <returns></returns>
         private static Dictionary<string, string> GetAvailableBuildProperties() {
             var properties = new Dictionary<string, string>();
             foreach (var type in new List<Type> { typeof(OeProperties), typeof(OeSourceFilterOptions), typeof(OePropathFilterOptions), typeof(OeIncrementalBuildOptions), typeof(OeGitFilterOptions), typeof(OeCompilationOptions), typeof(OeBuildOptions) }) {

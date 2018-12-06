@@ -1,7 +1,8 @@
 #region header
+
 // ========================================================================
 // Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
-// This file (CommandLineApplication2.cs) is part of Oetools.Sakoe.
+// This file (Convention.cs) is part of Oetools.Sakoe.
 // 
 // Oetools.Sakoe is a free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,21 +17,23 @@
 // You should have received a copy of the GNU General Public License
 // along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
+
 #endregion
 
+using System;
 using McMaster.Extensions.CommandLineUtils;
-using McMaster.Extensions.CommandLineUtils.HelpText;
+using McMaster.Extensions.CommandLineUtils.Conventions;
 
 namespace Oetools.Sakoe.Command {
-    
-    public class CommandLineApplicationCustomHint<TModel> : CommandLineApplication<TModel> where TModel : class {
-
-        private readonly IConsole _console;
-        
-        public CommandLineApplicationCustomHint(IHelpTextGenerator helpTextGenerator, IConsole console, string workingDirectory, bool throwOnUnexpectedArg) : base(helpTextGenerator, console, workingDirectory, throwOnUnexpectedArg) {
-            _console = console;
+    public class CommandCommonOptionsConvention : IConvention {
+        /// <inheritdoc />
+        public void Apply(ConventionContext context) {
+            if (context.ModelType == null) {
+                return;
+            }
+            context.Application.OptionsComparison = StringComparison.CurrentCultureIgnoreCase;
+            context.Application.ResponseFileHandling = ResponseFileHandling.ParseArgsAsLineSeparated;
+            context.Application.ParserSettings.MakeSuggestionsInErrorMessage = true;
         }
-        
-        public override void ShowHint() { }
     }
 }

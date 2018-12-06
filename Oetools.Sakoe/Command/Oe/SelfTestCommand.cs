@@ -15,8 +15,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Command(
         "selftest", "st",
         Description = "A command to test the behaviour of this tool.",
-        ExtendedHelpText = "sakoe selftest",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+        ExtendedHelpText = "sakoe selftest"
     )]
     [Subcommand(typeof(LogSelfTestCommand))]
     [Subcommand(typeof(InputSelfTestCommand))]
@@ -29,8 +28,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Command(
         "consoleformat", "cf",
         Description = "Subcommand that shows the use of CsConsoleFormat",
-        ExtendedHelpText = "sakoe selftest consoleformat",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+        ExtendedHelpText = "sakoe selftest consoleformat"
     )]
     internal class ConsoleFormatSelfTestCommand : ABaseCommand {
 
@@ -94,8 +92,7 @@ nibh.") { Align = Align.Right ,Stroke = LineThickness.None },
     [Command(
         "wrap", "wr",
         Description = "Subcommand that shows the word wrap",
-        ExtendedHelpText = "sakoe selftest wrap",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+        ExtendedHelpText = "sakoe selftest wrap"
     )]
     internal class WrapSelfTestCommand : ABaseCommand {
 
@@ -135,7 +132,6 @@ nibh.") { Align = Align.Right ,Stroke = LineThickness.None },
         Description = "Subcommand that shows the usage of options and arguments",
         ExtendedHelpText = @"sakoe st input boom.txt --attachment first --attachment ""second with spaces""
 sakoe st input -b2 s1024",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         AllowArgumentSeparator = true
     )]
     internal class InputSelfTestCommand : ABaseCommand {
@@ -261,7 +257,6 @@ sakoe st input -b2 s1024",
         "responsefile", "rf",
         Description = "Subcommand that shows the usage of a response file",
         ExtendedHelpText = "sakoe selftest responsefile",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
         AllowArgumentSeparator = true
     )]
     internal class ResponseFileSelfTestCommand : ABaseCommand {
@@ -292,8 +287,7 @@ sakoe st input -b2 s1024",
     [Command(
         "prompt", "prompt",
         Description = "Subcommand that shows the usage of prompt",
-        ExtendedHelpText = "sakoe selftest prompt",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+        ExtendedHelpText = "sakoe selftest prompt"
     )]
     internal class PromptSelfTestCommand : ABaseCommand {
 
@@ -326,8 +320,7 @@ sakoe st input -b2 s1024",
     [Command(
         "log", "l",
         Description = "Subcommand that shows the usage of log",
-        ExtendedHelpText = "sakoe selftest log",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+        ExtendedHelpText = "sakoe selftest log"
     )]
     internal class LogSelfTestCommand : ABaseCommand {
 

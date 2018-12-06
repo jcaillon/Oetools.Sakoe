@@ -13,10 +13,7 @@ namespace Oetools.Sakoe.Command {
     [Command(
         Name = "sakoe",
         FullName = "SAKOE - a Swiss Army Knife for OpenEdge",
-        Description = "SAKOE is a collection of tools aimed to simplify your work in Openedge environments.",
-        ExtendedHelpText = @"The 'sakoe " + ManCommand.Name + @"' command is the best place to learn about this tool.",
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase,
-        ResponseFileHandling = ResponseFileHandling.ParseArgsAsLineSeparated
+        Description = "SAKOE is a collection of tools aimed to simplify your work in Openedge environments."
     )]
     [HelpOption("-?|-h|" + HelpLongName, Description = "Show this help text.", Inherited = true)]
 #if DEBUG
@@ -36,9 +33,18 @@ namespace Oetools.Sakoe.Command {
 #if !WINDOWSONLYBUILD
     [Subcommand(typeof(CreateStarterCommand))]
 #endif
+    [CommandAdditionalHelpTextAttribute(nameof(GetAdditionalHelpText))]
     internal class MainCommand : AExpectSubCommand {
 
         public const string HelpLongName = "--help";
+        
+        public static void GetAdditionalHelpText(IHelpFormatter formatter, CommandLineApplication application, int firstColumnWidth) {
+            formatter.WriteOnNewLine(null);
+            formatter.WriteSectionTitle("HOW TO");
+            formatter.WriteOnNewLine($"Start by reading the manual for this tool: {typeof(ManCommand).GetFullCommandLine()}.");
+            formatter.WriteOnNewLine($"Get a full list of commands available: {typeof(ListAllCommandsManCommand).GetFullCommandLine()}.");
+
+        }
         
         public static int ExecuteMainCommand(string[] args) {
             // TODO: global configuration in an .xml next to sakoe.exe that store default verbosity, log path, http proxy and so on...
@@ -47,8 +53,7 @@ namespace Oetools.Sakoe.Command {
                 console.CursorVisible = false;
                 using (var app = new CommandLineApplicationCustomHint<MainCommand>(HelpGenerator.Singleton, console, Directory.GetCurrentDirectory(), true)) {
                     app.Conventions.UseDefaultConventions();
-                    app.ParserSettings.MakeSuggestionsInErrorMessage = true;
-                    app.OptionsComparison = StringComparison.CurrentCultureIgnoreCase;
+                    app.Conventions.AddConvention(new CommandCommonOptionsConvention());
                     return app.Execute(args);
                 }
             } catch (Exception ex) {

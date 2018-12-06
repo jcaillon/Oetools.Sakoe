@@ -240,19 +240,26 @@ namespace Oetools.Sakoe.Utilities {
 
         private int _currentPadding;
 
-        public virtual void WriteOnNewLine(string result, ConsoleColor? color = null, int padding = 0) {
-            _console.WriteOnNewLine(result, color, padding + DefaultPadding + _currentPadding);
+        /// <inheritdoc cref="IConsoleOutput.WriteOnNewLine"/>
+        public virtual void WriteOnNewLine(string result, ConsoleColor? color = null, int padding = 0, string prefixForNewLines = null) {
+            _console.WriteOnNewLine(result, color, padding + DefaultPadding + _currentPadding, DefaultPadding + _currentPadding == 0 || string.IsNullOrEmpty(prefixForNewLines) ? prefixForNewLines : prefixForNewLines.PadLeft(prefixForNewLines.Length + DefaultPadding + _currentPadding, ' '));
         }
-        public virtual void Write(string result, ConsoleColor? color = null, int padding = 0) {
-            _console.Write(result, color, padding + DefaultPadding + _currentPadding);
+        
+        /// <inheritdoc cref="IConsoleOutput.Write"/>
+        public virtual void Write(string result, ConsoleColor? color = null, int padding = 0, string prefixForNewLines = null) {
+            _console.Write(result, color, padding + DefaultPadding + _currentPadding, DefaultPadding + _currentPadding == 0 || string.IsNullOrEmpty(prefixForNewLines) ? prefixForNewLines : prefixForNewLines.PadLeft(prefixForNewLines.Length + DefaultPadding + _currentPadding, ' '));
         }
-        public virtual void WriteSectionTitle(string result) {
+        
+        public virtual void WriteSectionTitle(string result, int padding = 0) {
             _currentPadding = 0;
-            _console.WriteOnNewLine(result, ConsoleColor.Cyan, DefaultPadding + _currentPadding);
+            _console.WriteOnNewLine(result, ConsoleColor.Cyan, padding + DefaultPadding + _currentPadding);
             _currentPadding = SectionPadding;
         }
-        public virtual void WriteTip(string result, int padding = 0) {
-            _console.WriteOnNewLine(result, ConsoleColor.Gray, padding + DefaultPadding + _currentPadding);
+        
+        /// <inheritdoc cref="IConsoleOutput.Write"/>
+        /// <summary>Write a tip.</summary>
+        public virtual void WriteTip(string result, int padding = 0, string prefixForNewLines = null) {
+            _console.WriteOnNewLine(result, ConsoleColor.Gray, padding + DefaultPadding + _currentPadding, DefaultPadding + _currentPadding == 0 || string.IsNullOrEmpty(prefixForNewLines) ? prefixForNewLines : prefixForNewLines.PadLeft(prefixForNewLines.Length + DefaultPadding + _currentPadding, ' '));
         }
 
     }

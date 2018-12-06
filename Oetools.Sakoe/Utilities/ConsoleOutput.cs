@@ -48,42 +48,42 @@ namespace Oetools.Sakoe.Utilities {
         }
         
         /// <inheritdoc />
-        public virtual void WriteResult(string result, ConsoleColor? color = null) {
+        public virtual void WriteResult(string text, ConsoleColor? color = null) {
             _console.ForegroundColor = color ?? _originalForegroundColor;
-            (OutputTextWriter ?? _console.Out).Write(result);
+            (OutputTextWriter ?? _console.Out).Write(text);
             WordWrapWriter.HasWroteToOuput = true;
         }
 
         /// <inheritdoc />
-        public virtual void WriteResultOnNewLine(string result, ConsoleColor? color = null) {
+        public virtual void WriteResultOnNewLine(string text, ConsoleColor? color = null) {
             if (WordWrapWriter.HasWroteToOuput) {
                 WordWrapWriter.WriteLine(OutputTextWriter ?? _console.Out);
             }
-            WriteResult(result, color);
+            WriteResult(text, color);
         }
         
         /// <inheritdoc />
-        public virtual void Write(string result, ConsoleColor? color = null, int padding = 0) {
+        public virtual void Write(string text, ConsoleColor? color = null, int indentation = 0, string prefixForNewLines = null) {
             _console.ForegroundColor = color ?? _originalForegroundColor;
-            WordWrapWriter.Write(result, false, padding, OutputTextWriter ?? _console.Out);
+            WordWrapWriter.Write(text, false, indentation, OutputTextWriter ?? _console.Out, prefixForNewLines);
         }
 
         /// <inheritdoc />
-        public virtual void WriteOnNewLine(string result, ConsoleColor? color = null, int padding = 0) {
+        public virtual void WriteOnNewLine(string text, ConsoleColor? color = null, int indentation = 0, string prefixForNewLines = null) {
             _console.ForegroundColor = color ?? _originalForegroundColor;
-            WordWrapWriter.Write(result, true, padding, OutputTextWriter ?? _console.Out);
+            WordWrapWriter.Write(text, true, indentation, OutputTextWriter ?? _console.Out, prefixForNewLines);
         }
 
         /// <inheritdoc />
-        public virtual void WriteError(string result, ConsoleColor? color = null, int padding = 0) {
+        public virtual void WriteError(string text, ConsoleColor? color = null, int indentation = 0, string prefixForNewLines = null) {
             _console.ForegroundColor = color ?? _originalForegroundColor;
-            WordWrapWriter.Write(result, false, padding, OutputTextWriter ?? _console.Error);
+            WordWrapWriter.Write(text, false, indentation, OutputTextWriter ?? _console.Error, prefixForNewLines);
         }
 
         /// <inheritdoc />
-        public virtual void WriteErrorOnNewLine(string result, ConsoleColor? color = null, int padding = 0) {
+        public virtual void WriteErrorOnNewLine(string text, ConsoleColor? color = null, int indentation = 0, string prefixForNewLines = null) {
             _console.ForegroundColor = color ?? _originalForegroundColor;
-            WordWrapWriter.Write(result, true, padding, OutputTextWriter ?? _console.Error);
+            WordWrapWriter.Write(text, true, indentation, OutputTextWriter ?? _console.Error, prefixForNewLines);
         }
 
         /// <summary>

@@ -27,48 +27,52 @@ namespace Oetools.Sakoe.Utilities {
         /// <summary>
         /// Writes a result (no word wrap), appending to the existing line.
         /// </summary>
-        /// <param name="result"></param>
+        /// <param name="text"></param>
         /// <param name="color"></param>
-        void WriteResult(string result, ConsoleColor? color = null);
+        void WriteResult(string text, ConsoleColor? color = null);
         
         /// <summary>
         /// Writes a result (no word wrap) on a new line.
         /// </summary>
-        /// <param name="result"></param>
+        /// <param name="text"></param>
         /// <param name="color"></param>
-        void WriteResultOnNewLine(string result, ConsoleColor? color = null);
-        
+        void WriteResultOnNewLine(string text, ConsoleColor? color = null);
+
         /// <summary>
         /// Writes text, appending to the current line. Has word wrap.
         /// </summary>
-        /// <param name="result"></param>
-        /// <param name="color"></param>
-        /// <param name="padding"></param>
-        void Write(string result, ConsoleColor? color = null, int padding = 0);
+        /// <param name="text">The text to write.</param>
+        /// <param name="color">The color to use.</param>
+        /// <param name="indentation">Apply indentation when writing on a new line.</param>
+        /// <param name="prefixForNewLines">The text to put at the beginning of each new line that need to be created because of word wrap.</param>
+        void Write(string text, ConsoleColor? color = null, int indentation = 0, string prefixForNewLines = null);
         
         /// <summary>
         /// Writes text on a new line. Has word wrap.
         /// </summary>
-        /// <param name="result"></param>
-        /// <param name="color"></param>
-        /// <param name="padding"></param>
-        void WriteOnNewLine(string result, ConsoleColor? color = null, int padding = 0);
+        /// <param name="text">The text to write.</param>
+        /// <param name="color">The color to use.</param>
+        /// <param name="indentation">Apply indentation when writing on a new line.</param>
+        /// <param name="prefixForNewLines">The text to put at the beginning of each new line that need to be created because of word wrap.</param>
+        void WriteOnNewLine(string text, ConsoleColor? color = null, int indentation = 0, string prefixForNewLines = null);
         
         /// <summary>
         /// Writes a new error, appending to the current line. Has word wrap.
         /// </summary>
-        /// <param name="result"></param>
-        /// <param name="color"></param>
-        /// <param name="padding"></param>
-        void WriteError(string result, ConsoleColor? color = null, int padding = 0);
+        /// <param name="text">The text to write.</param>
+        /// <param name="color">The color to use.</param>
+        /// <param name="indentation">Apply indentation when writing on a new line.</param>
+        /// <param name="prefixForNewLines">The text to put at the beginning of each new line that need to be created because of word wrap.</param>
+        void WriteError(string text, ConsoleColor? color = null, int indentation = 0, string prefixForNewLines = null);
         
         /// <summary>
         /// Writes an error on a new line. Has word wrap.
         /// </summary>
-        /// <param name="result"></param>
-        /// <param name="color"></param>
-        /// <param name="padding"></param>
-        void WriteErrorOnNewLine(string result, ConsoleColor? color = null, int padding = 0);
+        /// <param name="text">The text to write.</param>
+        /// <param name="color">The color to use.</param>
+        /// <param name="indentation">Apply indentation when writing on a new line.</param>
+        /// <param name="prefixForNewLines">The text to put at the beginning of each new line that need to be created because of word wrap.</param>
+        void WriteErrorOnNewLine(string text, ConsoleColor? color = null, int indentation = 0, string prefixForNewLines = null);
         
         /// <summary>
         /// Draw the logo.
