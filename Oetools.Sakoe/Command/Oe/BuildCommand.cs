@@ -213,21 +213,32 @@ This allow a lot of flexibility for organizing and partitioning your build proce
                     .SelectMany(file => file.CompilationProblems.ToNonNullEnumerable())
                     .ToList();
                 if (compilationProblems.Count > 0) {
-                    Out.WriteErrorOnNewLine("Compilation errors:", indentation: 1);
-                    foreach (var filePathGrouped in compilationProblems.GroupBy(cp => cp.FilePath)) {
-                        Out.WriteErrorOnNewLine($"In {filePathGrouped.Key}:", indentation: 3);
+                    Out.WriteErrorOnNewLine(null);
+                    Out.WriteErrorOnNewLine("COMPILATION ERRORS", ConsoleColor.Yellow, 1);
+                    var groups = compilationProblems.GroupBy(cp => cp.FilePath).ToList();
+                    var i = 0;
+                    foreach (var filePathGrouped in groups) {
+                        Out.WriteErrorOnNewLine($"{(groups.Count - 1 == i ? "└─ " : "├─ ")}In {filePathGrouped.Key}:", indentation: 1);
+                        var j = 0;
                         foreach (var problem in filePathGrouped) {
-                            Out.WriteErrorOnNewLine($"- {problem}", problem is UoeCompilationWarning ? ConsoleColor.Yellow : ConsoleColor.Red, 5);
+                            Out.WriteErrorOnNewLine($"{(groups.Count - 1 == i ? "   " : "│  ")}{(filePathGrouped.Count() - 1 == j ? "└─ " : "├─ ")}", indentation: 1);
+                            Out.WriteError(problem.ToString(), problem is UoeCompilationWarning ? ConsoleColor.Yellow : ConsoleColor.Red, 1);
+                            j++;
                         }
+                        i++;
                     }
                 }
                 
                 // display exceptions.
                 var taskExceptions = builder.TaskExecutionExceptions;
                 if (taskExceptions.Count > 0) {
-                    Out.WriteErrorOnNewLine("Task exceptions:", indentation: 1);
+                    Out.WriteErrorOnNewLine(null);
+                    Out.WriteErrorOnNewLine("TASK EXCEPTIONS", ConsoleColor.Yellow, 1);
+                    var i = 0;
                     foreach (var exception in taskExceptions) {
-                        Out.WriteErrorOnNewLine(exception.Message, exception.IsWarning ? ConsoleColor.Yellow : ConsoleColor.Red, 3);
+                        Out.WriteErrorOnNewLine(taskExceptions.Count - 1 == i ? "└─ " : "├─ ", indentation: 1);
+                        Out.WriteError(exception.Message, exception.IsWarning ? ConsoleColor.Yellow : ConsoleColor.Red, 3);
+                        i++;
                     }
                 }
             }

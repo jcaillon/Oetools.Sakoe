@@ -257,7 +257,7 @@ namespace Oetools.Sakoe.Utilities {
                 return;
             }
             var elapsed = _stopwatch.Elapsed;
-            var outputMessage = $"{level.ToString().ToUpper().PadRight(5, ' ')} [{elapsed.Hours:D2}:{elapsed.Minutes:D2}:{elapsed.Seconds:D2}.{elapsed.Milliseconds:D3}] {message}";
+            var logPrefix = $"{level.ToString().ToUpper().PadRight(5, ' ')} [{elapsed.Hours:D2}:{elapsed.Minutes:D2}:{elapsed.Seconds:D2}.{elapsed.Milliseconds:D3}] ";
             
             ConsoleColor outputColor;
             switch (level) {
@@ -284,12 +284,14 @@ namespace Oetools.Sakoe.Utilities {
             }
 
             if (level >= ConsoleLogThreshold.Error) {
-                base.WriteErrorOnNewLine(outputMessage, outputColor);
+                base.WriteErrorOnNewLine(logPrefix, outputColor);
+                base.WriteError(message, outputColor, logPrefix.Length);
             } else {
-                base.WriteOnNewLine(outputMessage, outputColor);
+                base.WriteOnNewLine(logPrefix, outputColor);
+                base.Write(message, outputColor, logPrefix.Length);
             }
             if (e != null && LogTheshold <= ConsoleLogThreshold.Debug) {
-                base.WriteErrorOnNewLine(e.ToString(), ConsoleColor.DarkGray);
+                base.WriteErrorOnNewLine(e.ToString(), ConsoleColor.DarkGray, logPrefix.Length);
             }
         }
 
