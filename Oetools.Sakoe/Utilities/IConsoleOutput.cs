@@ -22,6 +22,7 @@ using System;
 using System.IO;
 
 namespace Oetools.Sakoe.Utilities {
+    
     public interface IConsoleOutput {
         
         /// <summary>
@@ -78,6 +79,18 @@ namespace Oetools.Sakoe.Utilities {
         /// Draw the logo.
         /// </summary>
         void DrawLogo();
+
+        /// <summary>
+        /// Starts a new "tree" node. Write the next text as a node and subsequent texts as children of this node.
+        /// </summary>
+        /// <returns></returns>
+        IConsoleOutput PushNode(bool isLastChild = false);
+        
+        /// <summary>
+        /// Ends a "tree" node. The next text will wrote at the same level as the current node.
+        /// </summary>
+        /// <returns></returns>
+        IConsoleOutput PopNode();
         
         TextWriter OutputTextWriter { get; set; }
     }

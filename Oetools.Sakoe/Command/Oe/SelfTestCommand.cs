@@ -325,6 +325,27 @@ sakoe st input -b2 s1024",
     internal class LogSelfTestCommand : ABaseCommand {
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
+            
+            Out.PushNode(false).WriteOnNewLine("Build");
+            Out.Write(": 1st");
+            Out.WriteOnNewLine("---- very very very long line very very very long linevery very very long linevery very very long linevery very very long linevery very very long linevery very very long linevery very very long linevery very very long line");
+            Out.PushNode(false).WriteOnNewLine("1st step");
+            Out.WriteOnNewLine("----");
+            Out.PushNode(false).WriteOnNewLine("1st task");
+            Out.WriteOnNewLine("----");
+            Out.WriteOnNewLine("----");
+            Out.PopNode().PushNode(true).WriteOnNewLine("2nd task");
+            Out.WriteOnNewLine("----");
+            Out.WriteOnNewLine("---- very very very long line very very very long linevery very very long linevery very very long linevery very very long linevery very very long linevery very very long linevery very very long linevery very very long line");
+            Out.PopNode();
+            Out.WriteOnNewLine("----");
+            Out.PopNode().PushNode(true).WriteOnNewLine("2nd step");
+            Out.WriteOnNewLine("----");
+            Out.WriteOnNewLine("----");
+            Out.PopNode();
+            Out.WriteOnNewLine("---- very very very long line very very very long linevery very very long linevery very very long linevery very very long linevery very very long linevery very very long linevery very very long linevery very very long line");
+            Out.PopNode();
+
             Log.Info("Log\n\nnew line  \r\n   \ndebug");
             Out.WriteOnNewLine("this is an output, it will still be displayed if the verbosity is set to None");
             Out.Write(".");

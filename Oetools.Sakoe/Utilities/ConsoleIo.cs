@@ -257,7 +257,7 @@ namespace Oetools.Sakoe.Utilities {
                 return;
             }
             var elapsed = _stopwatch.Elapsed;
-            var logPrefix = $"{level.ToString().ToUpper().PadRight(5, ' ')} [{elapsed.Hours:D2}:{elapsed.Minutes:D2}:{elapsed.Seconds:D2}.{elapsed.Milliseconds:D3}] ";
+            var logPrefix = $"{level.ToString().ToUpper().PadRight(5, ' ')} [{elapsed.Minutes:D2}:{elapsed.Seconds:D2}.{elapsed.Milliseconds:D3}] ";
             
             ConsoleColor outputColor;
             switch (level) {
@@ -306,7 +306,7 @@ namespace Oetools.Sakoe.Utilities {
         private void LogToFile(ConsoleLogThreshold level, string message, Exception e) {
             if (_logContent != null) {
                 var elapsed = _stopwatch.Elapsed;
-                _logContent.AppendLine($"{level.ToString().ToUpper().PadRight(5, ' ')} [{elapsed.Hours:D2}:{elapsed.Minutes:D2}:{elapsed.Seconds:D2}.{elapsed.Milliseconds:D3}] {message}");
+                _logContent.AppendLine($"{level.ToString().ToUpper().PadRight(5, ' ')} [{elapsed.Minutes:D2}:{elapsed.Seconds:D2}.{elapsed.Milliseconds:D3}] {message}");
                 if (e != null) {
                     _logContent.AppendLine(e.ToString());
                 }

@@ -19,6 +19,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using McMaster.Extensions.CommandLineUtils;
@@ -27,12 +28,18 @@ using Oetools.Utilities.Lib;
 namespace Oetools.Sakoe.Utilities {
     
     public class ConsoleOutput : IConsoleOutput, IDisposable {
+        
+        // TODO: add interface to draw a tree
 
         private ConsoleColor _originalForegroundColor;
 
         protected readonly TextWriterOutputWordWrap WordWrapWriter;
         
         private readonly IConsole _console;
+
+        private int _treeLevel;
+        private string _treeNewLinePrefix;
+        private bool _pushNewNode;
 
         public TextWriter OutputTextWriter { get; set; }
 
@@ -65,25 +72,62 @@ namespace Oetools.Sakoe.Utilities {
         /// <inheritdoc />
         public virtual void Write(string text, ConsoleColor? color = null, int indentation = 0, string prefixForNewLines = null) {
             _console.ForegroundColor = color ?? _originalForegroundColor;
-            WordWrapWriter.Write(text, false, indentation, OutputTextWriter ?? _console.Out, prefixForNewLines);
+            WordWrapWriter.Write(text, false, indentation, OutputTextWriter ?? _console.Out, string.IsNullOrEmpty(prefixForNewLines) ? _treeNewLinePrefix : $"{prefixForNewLines}{_treeNewLinePrefix}");
         }
 
         /// <inheritdoc />
         public virtual void WriteOnNewLine(string text, ConsoleColor? color = null, int indentation = 0, string prefixForNewLines = null) {
             _console.ForegroundColor = color ?? _originalForegroundColor;
-            WordWrapWriter.Write(text, true, indentation, OutputTextWriter ?? _console.Out, prefixForNewLines);
+            WordWrapWriter.Write(GetText(text), true, indentation, OutputTextWriter ?? _console.Out, string.IsNullOrEmpty(prefixForNewLines) ? _treeNewLinePrefix : $"{prefixForNewLines}{_treeNewLinePrefix}");
         }
 
         /// <inheritdoc />
         public virtual void WriteError(string text, ConsoleColor? color = null, int indentation = 0, string prefixForNewLines = null) {
             _console.ForegroundColor = color ?? _originalForegroundColor;
-            WordWrapWriter.Write(text, false, indentation, OutputTextWriter ?? _console.Error, prefixForNewLines);
+            WordWrapWriter.Write(text, false, indentation, OutputTextWriter ?? _console.Error, string.IsNullOrEmpty(prefixForNewLines) ? _treeNewLinePrefix : $"{prefixForNewLines}{_treeNewLinePrefix}");
         }
 
         /// <inheritdoc />
         public virtual void WriteErrorOnNewLine(string text, ConsoleColor? color = null, int indentation = 0, string prefixForNewLines = null) {
             _console.ForegroundColor = color ?? _originalForegroundColor;
-            WordWrapWriter.Write(text, true, indentation, OutputTextWriter ?? _console.Error, prefixForNewLines);
+            WordWrapWriter.Write(GetText(text), true, indentation, OutputTextWriter ?? _console.Error, string.IsNullOrEmpty(prefixForNewLines) ? _treeNewLinePrefix : $"{prefixForNewLines}{_treeNewLinePrefix}");
+        }
+
+        private string GetText(string text) {
+            if (_treeLevel > 0 || _pushNewNode) {
+                string prefix = null;
+                for (int j = 0; j < _treeLevel - 1; j++) {
+                    prefix = $"│  {prefix}";
+                }   
+                if (_pushNewNode) {
+                    _pushNewNode = false;
+                    _treeLevel++;
+                    if (_treeLevel > 1) {
+                        text = $"{prefix}├─ {text}";
+                        _treeNewLinePrefix = $"{prefix}│  │  ";
+                    } else {
+                        _treeNewLinePrefix = $"{prefix}│  ";
+                    }
+                } else {
+                    text = $"{prefix}│  {text}";
+                }
+            }
+            return text;
+        }
+
+        /// <inheritdoc />
+        public virtual IConsoleOutput PushNode(bool isLastChild = false) {
+            _pushNewNode = true;
+            return this;
+        }
+
+        /// <inheritdoc />
+        public virtual IConsoleOutput PopNode() {
+            if (_treeLevel > 0) {
+                _treeLevel--;
+                _treeNewLinePrefix = _treeNewLinePrefix.Length <= 3 ? null : _treeNewLinePrefix.Substring(0, _treeNewLinePrefix.Length - 3);
+            }
+            return this;
         }
 
         /// <summary>
@@ -137,6 +181,5 @@ namespace Oetools.Sakoe.Utilities {
             Write(@".", ConsoleColor.DarkGray);
             WriteOnNewLine(null);
         }
-
     }
 }

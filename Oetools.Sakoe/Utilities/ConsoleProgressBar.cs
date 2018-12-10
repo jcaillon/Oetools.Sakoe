@@ -216,7 +216,7 @@ namespace Oetools.Sakoe.Utilities {
             var line2 = $"{(int) (progress * 100)}%".PadRight(4, ' ');
             if (maxWidth > 15) {
                 var elapsed = _stopwatch.Elapsed;
-                line2 = $"[{elapsed.Hours:D2}:{elapsed.Minutes:D2}:{elapsed.Seconds:D2}] {line2}";
+                line2 = $"[{elapsed.Minutes:D2}:{elapsed.Seconds:D2}] {line2}";
             }
 
             if (!string.IsNullOrEmpty(_message)) {
