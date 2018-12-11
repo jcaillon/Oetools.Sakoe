@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Serialization;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder;
+using Oetools.Builder.History;
 using Oetools.Builder.Project;
 using Oetools.Builder.Project.Properties;
 using Oetools.Builder.Project.Task;
@@ -205,13 +207,7 @@ This allow a lot of flexibility for organizing and partitioning your build proce
 
                 
                 // display compilation error.
-                var compilationProblems = builder.BuildStepExecutors
-                    .Where(te => te is BuildStepExecutorBuildSource)
-                    .SelectMany(exec => exec.Tasks.ToNonNullEnumerable())
-                    .OfType<IOeTaskCompile>()
-                    .SelectMany(task => task.GetCompiledFiles().ToNonNullEnumerable())
-                    .SelectMany(file => file.CompilationProblems.ToNonNullEnumerable())
-                    .ToList();
+                var compilationProblems = builder.CompilationProblems;
                 if (compilationProblems.Count > 0) {
                     Out.WriteErrorOnNewLine(null);
                     Out.WriteErrorOnNewLine("COMPILATION ERRORS", ConsoleColor.Yellow, 1);
@@ -222,7 +218,7 @@ This allow a lot of flexibility for organizing and partitioning your build proce
                         var j = 0;
                         foreach (var problem in filePathGrouped) {
                             Out.WriteErrorOnNewLine($"{(groups.Count - 1 == i ? "   " : "│  ")}{(filePathGrouped.Count() - 1 == j ? "└─ " : "├─ ")}", indentation: 1);
-                            Out.WriteError(problem.ToString(), problem is UoeCompilationWarning ? ConsoleColor.Yellow : ConsoleColor.Red, 1);
+                            Out.WriteError($"Line {problem.Line}, Column {problem.Column}, error {problem.ErrorNumber} : {(string.IsNullOrEmpty(problem.FilePath) ? problem.Message : problem.Message.Replace(problem.FilePath, Path.GetFileName(problem.FilePath)))}", problem is OeCompilationWarning ? ConsoleColor.Yellow : ConsoleColor.Red, 1);
                             j++;
                         }
                         i++;
