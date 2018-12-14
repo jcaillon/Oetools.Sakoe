@@ -325,27 +325,41 @@ sakoe st input -b2 s1024",
     internal class LogSelfTestCommand : ABaseCommand {
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
+
+            Log.Info("Write as result (no word wrap)");
+            Out.WriteResultOnNewLine("Lorem Ipsum is simply dummy text of the printing and typesetting industry.\nLorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.", ConsoleColor.Green);
+            Out.WriteResult("It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.", ConsoleColor.Green);
             
+            Log.Info("Write as normal with indentation = 2 (with word wrap)");
+            Out.WriteOnNewLine("Lorem Ipsum is simply dummy text of the printing and typesetting industry.\nLorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.", ConsoleColor.Green, 2);
+            Out.Write("It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.", ConsoleColor.Green, 2);
+            
+            Log.Info("Write as error with indentation = 2 (with word wrap)");
+            Out.WriteErrorOnNewLine("Lorem Ipsum is simply dummy text of the printing and typesetting industry.\nLorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.", ConsoleColor.Green, 2);
+            Out.WriteError("It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.", ConsoleColor.Green, 2);
+            
+            Log.Info("Write a tree");
             Out.PushNode(false).WriteOnNewLine("Build");
             Out.Write(": 1st");
-            Out.WriteOnNewLine("---- very very very long line very very very long linevery very very long linevery very very long linevery very very long linevery very very long linevery very very long linevery very very long linevery very very long line");
+            Out.WriteOnNewLine("very very very long line very very very long linevery very very long linevery very very long linevery very very long linevery very very long linevery very very long linevery very very long linevery very very long line");
             Out.PushNode(false).WriteOnNewLine("1st step");
-            Out.WriteOnNewLine("----");
+            Out.WriteOnNewLine("item 1");
             Out.PushNode(false).WriteOnNewLine("1st task");
-            Out.WriteOnNewLine("----");
-            Out.WriteOnNewLine("----");
+            Out.WriteOnNewLine("item 1");
+            Out.WriteOnNewLine("item 2");
             Out.PopNode().PushNode(true).WriteOnNewLine("2nd task");
-            Out.WriteOnNewLine("----");
-            Out.WriteOnNewLine("---- very very very long line very very very long linevery very very long linevery very very long linevery very very long linevery very very long linevery very very long linevery very very long linevery very very long line");
+            Out.WriteOnNewLine("item 1");
+            Out.WriteOnNewLine("very very very long line very very very long linevery very very long linevery very very long linevery very very long linevery very very long linevery very very long linevery very very long linevery very very long line");
             Out.PopNode();
-            Out.WriteOnNewLine("----");
+            Out.WriteOnNewLine("item 2");
             Out.PopNode().PushNode(true).WriteOnNewLine("2nd step");
-            Out.WriteOnNewLine("----");
-            Out.WriteOnNewLine("----");
+            Out.WriteOnNewLine("item 1");
+            Out.WriteOnNewLine("item 2");
             Out.PopNode();
-            Out.WriteOnNewLine("---- very very very long line very very very long linevery very very long linevery very very long linevery very very long linevery very very long linevery very very long linevery very very long linevery very very long line");
+            Out.WriteOnNewLine("very very very long line very very very long linevery very very long linevery very very long linevery very very long linevery very very long linevery very very long linevery very very long linevery very very long line");
             Out.PopNode();
 
+            Log.Info("Log something with new lines (it should be indented)");
             Log.Info("Log\n\nnew line  \r\n   \ndebug");
             Out.WriteOnNewLine("this is an output, it will still be displayed if the verbosity is set to None");
             Out.Write(".");
@@ -361,7 +375,7 @@ sakoe st input -b2 s1024",
             Log.Debug("Log debug");
             Log.Info("Log info");
             Log.Warn("Log warn");
-            Log.Error("Log error");
+            Log.Error("Log error éà!€");
             Log.Fatal("Log fatal");
             Log.Done("Log success");
             Log?.Info(app.GetTypeFromCommandLine().ToString());

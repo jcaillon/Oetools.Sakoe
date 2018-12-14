@@ -36,18 +36,6 @@ namespace Oetools.Sakoe.Utilities {
             }
             UnderLyingWriter = writer;
         }
-
-        /// <summary>
-        /// Returns the maximum length that a line can have.
-        /// </summary>
-        /// <returns></returns>
-        private int GetLineMaximumLength() {
-            try {
-                return Console.WindowWidth - 1;
-            } catch (IOException) {
-                return 120;
-            }
-        }
         
         /// <summary>
         /// Has this writer alright wrote thing to the output?
@@ -55,7 +43,10 @@ namespace Oetools.Sakoe.Utilities {
         /// </summary>
         public bool HasWroteToOuput { get; set; }
 
-        private int _currentConsoleLineSpaceTaken;
+        /// <summary>
+        /// The length of what is already written in the current line.
+        /// </summary>
+        private int _currentLineSpaceTaken;
 
         /// <summary>
         /// Write a new line char into the text writer
@@ -64,7 +55,7 @@ namespace Oetools.Sakoe.Utilities {
         /// <param name="newLine"></param>
         public void WriteLine(TextWriter underLyingWriter = null, string newLine = null) {
             (underLyingWriter ?? UnderLyingWriter).Write(newLine ?? UnderLyingWriter.NewLine);
-            _currentConsoleLineSpaceTaken = 0;
+            _currentLineSpaceTaken = 0;
             HasWroteToOuput = true;
         }
 
@@ -72,14 +63,14 @@ namespace Oetools.Sakoe.Utilities {
         /// Writes a text to the console with word wrap.
         /// </summary>
         /// <param name="message">the message to write</param>
+        /// <param name="maxLineWidth">the maximum length of a line before line break.</param>
         /// <param name="writeToNewLine">write the message to a separated line (otherwise continue to output on the same line)</param>
         /// <param name="indentation">Apply indentation when writing on a new line.</param>
         /// <param name="underLyingWriter"></param>
         /// <param name="prefixForNewLines">The text to put at the beginning of each new line that need to be created because of word wrap.</param>
-        /// <param name="maximumLineLength"></param>
-        public void Write(string message, bool writeToNewLine, int indentation, TextWriter underLyingWriter = null, string prefixForNewLines = null, int? maximumLineLength = null) {
+        public void Write(string message, int maxLineWidth, bool writeToNewLine, int indentation = 0, TextWriter underLyingWriter = null, string prefixForNewLines = null) {
             
-            // check message
+            // handle null message
             if (message == null) {
                 // write a new line
                 if (writeToNewLine && HasWroteToOuput) {
@@ -88,16 +79,25 @@ namespace Oetools.Sakoe.Utilities {
                 HasWroteToOuput = true;
                 return;
             }
-
-            // maximum length for a line
-            var maxLineWidth = maximumLineLength ?? GetLineMaximumLength();
-            if (maxLineWidth < 1) {
-                maxLineWidth = 1;
-            }
             
-            // check padding
-            if (indentation >= maxLineWidth) {
+            // check indentation
+            if (maxLineWidth > 0 && indentation >= maxLineWidth) {
                 indentation = maxLineWidth - 1;
+            }
+            indentation = Math.Max(indentation, 0);
+
+            // write without word wrap
+            if (maxLineWidth <= 0) {
+                // write a new line
+                if (writeToNewLine && HasWroteToOuput) {
+                    WriteLine(underLyingWriter);
+                    _currentLineSpaceTaken = 0;
+                }
+                message = _currentLineSpaceTaken == 0 && indentation > 0 ? message.PadLeft(message.Length + indentation) : message;
+                (underLyingWriter ?? UnderLyingWriter).Write(message);
+                _currentLineSpaceTaken += message.Length;
+                HasWroteToOuput = true;
+                return;
             }
             
             // for each line of text
@@ -124,19 +124,19 @@ namespace Oetools.Sakoe.Utilities {
                 if (eolPosition > lineStartPos) {
                     do {
                         // write a new line
-                        if (writeToNewLine && HasWroteToOuput || _currentConsoleLineSpaceTaken >= maxLineWidth) {
+                        if (writeToNewLine && HasWroteToOuput || _currentLineSpaceTaken >= maxLineWidth) {
                             if (newInputLineStarting || string.IsNullOrEmpty(prefixForNewLines)) {
                                 WriteLine(underLyingWriter);
                             } else {
                                 var newLinePrefix = prefixForNewLines.PadRight(Math.Max(0, indentation + paragraphIndent));
                                 WriteLine(underLyingWriter, $"{UnderLyingWriter.NewLine}{newLinePrefix}");
-                                _currentConsoleLineSpaceTaken += newLinePrefix.Length;
+                                _currentLineSpaceTaken += newLinePrefix.Length;
                             }
                         }
                         
                         int lineLength = eolPosition - lineStartPos;
-                        int totalIndent = _currentConsoleLineSpaceTaken > 0 ? 0 : indentation + paragraphIndent;
-                        int currentConsoleLineSpaceLeft = maxLineWidth - _currentConsoleLineSpaceTaken - totalIndent;
+                        int totalIndent = _currentLineSpaceTaken > 0 ? 0 : indentation + paragraphIndent;
+                        int currentConsoleLineSpaceLeft = maxLineWidth - _currentLineSpaceTaken - totalIndent;
                         
                         if (lineLength > currentConsoleLineSpaceLeft) {
                             lineLength = GetLineLengthToKeep(message, lineStartPos, currentConsoleLineSpaceLeft, !writeToNewLine && message.Length <= maxLineWidth - totalIndent);
@@ -144,9 +144,9 @@ namespace Oetools.Sakoe.Utilities {
 
                         if (lineLength > 0) {
                             var line = message.Substring(lineStartPos, lineLength);
-                            line = _currentConsoleLineSpaceTaken > 0 ? line : line.PadLeft(lineLength + indentation + paragraphIndent, ' ');
+                            line = _currentLineSpaceTaken > 0 ? line : line.PadLeft(lineLength + indentation + paragraphIndent, ' ');
                             (underLyingWriter ?? UnderLyingWriter).Write(line);
-                            _currentConsoleLineSpaceTaken += line.Length;
+                            _currentLineSpaceTaken += line.Length;
                             HasWroteToOuput = true;
                         }
                         

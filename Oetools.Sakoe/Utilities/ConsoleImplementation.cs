@@ -22,6 +22,7 @@
 
 using System;
 using System.IO;
+using System.Text;
 
 namespace Oetools.Sakoe.Utilities {
     public class ConsoleImplementation : IConsoleImplementation {
@@ -30,13 +31,18 @@ namespace Oetools.Sakoe.Utilities {
         
         private static ConsoleImplementation _instance;
         private bool? _isConsoleFullFeatured;
+        private bool? _isOutputRedirect;
+        private bool _hasWindowWidth = true;
 
         /// <summary>
         /// A singleton instance of <see cref="ConsoleImplementation" />.
         /// </summary>
         public static ConsoleImplementation Singleton => _instance ?? (_instance = new ConsoleImplementation());
 
-        private ConsoleImplementation() { }
+        private ConsoleImplementation() {
+            Console.OutputEncoding = Encoding.UTF8;
+            Console.InputEncoding = Encoding.UTF8;
+        }
 
         #endregion
 
@@ -71,7 +77,7 @@ namespace Oetools.Sakoe.Utilities {
         /// <summary>
         /// <see cref="Console.IsOutputRedirected"/>.
         /// </summary>
-        public bool IsOutputRedirected => Console.IsOutputRedirected;
+        public bool IsOutputRedirected => _isOutputRedirect ?? (_isOutputRedirect = Console.IsOutputRedirected).Value;
 
         /// <summary>
         /// <see cref="Console.IsErrorRedirected"/>.
@@ -121,7 +127,14 @@ namespace Oetools.Sakoe.Utilities {
         /// <see cref="Console.WindowWidth"/>.
         /// </summary>
         public int WindowWidth {
-            get => Console.WindowWidth;
+            get {
+                try {
+                    return _hasWindowWidth ? Console.WindowWidth : 0;
+                } catch (IOException) {
+                    _hasWindowWidth = false;
+                    return 0;
+                }
+            }
             set => Console.WindowWidth = value;
         }
         

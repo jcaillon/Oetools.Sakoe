@@ -283,15 +283,16 @@ namespace Oetools.Sakoe.Utilities {
                     throw new ArgumentOutOfRangeException(nameof(level), level, null);
             }
 
+            if (e != null && LogTheshold <= ConsoleLogThreshold.Debug) {
+                base.WriteErrorOnNewLine(logPrefix, ConsoleColor.DarkGray);
+                base.WriteError(e.ToString(), ConsoleColor.DarkGray, logPrefix.Length);
+            }
             if (level >= ConsoleLogThreshold.Error) {
                 base.WriteErrorOnNewLine(logPrefix, outputColor);
                 base.WriteError(message, outputColor, logPrefix.Length);
             } else {
                 base.WriteOnNewLine(logPrefix, outputColor);
                 base.Write(message, outputColor, logPrefix.Length);
-            }
-            if (e != null && LogTheshold <= ConsoleLogThreshold.Debug) {
-                base.WriteErrorOnNewLine(e.ToString(), ConsoleColor.DarkGray, logPrefix.Length);
             }
         }
 
