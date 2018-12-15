@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
+﻿using System.ComponentModel.DataAnnotations;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Command.Exceptions;
-using Oetools.Sakoe.Command.Oe.Abstract;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge.Database;
@@ -24,7 +20,8 @@ namespace Oetools.Sakoe.Command.Oe {
     [Subcommand(typeof(KillAllDatabaseCommand))]
     [Subcommand(typeof(DeleteDatabaseCommand))]
     [Subcommand(typeof(RepairDatabaseCommand))]
-    // TODO : generate a delta .df
+    // TODO: generate a delta .df
+    // TODO: get connection string
     internal class DatabaseCommand : AExpectSubCommand {
     }
     
@@ -45,7 +42,7 @@ namespace Oetools.Sakoe.Command.Oe {
             // to absolute path
             TargetDatabasePath = !string.IsNullOrEmpty(TargetDatabasePath) ? TargetDatabasePath.MakePathAbsolute() : null;
             
-            var dbOperator = new UoeDatabaseOperator(GetDlcPath());
+            var dbOperator = new UoeDatabaseOperator(GetDlcPath()) { Log = Log };
                         
             dbOperator.ProstrctRepair(TargetDatabasePath);
            
@@ -70,7 +67,7 @@ namespace Oetools.Sakoe.Command.Oe {
             // to absolute path
             TargetDatabasePath = !string.IsNullOrEmpty(TargetDatabasePath) ? TargetDatabasePath.MakePathAbsolute() : null;
             
-            var dbOperator = new UoeDatabaseOperator(GetDlcPath());
+            var dbOperator = new UoeDatabaseOperator(GetDlcPath()) { Log = Log };
                         
             dbOperator.Delete(TargetDatabasePath);
            
@@ -98,13 +95,13 @@ namespace Oetools.Sakoe.Command.Oe {
             // to absolute path
             TargetDatabasePath = !string.IsNullOrEmpty(TargetDatabasePath) ? TargetDatabasePath.MakePathAbsolute() : null;
             
-            var dbOperator = new UoeDatabaseOperator(GetDlcPath());
+            var dbOperator = new UoeDatabaseOperator(GetDlcPath()) { Log = Log };
                         
             if (RemainingArgs != null) {
-                Log.Info($"Extra parameters : {string.Join(" ", RemainingArgs)}");
+                Log.Info($"Extra parameters: {string.Join(" ", RemainingArgs)}.");
             }
            
-            dbOperator.Proshut(TargetDatabasePath, string.Join(" ", RemainingArgs));
+            dbOperator.Proshut(TargetDatabasePath, RemainingArgs != null && RemainingArgs.Length > 0 ? string.Join(" ", RemainingArgs) : null);
             Log.Debug(dbOperator.LastOperationOutput);
             
             return 0;
@@ -154,7 +151,7 @@ namespace Oetools.Sakoe.Command.Oe {
             // to absolute path
             TargetDatabasePath = !string.IsNullOrEmpty(TargetDatabasePath) ? TargetDatabasePath.MakePathAbsolute() : null;
             
-            var dbOperator = new UoeDatabaseOperator(GetDlcPath());
+            var dbOperator = new UoeDatabaseOperator(GetDlcPath()) { Log = Log };
                        
             if (RemainingArgs != null) {
                 Log.Info($"Extra parameters for proserve : {string.Join(" ", RemainingArgs)}");
@@ -162,26 +159,26 @@ namespace Oetools.Sakoe.Command.Oe {
            
             // service or port
             if (!string.IsNullOrEmpty(ServiceName) && Port.HasValue) {
-                throw new CommandException($"Both {nameof(ServiceName)} and {nameof(Port)} are defined but they are mutually exclusive options");
+                throw new CommandException($"Both {nameof(ServiceName)} and {nameof(Port)} are defined but they are mutually exclusive options.");
             }
 
             // port or next port
             if (Port.HasValue && NextPortAvailable.HasValue) {
-                throw new CommandException($"Both {nameof(NextPortAvailable)} and {nameof(Port)} are defind but they are mutually exclusive options");
+                throw new CommandException($"Both {nameof(NextPortAvailable)} and {nameof(Port)} are defined but they are mutually exclusive options.");
             }
 
             if (NbUsers.HasValue && NbUsers.value <= 0) {
-                throw new CommandException($"{nameof(NbUsers)} can only be > 0");
+                throw new CommandException($"{nameof(NbUsers)} can only be > 0.");
             }
             
             ServiceName = !string.IsNullOrEmpty(ServiceName) ? ServiceName : null;
             ServiceName = ServiceName ?? (Port.HasValue && Port.value > 0 ? Port.value.ToString() : null);
             
-            var options = dbOperator.ProServe(TargetDatabasePath, ServiceName, NbUsers.value > 0 ? (int?) NbUsers.value : null, RemainingArgs == null ? null : string.Join(" ", RemainingArgs));
-            Log.Info($"Proserve with options : {options.PrettyQuote()}");
+            dbOperator.ProServe(TargetDatabasePath, ServiceName, NbUsers.value > 0 ? (int?) NbUsers.value : null, RemainingArgs == null ? null : string.Join(" ", RemainingArgs));
             
-            Log.Done($"Database started successfully, connection string :");
-            Log.Done($"{UoeDatabaseOperator.GetMultiUserConnectionString(TargetDatabasePath, ServiceName)}");
+            Log.Info("Multi-user connection string:");
+            Out.WriteResultOnNewLine($"{UoeDatabaseOperator.GetMultiUserConnectionString(TargetDatabasePath, ServiceName)}");
+            Log.Done("Database started successfully.");
             
             return 0;
         }
@@ -222,62 +219,18 @@ namespace Oetools.Sakoe.Command.Oe {
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
 
             using (var dbAdministrator = new UoeDatabaseAdministrator(GetDlcPath())) {
+                dbAdministrator.Log = Log;
 
                 // to absolute path
                 StuctureFilePath = !string.IsNullOrEmpty(StuctureFilePath) ? StuctureFilePath.MakePathAbsolute() : null;
                 SchemaDefinitionFilePath = !string.IsNullOrEmpty(SchemaDefinitionFilePath) ? SchemaDefinitionFilePath.MakePathAbsolute() : null;
                 TargetDatabasePath = !string.IsNullOrEmpty(TargetDatabasePath) ? TargetDatabasePath.MakePathAbsolute() : null;
 
-                // exists?
-                if (UoeDatabaseOperator.DatabaseExists(TargetDatabasePath)) {
-                    throw new CommandException("The target database already exists, choose a new name or delete the existing database");
-                }
+                dbAdministrator.CreateDatabase(TargetDatabasePath, StuctureFilePath, BlockSize, Codepage, NewInstance, RelativePath, SchemaDefinitionFilePath);
 
-                bool stAutoGenerated = false;
-
-                // copy structure file to target
-                if (!string.IsNullOrEmpty(StuctureFilePath)) {
-                    Log.Info("Copying source structure file (.st) to target database folder");
-                    dbAdministrator.CopyStructureFile(TargetDatabasePath, StuctureFilePath);
-                } else if (!string.IsNullOrEmpty(SchemaDefinitionFilePath)) {
-                    
-                    // generate a structure file from df?
-                    Log.Info("Generating structure file (.st) from schema definition file (.df)");
-                    StuctureFilePath = dbAdministrator.GenerateStructureFileFromDf(TargetDatabasePath, SchemaDefinitionFilePath);
-                    Log.Debug($"File generated : {StuctureFilePath}");
-                    Log.Debug(dbAdministrator.LastOperationOutput);
-                    stAutoGenerated = true;
-                }
-
-                // prostct create
-                if (!string.IsNullOrEmpty(StuctureFilePath)) {
-                    Log.Info($"Create database structure from structure file (.st) using {BlockSize} blocksize");
-                    dbAdministrator.ProstrctCreate(TargetDatabasePath, StuctureFilePath, BlockSize);
-                    Log.Debug(dbAdministrator.LastOperationOutput);
-                }
-
-                // procopy empty
-                Log.Info($"Procopy the empty database from the dlc folder corresponding to a {BlockSize} blocksize");
-                dbAdministrator.Procopy(TargetDatabasePath, BlockSize, Codepage, NewInstance, RelativePath);
-                Log.Debug(dbAdministrator.LastOperationOutput);
-
-                if (!UoeDatabaseOperator.DatabaseExists(TargetDatabasePath)) {
-                    throw new CommandException("The database does not exist for unknown reasons");
-                }
-
-                // Load .df
-                if (!string.IsNullOrEmpty(SchemaDefinitionFilePath)) {
-                    Log.Info($"Loading the schema definition from {SchemaDefinitionFilePath}");
-                    dbAdministrator.LoadDf(TargetDatabasePath, SchemaDefinitionFilePath);
-                    Log.Debug(dbAdministrator.LastOperationOutput);
-                }
-
-                if (stAutoGenerated) {
-                    Log.Warn("The database physical structure (described in .st) has been generated automatically, this database should not be used in production");
-                }
-
-                Log.Done($"Database created successfully : {TargetDatabasePath.PrettyQuote()}");
-
+                Log.Info("Single user connection string:");
+                Out.WriteOnNewLine(UoeDatabaseOperator.GetSingleUserConnectionString(TargetDatabasePath));
+                Log.Done($"Database created successfully: {TargetDatabasePath.PrettyQuote()}");
             }
 
             return 0;

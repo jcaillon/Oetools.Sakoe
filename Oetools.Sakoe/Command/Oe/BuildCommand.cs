@@ -195,7 +195,7 @@ This allow a lot of flexibility for organizing and partitioning your build proce
                 }
             }
             
-            var config = OeProject.GetBuildConfigurationCopy(configQueue);
+            var config = OeProject.GetConfiguration(configQueue);
             using (var builder = new BuilderAuto(config)) {
                 builder.BuildConfiguration.Properties.SetPropertiesFromKeyValuePairs(keyValueProperties);
                 if (addedVariables != null) {
