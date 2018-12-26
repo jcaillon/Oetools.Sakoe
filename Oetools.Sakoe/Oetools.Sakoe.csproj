@@ -3,41 +3,53 @@
     <!-- Exe or Library-->
     <OutputType>Exe</OutputType>
     <AssemblyName>sakoe</AssemblyName>
+    <!-- RepositoryName is a custom variable, should be the name of the github repo -->
+    <RepositoryName>Oetools.Sakoe</RepositoryName>
     <RootNamespace>Oetools.Sakoe</RootNamespace>
-    <Version>0.9.0-beta</Version>
+    <Version>1.0.0-beta</Version>
     <!-- Assembly.GetExecutingAssembly().GetName().Version = $(Version) but completed if necessary to make a 4 digit version and without what is after the dash -->
     <!-- FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductVersion = $(Version) -->
     <!-- FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion = $(FileVersion) -->
     <FileVersion>$(VersionPrefix)</FileVersion>
     <!-- this will be the product name-->
-    <Product>sakoe</Product>
+    <Product>$(AssemblyName)</Product>
     <!-- this will be the file description -->
-    <AssemblyTitle>$(Product) - Swiss Army Knife for OpenEdge</AssemblyTitle>
+    <AssemblyTitle>$(Product) - A Swiss Army Knife for OpenEdge developers</AssemblyTitle>
     <Copyright>Copyright (c) 2018 - Julien Caillon - GNU General Public License v3</Copyright>
     <ApplicationIcon>app.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Label="Package info basic">
-    <Title>$(AssemblyTitle)</Title>
-    <Description>A set of handy tools for openedge developers</Description>
     <Company>Noyacode</Company>
     <Authors>jcailon</Authors>
+    <PackageId>$(Company).$(AssemblyName)</PackageId>
+    <!-- Small text that will appear under the package name in nuget -->
+    <Title>$(AssemblyName)</Title>
+    <!-- The package description -->
+    <Description>$(AssemblyTitle)</Description>
   </PropertyGroup>
   <PropertyGroup Label="Package info">
+    <IsPackable>false</IsPackable>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <PackageId>$(Company).$(AssemblyName)</PackageId>
     <PackageVersion>$(Version)</PackageVersion>
+    <PackageTags>update updater</PackageTags>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageLicenseUrl>https://github.com/jcaillon/Oetools.Sakoe/blob/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/jcaillon/Oetools.Sakoe</PackageProjectUrl>
+    <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+    <PackageProjectUrl>https://jcaillon.github.io/$(RepositoryName)</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/jcaillon/$(RepositoryName)/master/docs/logo.png</PackageIconUrl>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/jcaillon/Oetools.Sakoe.git</RepositoryUrl>
-    <PackageIconUrl>https://raw.githubusercontent.com/jcaillon/Oetools.Sakoe/master/docs/images/logo.png</PackageIconUrl>
-    <PackageReleaseNotes>
+    <RepositoryUrl>https://github.com/jcaillon/$(RepositoryName).git</RepositoryUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <PackageReleaseNotes><![CDATA[
+Learn more about this project on github: $(PackageProjectUrl).
+
+See more details about this release on github: https://github.com/jcaillon/$(RepositoryName)/releases.]]>
     </PackageReleaseNotes>
-    <PackageTags>openedge sakoe progress 4GL abl</PackageTags>
     <PackageOutputPath>$(OutputPath)</PackageOutputPath>
     <!-- allow pdb to be packed with the the nuget package (instead of having a separate pack for debug symbols) -->
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSource>true</IncludeSource>
+    <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
   <PropertyGroup Label="Compilation info">
     <!-- https://docs.microsoft.com/en-us/dotnet/standard/frameworks -->
@@ -88,7 +100,11 @@
   <ItemGroup Label="PackageReferences">
     <NugetPackageSource Include="https://www.myget.org/F/natemcmaster/api/v3/index.json" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.3.0-beta.374" />
+    <PackageReference Include="Noyacode.GithubUpdater" Version="1.0.0" />
     <!--<PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.5" />-->
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.IO.Compression" />
   </ItemGroup>
   <!-- Extra targets -->
   <Import Project="Target.*.target" />

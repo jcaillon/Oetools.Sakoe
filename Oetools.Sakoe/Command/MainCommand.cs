@@ -20,6 +20,7 @@ namespace Oetools.Sakoe.Command {
     [Subcommand(typeof(SelfTestCommand))]
 #endif
     [Subcommand(typeof(ManCommand))]
+    [Subcommand(typeof(UpdateCommand))]
     [Subcommand(typeof(DatabaseCommand))]
     [Subcommand(typeof(LintCommand))]
     [Subcommand(typeof(ProjectCommand))]
