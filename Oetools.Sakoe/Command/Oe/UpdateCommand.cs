@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -20,17 +19,26 @@ namespace Oetools.Sakoe.Command.Oe {
     )]
     internal class UpdateCommand : ABaseCommand {
 
-        private const string RepoOwner = "3pUser";
-        private const string RepoName = "yolo";
+        private const string RepoOwner = "jcaillon";
+        private const string RepoName = "Oetools.Sakoe";
+        
+        [Option("-b|--get-beta", "Accept to update from new 'beta' (i.e. pre-release) versions of the tool.\nThis option will be used by default if the current version of the tool is a beta version. Otherwise, only stable releases will be used for updates. ", CommandOptionType.NoValue)]
+        public bool GetBeta { get; set; }
         
         [Option("-p|--proxy", "The http proxy to use for this update. Useful if you are behind a corporate firewall.\nThe expected format is: 'http(s)://[user:password@]host[:port]'.\nIt is also possible to use the environment variable HTTP_PROXY to set this value.", CommandOptionType.SingleValue)]
         public string HttpProxy { get; set; }
         
-        [Option("-u|--override-github-url", "Force the creation of the project file by replacing an older project file, if it exists. By default, the command will fail if the project file already exists.", CommandOptionType.SingleValue)]
+        [Option("-c|--check-only", "Check for new releases but exit the command before actually updating the tool.", CommandOptionType.NoValue)]
+        public bool CheckOnly { get; set; }
+        
+        [Option("-u|--override-github-url", "Use an alternative url for the github api. This option is here to allow updates from a different location (a private server for instance) but should not be used in most cases.", CommandOptionType.SingleValue)]
         public string OverrideGithubUrl { get; set; }
         
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
 
+            var usePreRelease = GetBeta || Utils.IsRunningAssemblyPreRelease;
+            Log.Debug(usePreRelease ? "Getting pre-releases." : "Skipping pre-releases.");
+            
             var httpProxyFromEnv = Environment.GetEnvironmentVariable("HTTP_PROXY");
 
             if (string.IsNullOrEmpty(HttpProxy) && !string.IsNullOrEmpty(httpProxyFromEnv)) {
@@ -54,18 +62,32 @@ namespace Oetools.Sakoe.Command.Oe {
                 updater.UseProxy($"{host}{(port > 0 ? $":{port}" : "")}", userName, password);
             }
             
-            var currentVersion = UpdaterHelper.StringToVersion(FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion);
+            var currentVersion = UpdaterHelper.StringToVersion(Utils.RunningAssemblyFileVersion);
             Log.Info($"Current local version: {currentVersion}.");
 
             var releases = updater.FetchNewReleases(currentVersion);
-            if (releases == null || releases.Count == 0) {
+
+            GitHubRelease first;
+            while (!usePreRelease && (first = releases.FirstOrDefault()) != null && (first.Draft || first.Prerelease)) {
+                releases.RemoveAt(0);
+            }
+            
+            if (releases.Count == 0) {
                 Log.Done("Your version is up to date.");
                 return 0;
             }
 
             var latestRelease = releases[0];
             
-            Log.Debug($"{releases.Count} new releases found on github, the latest release is {latestRelease.TagName}.");
+            Log.Info($"{releases.Count} new releases found on github:");
+            foreach (var release in releases) {
+                Log.Info($"- {release.TagName}, {release.Name.PrettyQuote()}: {release.HtmlUrl}");
+            }
+
+            if (CheckOnly) {
+                Log.Warn("Option 'check only' activated, no updates done.");
+                return 1;
+            }
 
             var latestAsset = latestRelease.Assets.FirstOrDefault(asset => {
                 if (Utils.IsNetFrameworkBuild) {
@@ -80,18 +102,22 @@ namespace Oetools.Sakoe.Command.Oe {
             
             Log.Debug($"Downloading the latest release asset: {latestAsset.BrowserDownloadUrl}.");
             var tempFilePath = updater.DownloadToTempFile(releases[0].Assets[0].BrowserDownloadUrl, progress => {
-                Log.ReportProgress(100, (int) Math.Round((decimal) progress.NumberOfBytesDoneTotal / progress.NumberOfBytesDoneTotal * 100), "Downloading update.");
+                Log.ReportProgress(100, (int) Math.Round((decimal) progress.NumberOfBytesDoneTotal / progress.NumberOfBytesTotal * 100), "Downloading update.");
             });
 
-            var tempExtractionDir = Path.Combine(Path.GetTempPath(), Path.GetTempFileName());
+            var tempExtractionDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
             Directory.CreateDirectory(tempExtractionDir);
             using (var zip = ZipFile.Open(tempFilePath, ZipArchiveMode.Read)) {
                 zip.ExtractToDirectory(tempExtractionDir);
             }
             
             var fileUpdater = SimpleFileUpdater.Instance;
+            var toolDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            if (string.IsNullOrEmpty(toolDirectory)) {
+                throw new CommandException("Could not find the directory in which this tool is installed.");
+            }
             foreach (var file in Utils.EnumerateAllFiles(tempExtractionDir)) {
-                fileUpdater.AddFileToMove(file, Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), file.Replace(tempExtractionDir, "")));
+                fileUpdater.AddFileToMove(file, Path.Combine(toolDirectory, file.Replace(tempExtractionDir, "").TrimStartDirectorySeparator()));
             }
             
             File.Delete(tempFilePath);
@@ -103,7 +129,7 @@ namespace Oetools.Sakoe.Command.Oe {
             Log.Done("The update will be done after this command has ended.");
             fileUpdater.Start();
             
-            return 1;
+            return 0;
         }
     }
 
