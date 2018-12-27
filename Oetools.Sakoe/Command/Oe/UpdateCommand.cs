@@ -3,10 +3,12 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using GithubUpdater;
 using GithubUpdater.GitHub;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Command.Exceptions;
+using Oetools.Sakoe.Utilities;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
 
@@ -18,9 +20,10 @@ namespace Oetools.Sakoe.Command.Oe {
         ExtendedHelpText = ""
     )]
     internal class UpdateCommand : ABaseCommand {
-
+        
         private const string RepoOwner = "jcaillon";
         private const string RepoName = "Oetools.Sakoe";
+        private const string GitHubToken = "MmViMDJlNWVlYWZlMTIzNGIxN2VmOTkxMGQ1NzljMTRkM2E1ZDEyMw==";
         
         [Option("-b|--get-beta", "Accept to update from new 'beta' (i.e. pre-release) versions of the tool.\nThis option will be used by default if the current version of the tool is a beta version. Otherwise, only stable releases will be used for updates. ", CommandOptionType.NoValue)]
         public bool GetBeta { get; set; }
@@ -36,7 +39,7 @@ namespace Oetools.Sakoe.Command.Oe {
         
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
 
-            var usePreRelease = GetBeta || Utils.IsRunningAssemblyPreRelease;
+            var usePreRelease = GetBeta || RunningAssembly.IsPreRelease;
             Log.Debug(usePreRelease ? "Getting pre-releases." : "Skipping pre-releases.");
             
             var httpProxyFromEnv = Environment.GetEnvironmentVariable("HTTP_PROXY");
@@ -52,7 +55,8 @@ namespace Oetools.Sakoe.Command.Oe {
                 Log.Debug($"Using alternative base url for github api: {OverrideGithubUrl.PrettyQuote()}.");
                 updater.UseAlternativeBaseUrl(OverrideGithubUrl);
             }
-            
+
+            updater.UseAuthorizationToken(Encoding.ASCII.GetString(Convert.FromBase64String(GitHubToken)));
             updater.SetRepo(RepoOwner, RepoName);
             updater.UseCancellationToken(CancelToken);
             updater.UseMaxNumberOfReleasesToFetch(10);
@@ -62,13 +66,14 @@ namespace Oetools.Sakoe.Command.Oe {
                 updater.UseProxy($"{host}{(port > 0 ? $":{port}" : "")}", userName, password);
             }
             
-            var currentVersion = UpdaterHelper.StringToVersion(Utils.RunningAssemblyFileVersion);
+            var currentVersion = UpdaterHelper.StringToVersion(RunningAssembly.FileVersion);
             Log.Info($"Current local version: {currentVersion}.");
 
             var releases = updater.FetchNewReleases(currentVersion);
 
             GitHubRelease first;
             while (!usePreRelease && (first = releases.FirstOrDefault()) != null && (first.Draft || first.Prerelease)) {
+                Log.Debug($"Removing pre-release: {first.TagName}.");
                 releases.RemoveAt(0);
             }
             
@@ -101,7 +106,7 @@ namespace Oetools.Sakoe.Command.Oe {
             }
             
             Log.Debug($"Downloading the latest release asset: {latestAsset.BrowserDownloadUrl}.");
-            var tempFilePath = updater.DownloadToTempFile(releases[0].Assets[0].BrowserDownloadUrl, progress => {
+            var tempFilePath = updater.DownloadToTempFile(latestAsset.BrowserDownloadUrl, progress => {
                 Log.ReportProgress(100, (int) Math.Round((decimal) progress.NumberOfBytesDoneTotal / progress.NumberOfBytesTotal * 100), "Downloading update.");
             });
 
@@ -126,8 +131,8 @@ namespace Oetools.Sakoe.Command.Oe {
                 Log.Warn("The update will require you to accept the execution permission for the updater.exe.");
             }
 
-            Log.Done("The update will be done after this command has ended.");
             fileUpdater.Start();
+            Log.Done("Update successful.");
             
             return 0;
         }
