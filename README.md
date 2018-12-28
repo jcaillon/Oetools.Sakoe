@@ -1,36 +1,35 @@
-# Oetools.Sakoe
+# Sakoe
 
-[![Build status](https://ci.appveyor.com/api/projects/status/67ij0nnuwduac2cn?svg=true)](https://ci.appveyor.com/project/jcaillon/oetools-sakoe)
-[![GitHub release](https://img.shields.io/github/release/jcaillon/Oetools.Sakoe.svg)](https://github.com/jcaillon/Oetools.Sakoe/releases/latest)
-[![Total downloads](https://img.shields.io/github/downloads/jcaillon/Oetools.Sakoe/total.svg)](https://github.com/jcaillon/Oetools.Sakoe/releases)
-<!-- [![Coverity status](https://scan.coverity.com/projects/15362/badge.svg)](https://scan.coverity.com/projects/oetools-runner) -->
-
-[![GPLv3 licence](https://img.shields.io/badge/License-GPLv3-74A5C2.svg)](https://github.com/jcaillon/Oetools.Sakoe/blob/master/LICENSE)
-[![.net 4.6.1+ required](https://img.shields.io/badge/Requires%20.NET-4.6.1+-C8597A.svg)](http://go.microsoft.com/fwlink/?LinkId=671743)
+The **S**wiss **a**rmy **k**nife for **o**pen**e**dge, provides various tools useful for any openedge developer such as database manipulation, compiling a project, linting source files, etc...
 
 [![logo](docs/images/logo.png)](https://jcaillon.github.io/Oetools.Sakoe/)
 
-Sakoe has a **[dedicated website](https://jcaillon.github.io/Oetools.Sakoe/)**, go check it out!
+Status | Info
+------ | --------
+[![Build status](https://ci.appveyor.com/api/projects/status/67ij0nnuwduac2cn/branch/master?svg=true)](https://ci.appveyor.com/project/jcaillon/oetools-sakoe) | Windows CI Provided By [AppVeyor][]
+[![GitHub release](https://img.shields.io/github/release/jcaillon/Oetools.Sakoe.svg)](https://github.com/jcaillon/Oetools.Sakoe/releases/latest) | Latest github release
+[![Total downloads](https://img.shields.io/github/downloads/jcaillon/Oetools.Sakoe/total.svg)](https://github.com/jcaillon/Oetools.Sakoe/releases) | Total download
+[![GPLv3 licence](https://img.shields.io/badge/License-GPLv3-74A5C2.svg)](https://github.com/jcaillon/Oetools.Sakoe/blob/master/LICENSE) | GPLv3 License
+[![.net frmwk 4.6.1+](https://img.shields.io/badge/Requires%20.NET%20Framework-4.6.1+-C8597A.svg)](http://go.microsoft.com/fwlink/?LinkId=671743) | .net framwork 4.6.1+
+[![.net core 2.1+](https://img.shields.io/badge/Requires%20.NET%20core-2.1+-C8597A.svg)](https://dotnet.microsoft.com/download/dotnet-core/2.2) | or .net core 2.1+
+
+[AppVeyor]:http://www.appveyor.com/
+
+## About
+
+Please refer [to the documentation here](https://jcaillon.github.io/Oetools.Sakoe/).
 
 ## Build information
 
-Details/help on [how to build this project](docs/BUILD.md)
+Details/help on [how to build this project](docs/BUILD.md).
 
 ## Submodules
 
-- [Oetools.Utilities](https://github.com/jcaillon/Oetools.Utilities)
-- [Oetools.Builder](https://github.com/jcaillon/Oetools.Builder)
+- [Oetools.Utilities](https://github.com/jcaillon/Oetools.Utilities).
+- [Oetools.Builder](https://github.com/jcaillon/Oetools.Builder).
 
 ## Thanks
 
-### Jetbrain
+This project was developped using an opensource license of the [rider by jetbrains](https://www.jetbrains.com/).
 
-This project was developped using an opensource license of the **awesome** :
-
-[![resharper](docs/images/resharper.png)](https://www.jetbrains.com/)
-
-### Icon8
-
-The Sakoe logo is provided by the **awesome** :
-
-[![icon8](https://png.icons8.com/color/48/000000/icons8-logo.png)](https://icons8.com/)
+The logo is provided by the [icons8](https://icons8.com/).

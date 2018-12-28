@@ -24,10 +24,12 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Timers;
-using Oetools.Sakoe.ShellProgressBar;
 
-namespace Oetools.Sakoe.Utilities {
+namespace Oetools.Sakoe.ConLog {
     
+    /// <summary>
+    /// A progress bar displayed in the console.
+    /// </summary>
     public class ConsoleProgressBar : IDisposable {
         
         public ConsoleColor ForegroundColor { get; set; } = ConsoleColor.White;

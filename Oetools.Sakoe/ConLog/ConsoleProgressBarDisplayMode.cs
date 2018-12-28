@@ -1,4 +1,8 @@
-﻿namespace Oetools.Sakoe.Utilities {
+﻿namespace Oetools.Sakoe.ConLog {
+    
+    /// <summary>
+    /// The display mode of progress bars.
+    /// </summary>
     public enum ConsoleProgressBarDisplayMode {
         
         /// <summary>

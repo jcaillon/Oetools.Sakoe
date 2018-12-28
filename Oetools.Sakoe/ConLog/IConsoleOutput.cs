@@ -21,7 +21,7 @@
 using System;
 using System.IO;
 
-namespace Oetools.Sakoe.Utilities {
+namespace Oetools.Sakoe.ConLog {
     
     public interface IConsoleOutput {
         
@@ -74,11 +74,6 @@ namespace Oetools.Sakoe.Utilities {
         /// <param name="indentation">Apply indentation when writing on a new line.</param>
         /// <param name="prefixForNewLines">The text to put at the beginning of each new line that need to be created because of word wrap.</param>
         void WriteErrorOnNewLine(string text, ConsoleColor? color = null, int indentation = 0, string prefixForNewLines = null);
-        
-        /// <summary>
-        /// Draw the logo.
-        /// </summary>
-        void DrawLogo();
 
         /// <summary>
         /// Starts a new "tree" node. Write the next text as a node and subsequent texts as children of this node.
@@ -92,6 +87,9 @@ namespace Oetools.Sakoe.Utilities {
         /// <returns></returns>
         IConsoleOutput PopNode();
         
+        /// <summary>
+        /// Set or get the text writer to write to.
+        /// </summary>
         TextWriter OutputTextWriter { get; set; }
     }
 }

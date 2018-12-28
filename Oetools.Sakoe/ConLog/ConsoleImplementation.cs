@@ -24,108 +24,86 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace Oetools.Sakoe.Utilities {
+namespace Oetools.Sakoe.ConLog {
+    
+    /// <summary>
+    /// A wrapper around <see cref="Console"/> implementing <see cref="IConsoleImplementation"/>.
+    /// </summary>
     public class ConsoleImplementation : IConsoleImplementation {
-
-        #region singleton
         
         private static ConsoleImplementation _instance;
-        private bool? _isConsoleFullFeatured;
-        private bool? _isOutputRedirect;
-        private bool _hasWindowWidth = true;
 
         /// <summary>
         /// A singleton instance of <see cref="ConsoleImplementation" />.
         /// </summary>
         public static ConsoleImplementation Singleton => _instance ?? (_instance = new ConsoleImplementation());
+        
+        private bool? _isOutputRedirect;
+        private bool _hasWindowWidth = true;
 
-        private ConsoleImplementation() {
+        protected ConsoleImplementation() {
             Console.OutputEncoding = Encoding.UTF8;
             Console.InputEncoding = Encoding.UTF8;
         }
 
-        #endregion
-
-        /// <summary>
-        /// <see cref="Console.CancelKeyPress"/>.
-        /// </summary>
+        /// <inheritdoc />
         public event ConsoleCancelEventHandler CancelKeyPress {
             add => Console.CancelKeyPress += value;
             remove => Console.CancelKeyPress -= value;
         }
 
-        /// <summary>
-        /// <see cref="Console.Error"/>.
-        /// </summary>
+        /// <inheritdoc />
         public TextWriter Error => Console.Error;
 
-        /// <summary>
-        /// <see cref="Console.In"/>.
-        /// </summary>
+        /// <inheritdoc />
         public TextReader In => Console.In;
 
-        /// <summary>
-        /// <see cref="Console.Out"/>.
-        /// </summary>
+        /// <inheritdoc />
         public TextWriter Out => Console.Out;
 
-        /// <summary>
-        /// <see cref="Console.IsInputRedirected"/>.
-        /// </summary>
+        /// <inheritdoc />
         public bool IsInputRedirected => Console.IsInputRedirected;
 
-        /// <summary>
-        /// <see cref="Console.IsOutputRedirected"/>.
-        /// </summary>
+        /// <inheritdoc />
         public bool IsOutputRedirected => _isOutputRedirect ?? (_isOutputRedirect = Console.IsOutputRedirected).Value;
 
-        /// <summary>
-        /// <see cref="Console.IsErrorRedirected"/>.
-        /// </summary>
+        /// <inheritdoc />
         public bool IsErrorRedirected => Console.IsErrorRedirected;
 
-        /// <summary>
-        /// <see cref="Console.ForegroundColor"/>.
-        /// </summary>
+        /// <inheritdoc />
         public ConsoleColor ForegroundColor {
             get => Console.ForegroundColor;
             set => Console.ForegroundColor = value;
         }
 
-        /// <summary>
-        /// <see cref="Console.BackgroundColor"/>.
-        /// </summary>
+        /// <inheritdoc />
         public ConsoleColor BackgroundColor {
             get => Console.BackgroundColor;
             set => Console.BackgroundColor = value;
         }
-
+        
+        /// <inheritdoc />
         public void Write(string text = null) {
             Out.Write(text);
         }
 
+        /// <inheritdoc />
         public void WriteLine(string text = null) {
             Out.WriteLine(text);
         }
 
-        /// <summary>
-        /// <see cref="Console.ResetColor"/>.
-        /// </summary>
+        /// <inheritdoc />
         public void ResetColor() {
             Console.ResetColor();
         }
 
-        /// <summary>
-        /// <see cref="Console.CursorTop"/>.
-        /// </summary>
+        /// <inheritdoc />
         public int CursorTop {
             get => Console.CursorTop;
             set => Console.CursorTop = value;
         }
         
-        /// <summary>
-        /// <see cref="Console.WindowWidth"/>.
-        /// </summary>
+        /// <inheritdoc />
         public int WindowWidth {
             get {
                 try {
@@ -138,39 +116,21 @@ namespace Oetools.Sakoe.Utilities {
             set => Console.WindowWidth = value;
         }
         
-        /// <summary>
-        /// <see cref="Console.CursorVisible"/>.
-        /// </summary>
+        /// <inheritdoc />
         public bool CursorVisible {
             get => Console.CursorVisible;
             set {
                 try {
                     Console.CursorVisible = value;
                 } catch (IOException) {
-                    _isConsoleFullFeatured = false;
+                    // ignored.
                 }
             }
         }
 
-        /// <summary>
-        /// <see cref="Console.SetCursorPosition"/>.
-        /// </summary>
+        /// <inheritdoc />
         public void SetCursorPosition(int left, int top) {
             Console.SetCursorPosition(left, top);
-        }
-
-        public bool IsConsoleFullFeatured {
-            get {
-                if (!_isConsoleFullFeatured.HasValue) {
-                    try {
-                        Console.CursorVisible = Console.CursorVisible;
-                        _isConsoleFullFeatured = true;
-                    } catch (IOException) {
-                        _isConsoleFullFeatured = false;
-                    }
-                }
-                return _isConsoleFullFeatured.Value;
-            }
         }
         
     }

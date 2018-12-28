@@ -1,7 +1,7 @@
 #region header
 // ========================================================================
 // Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
-// This file (AExpectSubCommand.cs) is part of Oetools.Sakoe.
+// This file (ITraceLogger.cs) is part of Oetools.Sakoe.
 // 
 // Oetools.Sakoe is a free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,27 +18,28 @@
 // ========================================================================
 #endregion
 
-using McMaster.Extensions.CommandLineUtils;
-using Oetools.Sakoe.ConLog;
-using Oetools.Sakoe.Utilities;
-using ILogger = Oetools.Builder.Utilities.ILogger;
+using System;
 
-namespace Oetools.Sakoe.Command {
-    public abstract class AExpectSubCommand {
-
-        protected ILogger Log => ConsoleLogger2.Singleton;
+namespace Oetools.Sakoe.ConLog {
+    
+    /// <summary>
+    /// A debug/trace logger.
+    /// </summary>
+    public interface ITraceLogger {
         
-        protected IConsoleOutput Out => ConsoleLogger2.Singleton;
+        /// <summary>
+        /// Write the message to the debug log.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="e"></param>
+        void Write(string message, Exception e = null);
         
-        protected virtual int OnExecute(CommandLineApplication app, IConsole console) {
-            if (app.Parent == null) {
-                MainCommand.DrawLogo(Out);
-            }
-            app.ShowHelp();
-            Log.Warn(HelpGenerator.GetHelpProvideCommand(app));
-            Log.Warn($"Exit code {1}");
-            Out.WriteOnNewLine(null);
-            return 1;
-        }
+        /// <summary>
+        /// Report progress.
+        /// </summary>
+        /// <param name="max"></param>
+        /// <param name="current"></param>
+        /// <param name="message"></param>
+        void ReportProgress(int max, int current, string message);
     }
 }

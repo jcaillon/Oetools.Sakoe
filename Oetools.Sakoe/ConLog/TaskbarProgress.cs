@@ -2,9 +2,9 @@
 using System.Runtime.InteropServices;
 using Oetools.Utilities.Lib;
 
-namespace Oetools.Sakoe.ShellProgressBar {
+namespace Oetools.Sakoe.ConLog {
     
-    public static class TaskbarProgress {
+    internal static class TaskbarProgress {
         
         public enum TaskbarStates {
             NoProgress = 0,
@@ -14,7 +14,7 @@ namespace Oetools.Sakoe.ShellProgressBar {
             Paused = 0x8
         }
 
-        [ComImport()]
+        [ComImport]
         [Guid("ea1afb91-9e28-4b86-90e9-9e9f8a5eefaf")]
         [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
         private interface ITaskbarList3 {

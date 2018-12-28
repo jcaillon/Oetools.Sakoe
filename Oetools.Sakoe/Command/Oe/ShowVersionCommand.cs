@@ -19,7 +19,7 @@ namespace Oetools.Sakoe.Command.Oe {
             if (BareVersion) {
                 Out.WriteResultOnNewLine($"v{typeof(HelpGenerator).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}");
             } else {
-                Out.DrawLogo();
+                MainCommand.DrawLogo(Out);
             }
             return 0;
         }

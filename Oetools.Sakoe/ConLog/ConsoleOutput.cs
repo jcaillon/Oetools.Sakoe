@@ -20,34 +20,43 @@
 
 using System;
 using System.IO;
-using System.Reflection;
-using Oetools.Utilities.Lib;
 
-namespace Oetools.Sakoe.Utilities {
+namespace Oetools.Sakoe.ConLog {
     
     public class ConsoleOutput : IConsoleOutput, IDisposable {
         
         // TODO: add interface to draw a tree
 
         private ConsoleColor _originalForegroundColor;
-
-        protected readonly TextWriterOutputWordWrap WordWrapWriter;
-        
+        private readonly TextWriterOutputWordWrap _wordWrapWriter;
         private readonly IConsoleImplementation _console;
 
         private int _treeLevel;
         private string _treeNewLinePrefix;
         private bool _pushNewNode;
 
-        public TextWriter OutputTextWriter { get; set; }
+        /// <inheritdoc />
+        public TextWriter OutputTextWriter {
+            get => _wordWrapWriter.UnderLyingWriter;
+            set => _wordWrapWriter.UnderLyingWriter = value ?? _console.Out;
+        }
 
-        public ConsoleOutput(IConsoleImplementation console) {
+        /// <inheritdoc cref="TextWriterOutputWordWrap.HasWroteToOuput"/>
+        protected bool HasWroteToOuput {
+            get => _wordWrapWriter.HasWroteToOuput;
+            set => _wordWrapWriter.HasWroteToOuput = value;
+        }
+
+        protected ConsoleOutput(IConsoleImplementation console) {
             _console = console;
             _console.ResetColor();
             _originalForegroundColor = _console.ForegroundColor;
-            WordWrapWriter = new TextWriterOutputWordWrap(_console.Out);
+            _wordWrapWriter = new TextWriterOutputWordWrap(_console.Out);
         }
 
+        /// <summary>
+        /// Disposable implementation.
+        /// </summary>
         public virtual void Dispose() {
             _console.ResetColor();
         }
@@ -55,37 +64,37 @@ namespace Oetools.Sakoe.Utilities {
         /// <inheritdoc />
         public virtual void WriteResult(string text, ConsoleColor? color = null) {
             _console.ForegroundColor = color ?? _originalForegroundColor;
-            WordWrapWriter.Write(text, 0, false, 0, OutputTextWriter ?? _console.Out);
+            _wordWrapWriter.Write(text, 0, false);
         }
 
         /// <inheritdoc />
         public virtual void WriteResultOnNewLine(string text, ConsoleColor? color = null) {
             _console.ForegroundColor = color ?? _originalForegroundColor;
-            WordWrapWriter.Write(text, 0, true, 0, OutputTextWriter ?? _console.Out);
+            _wordWrapWriter.Write(text, 0, true);
         }
         
         /// <inheritdoc />
         public virtual void Write(string text, ConsoleColor? color = null, int indentation = 0, string prefixForNewLines = null) {
             _console.ForegroundColor = color ?? _originalForegroundColor;
-            WordWrapWriter.Write(text, _console.IsOutputRedirected ? 0 : _console.WindowWidth, false, indentation, OutputTextWriter ?? _console.Out, string.IsNullOrEmpty(prefixForNewLines) ? _treeNewLinePrefix : $"{prefixForNewLines}{_treeNewLinePrefix}");
+            _wordWrapWriter.Write(text, _console.IsOutputRedirected ? 0 : _console.WindowWidth, false, indentation, string.IsNullOrEmpty(prefixForNewLines) ? _treeNewLinePrefix : $"{prefixForNewLines}{_treeNewLinePrefix}");
         }
 
         /// <inheritdoc />
         public virtual void WriteOnNewLine(string text, ConsoleColor? color = null, int indentation = 0, string prefixForNewLines = null) {
             _console.ForegroundColor = color ?? _originalForegroundColor;
-            WordWrapWriter.Write(GetText(text), _console.IsOutputRedirected ? 0 : _console.WindowWidth, true, indentation, OutputTextWriter ?? _console.Out, string.IsNullOrEmpty(prefixForNewLines) ? _treeNewLinePrefix : $"{prefixForNewLines}{_treeNewLinePrefix}");
+            _wordWrapWriter.Write(GetText(text), _console.IsOutputRedirected ? 0 : _console.WindowWidth, true, indentation, string.IsNullOrEmpty(prefixForNewLines) ? _treeNewLinePrefix : $"{prefixForNewLines}{_treeNewLinePrefix}");
         }
 
         /// <inheritdoc />
         public virtual void WriteError(string text, ConsoleColor? color = null, int indentation = 0, string prefixForNewLines = null) {
             _console.ForegroundColor = color ?? _originalForegroundColor;
-            WordWrapWriter.Write(text, _console.IsOutputRedirected ? 0 : _console.WindowWidth, false, indentation, OutputTextWriter ?? _console.Error, string.IsNullOrEmpty(prefixForNewLines) ? _treeNewLinePrefix : $"{prefixForNewLines}{_treeNewLinePrefix}");
+            _wordWrapWriter.Write(text, _console.IsOutputRedirected ? 0 : _console.WindowWidth, false, indentation, string.IsNullOrEmpty(prefixForNewLines) ? _treeNewLinePrefix : $"{prefixForNewLines}{_treeNewLinePrefix}");
         }
 
         /// <inheritdoc />
         public virtual void WriteErrorOnNewLine(string text, ConsoleColor? color = null, int indentation = 0, string prefixForNewLines = null) {
             _console.ForegroundColor = color ?? _originalForegroundColor;
-            WordWrapWriter.Write(GetText(text), _console.IsOutputRedirected ? 0 : _console.WindowWidth, true, indentation, OutputTextWriter ?? _console.Error, string.IsNullOrEmpty(prefixForNewLines) ? _treeNewLinePrefix : $"{prefixForNewLines}{_treeNewLinePrefix}");
+            _wordWrapWriter.Write(GetText(text), _console.IsOutputRedirected ? 0 : _console.WindowWidth, true, indentation, string.IsNullOrEmpty(prefixForNewLines) ? _treeNewLinePrefix : $"{prefixForNewLines}{_treeNewLinePrefix}");
         }
 
         private string GetText(string text) {
@@ -125,56 +134,5 @@ namespace Oetools.Sakoe.Utilities {
             return this;
         }
 
-        /// <summary>
-        /// Draw the logo of this tool.
-        /// </summary>
-        public void DrawLogo() {
-            WriteOnNewLine(null);
-            WriteOnNewLine(@"                '`.        ", ConsoleColor.DarkGray);
-            Write(@"============ ", ConsoleColor.DarkGray);
-            Write(@"SAKOE", ConsoleColor.Yellow);
-            Write(@" ============", ConsoleColor.DarkGray);
-            WriteOnNewLine(@" '`.    ", ConsoleColor.DarkGray);
-            Write(@".^", ConsoleColor.Gray);
-            Write(@"      \  \       ", ConsoleColor.DarkGray);
-            Write(@"A ");
-            Write(@"S", ConsoleColor.Yellow);
-            Write(@"wiss ");
-            Write(@"A", ConsoleColor.Yellow);
-            Write(@"rmy ");
-            Write(@"K", ConsoleColor.Yellow);
-            Write(@"nife for ");
-            Write(@"O", ConsoleColor.Yellow);
-            Write(@"pen");
-            Write(@"E", ConsoleColor.Yellow);
-            Write(@"dge.");
-            WriteOnNewLine(@"  \ \", ConsoleColor.DarkGray);
-            Write(@"  /;/", ConsoleColor.Gray);
-            Write(@"       \ \\      ", ConsoleColor.DarkGray);
-            Write("Version ", ConsoleColor.DarkGray);
-            Write(typeof(HelpGenerator).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion, ConsoleColor.Gray);
-            Write(".", ConsoleColor.DarkGray);
-            WriteOnNewLine(@"   \ \", ConsoleColor.DarkGray);
-            Write(@"/", ConsoleColor.Gray);
-            Write(@"_", ConsoleColor.Red);
-            Write(@"/", ConsoleColor.Gray);
-            Write(@"_________", ConsoleColor.Red);
-            Write(@"\", ConsoleColor.DarkGray);
-            Write(@"__", ConsoleColor.Red);
-            Write(@"\     ", ConsoleColor.DarkGray);
-            Write($"Running with {(Utils.IsNetFrameworkBuild ? ".netframework" : $".netcore-{(Utils.IsRuntimeWindowsPlatform ? "win" : "unix")}")}.", ConsoleColor.DarkGray);
-            WriteOnNewLine(@"    `", ConsoleColor.DarkGray);
-            Write(@"/ ", ConsoleColor.Red);
-            Write(@".           _", ConsoleColor.White);
-            Write(@"  \    ", ConsoleColor.Red);
-            Write("Session started on .", ConsoleColor.DarkGray);
-            Write($"{DateTime.Now:yy-MM-dd} at {DateTime.Now:HH:mm:ss}", ConsoleColor.Gray);
-            Write(".", ConsoleColor.DarkGray);
-            WriteOnNewLine(@"     \________________/    ", ConsoleColor.Red);
-            Write(@"Source code on ", ConsoleColor.DarkGray);
-            Write(@"github.com/jcaillon", ConsoleColor.Gray);
-            Write(@".", ConsoleColor.DarkGray);
-            WriteOnNewLine(null);
-        }
     }
 }

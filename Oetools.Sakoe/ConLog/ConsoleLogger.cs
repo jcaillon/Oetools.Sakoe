@@ -1,8 +1,7 @@
-﻿#region header
-
+#region header
 // ========================================================================
 // Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
-// This file (Logger.cs) is part of Oetools.Sakoe.
+// This file (ConsoleLogger.cs) is part of Oetools.Sakoe.
 // 
 // Oetools.Sakoe is a free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,106 +16,52 @@
 // You should have received a copy of the GNU General Public License
 // along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
-
 #endregion
 
 using System;
 using System.Diagnostics;
-using System.IO;
-using System.Text;
-using Oetools.Builder.Utilities;
-using Oetools.Utilities.Lib.Extension;
-using Utils = Oetools.Utilities.Lib.Utils;
 
-namespace Oetools.Sakoe.Utilities {
+namespace Oetools.Sakoe.ConLog {
     
-    public class ConsoleIo : ConsoleOutput, ILogger, ITraceLogger {
+    public class ConsoleLogger : ConsoleOutput, ILogger, ITraceLogger {
 
-        #region singleton
-
-        private static ConsoleIo _instance;
+        private static ConsoleLogger _instance;
 
         /// <summary>
-        /// A singleton instance of <see cref="HelpGenerator" />.
+        /// A singleton instance of <see cref="ConsoleLogger" />.
         /// </summary>
-        public static ConsoleIo Singleton => _instance ?? (_instance = new ConsoleIo(ConsoleImplementation.Singleton));
-
-        #endregion
+        public static ConsoleLogger Singleton => _instance ?? (_instance = new ConsoleLogger(ConsoleImplementation.Singleton));
 
         /// <summary>
-        /// Initializes a new instance of <see cref="ConsoleIo"/>.
+        /// Initializes a new instance of <see cref="ConsoleLogger"/>.
         /// </summary>
-        private ConsoleIo(IConsoleImplementation console) : base(console) {
+        protected ConsoleLogger(IConsoleImplementation console) : base(console) {
             _stopwatch = Stopwatch.StartNew();
             _console = console;
         }
         
         private readonly IConsoleImplementation _console;
-        
-        private Stopwatch _stopwatch;
-
+        protected Stopwatch _stopwatch;
         private ConsoleProgressBar _progressBar;
-        
-        private ConsoleLogThreshold _logThreshold = ConsoleLogThreshold.Info;
 
-        private StringBuilder _logContent;
-        private string _logOutputFilePath;
-
-        public ConsoleLogThreshold LogTheshold {
-            get => _logThreshold;
-            set {
-                _logThreshold = value;
-                if (LogTheshold <= ConsoleLogThreshold.Debug) {
-                    Trace = this;
-                } else {
-                    Trace = null;
-                }
-            }
-        }
-
-        public string LogOutputFilePath {
-            get => _logOutputFilePath;
-            set {
-                _logOutputFilePath = value;
-                if (!Utils.IsPathRooted(_logOutputFilePath)) {
-                    _logOutputFilePath = Path.Combine(Directory.GetCurrentDirectory(), _logOutputFilePath);
-                }
-                const int maxSizeInMo = 100;
-                if (File.Exists(_logOutputFilePath)) {
-                    if (new FileInfo(_logOutputFilePath).Length > maxSizeInMo * 1024 * 1024) {
-                        Warn($"The log file has a size superior to {maxSizeInMo}MB, please consider clearing it: {_logOutputFilePath.PrettyQuote()}.");
-                    }
-                } else {
-                    try {
-                        var dirName = Path.GetDirectoryName(_logOutputFilePath);
-                        if (!Directory.Exists(dirName)) {
-                            Directory.CreateDirectory(dirName);
-                        }
-                        File.WriteAllText(_logOutputFilePath, "");
-                    } catch (Exception e) {
-                        throw new Exception($"Could not create the log file: {_logOutputFilePath.PrettyQuote()}. {e.Message}", e);
-                    }
-                }
-                Info($"Logging to file: {_logOutputFilePath.PrettyQuote()}.");
-                _logContent = new StringBuilder();
-                _logContent.AppendLine("===================================");
-                _logContent.AppendLine("========= NEW LOG SESSION =========");
-            }
-        }
+        /// <summary>
+        /// Sets and gets the current threshold at which to start logging events.
+        /// </summary>
+        public ConsoleLogThreshold LogTheshold { get; set; } = ConsoleLogThreshold.Info;
 
         /// <inheritdoc />
-        public ITraceLogger Trace { get; private set; }
+        public ITraceLogger Trace => LogTheshold <= ConsoleLogThreshold.Debug ? this : null;
 
         /// <summary>
         /// Progress bar display mode.
         /// </summary>
         public ConsoleProgressBarDisplayMode ProgressBarDisplayMode { get; set; }
 
+        /// <inheritdoc />
         public override void Dispose() {
             base.Dispose();
             _progressBar?.Dispose();
             _progressBar = null;
-            FlushLogToFile();
         }
         
         /// <inheritdoc />
@@ -159,14 +104,10 @@ namespace Oetools.Sakoe.Utilities {
         }
 
         /// <inheritdoc />
-        public ILogger If(bool condition) {
-            return condition ? this : null;
-        }
+        public ILogger If(bool condition) => condition ? this : null;
 
         /// <inheritdoc cref="ILogger.ReportProgress"/>
-        public void ReportProgress(int max, int current, string message) {
-            LogToFile(ConsoleLogThreshold.Debug, $"[{$"{(int) Math.Round((decimal) current / max * 100, 2)}%".PadLeft(4)}] {message}", null);
-            
+        public virtual void ReportProgress(int max, int current, string message) {
             if (ProgressBarDisplayMode == ConsoleProgressBarDisplayMode.Off) {
                 return;
             }
@@ -202,7 +143,7 @@ namespace Oetools.Sakoe.Utilities {
 
         private void StopProgressBar() {
             if (_progressBar?.Stop() ?? false) {
-                WordWrapWriter.HasWroteToOuput = false;
+                HasWroteToOuput = false;
             }
         }
 
@@ -247,12 +188,16 @@ namespace Oetools.Sakoe.Utilities {
             base.WriteErrorOnNewLine(text, color, indentation, prefixForNewLines);
         }
 
-
-        private void Log(ConsoleLogThreshold level, string message, Exception e = null) {
+        /// <summary>
+        /// Log a message.
+        /// </summary>
+        /// <param name="level"></param>
+        /// <param name="message"></param>
+        /// <param name="e"></param>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        protected virtual void Log(ConsoleLogThreshold level, string message, Exception e = null) {
             StopProgressBar();           
             
-            LogToFile(level, message, e);
-
             if (level < LogTheshold) {
                 return;
             }
@@ -295,27 +240,5 @@ namespace Oetools.Sakoe.Utilities {
                 base.Write(message, outputColor, logPrefix.Length);
             }
         }
-
-        private void FlushLogToFile() {
-            if (string.IsNullOrEmpty(LogOutputFilePath) || _logContent == null) {
-                return;
-            }
-            File.AppendAllText(LogOutputFilePath, _logContent.ToString());
-            _logContent.Clear();
-        }
-
-        private void LogToFile(ConsoleLogThreshold level, string message, Exception e) {
-            if (_logContent != null) {
-                var elapsed = _stopwatch.Elapsed;
-                _logContent.AppendLine($"{level.ToString().ToUpper().PadRight(5, ' ')} [{elapsed.Minutes:D2}:{elapsed.Seconds:D2}.{elapsed.Milliseconds:D3}] {message}");
-                if (e != null) {
-                    _logContent.AppendLine(e.ToString());
-                }
-                if (_logContent.Length > 100000) {
-                    FlushLogToFile();
-                }
-            }
-        }
-        
     }
 }

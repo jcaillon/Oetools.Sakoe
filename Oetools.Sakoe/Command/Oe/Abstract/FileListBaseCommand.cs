@@ -39,16 +39,16 @@ namespace Oetools.Sakoe.Command.Oe.Abstract {
         [Option("-r|--recursive", "Recursive listing in the directories.", CommandOptionType.NoValue)]
         public bool RecursiveListing { get; }
         
-        [Option("-i|--include <filter>", "Include filter for directory listing. Can use wildcards (**,*,?). See " + ManCommand.Name + " " + FiltersHelpCommand.Name + ".", CommandOptionType.SingleValue)]
+        [Option("-i|--include <filter>", "Include filter for directory listing. Can use wildcards (**,*,?).", CommandOptionType.SingleValue)]
         public string IncludeFilter { get; }
         
-        [Option("-e|--exclude <filter>", "Exclude filter for directory listing. Can use wildcards (**,*,?). See " + ManCommand.Name + " " + FiltersHelpCommand.Name + ".", CommandOptionType.SingleValue)]
+        [Option("-e|--exclude <filter>", "Exclude filter for directory listing. Can use wildcards (**,*,?).", CommandOptionType.SingleValue)]
         public string ExcludeFilter { get; }
         
-        [Option("-ir|--include-regex <filter>", "Regular expression include filter for directory listing. See " + ManCommand.Name + " " + FiltersHelpCommand.Name + ".", CommandOptionType.SingleValue)]
+        [Option("-ir|--include-regex <filter>", "Regular expression include filter for directory listing.", CommandOptionType.SingleValue)]
         public string IncludeRegexFilter { get; }
         
-        [Option("-er|--exclude-regex <filter>", "Regular expression include filter for directory listing. See " + ManCommand.Name + " " + FiltersHelpCommand.Name + ".", CommandOptionType.SingleValue)]
+        [Option("-er|--exclude-regex <filter>", "Regular expression include filter for directory listing..", CommandOptionType.SingleValue)]
         public string ExcludeRegexFilter { get; }
 
         public virtual IEnumerable<string> GetFilesList(CommandLineApplication app) {

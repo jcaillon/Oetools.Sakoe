@@ -28,6 +28,7 @@ using System.Linq;
 using System.Reflection;
 using McMaster.Extensions.CommandLineUtils;
 using McMaster.Extensions.CommandLineUtils.HelpText;
+using Oetools.Sakoe.ConLog;
 using Oetools.Sakoe.Utilities.Extension;
 using Oetools.Utilities.Lib.Extension;
 
@@ -42,7 +43,7 @@ namespace Oetools.Sakoe.Utilities {
         /// <summary>
         /// A singleton instance of <see cref="HelpGenerator" />.
         /// </summary>
-        public static HelpGenerator Singleton => _instance ?? (_instance = new HelpGenerator(ConsoleIo.Singleton));
+        public static HelpGenerator Singleton => _instance ?? (_instance = new HelpGenerator(ConsoleLogger2.Singleton));
 
         /// <summary>
         /// Initializes a new instance of <see cref="HelpGenerator"/>.
@@ -60,7 +61,7 @@ namespace Oetools.Sakoe.Utilities {
         }
 
         /// <inheritdoc />
-        public void Generate(CommandLineApplication application, TextWriter output) {
+        public virtual void Generate(CommandLineApplication application, TextWriter output) {
             try {
                 _console.OutputTextWriter = output;
                 GenerateCommandHelp(application);
@@ -69,7 +70,7 @@ namespace Oetools.Sakoe.Utilities {
             }
         }
 
-        private void GenerateCommandHelp(CommandLineApplication application) {
+        protected virtual void GenerateCommandHelp(CommandLineApplication application) {
             var arguments = application.Arguments.Where(a => a.ShowInHelpText).ToList();
             var options = application.GetOptions().Where(o => o.ShowInHelpText).ToList();
             var commands = application.Commands.Where(c => c.ShowInHelpText).ToList();
@@ -137,12 +138,6 @@ namespace Oetools.Sakoe.Utilities {
             WriteOnNewLine(null);
             WriteSectionTitle("USAGE");
             WriteOnNewLine(thisCommandLine);
-            #if !WINDOWSONLYBUILD
-            if (!File.Exists(CreateStarterCommand.StartScriptFilePath)) {
-                WriteOnNewLine(null);
-                WriteTip($"Tip: use the command '{typeof(CreateStarterCommand).GetFullCommandLine()}' to simplify your invocation of sakoe.");
-            }
-            #endif
             
             foreach (var argument in visibleArguments) {
                 Write($" {argument.Name}");
@@ -160,6 +155,13 @@ namespace Oetools.Sakoe.Utilities {
                     Write(" [[--] <arg>...]");
                 }
             }
+            
+            #if !WINDOWSONLYBUILD
+            if (!File.Exists(CreateStarterCommand.StartScriptFilePath)) {
+                WriteOnNewLine(null);
+                WriteTip($"Tip: use the command '{typeof(CreateStarterCommand).GetFullCommandLine()}' to simplify your invocation of sakoe.");
+            }
+            #endif
         }
 
         /// <summary>

@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
+using System.Text;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder.Project;
 using Oetools.Builder.Project.Properties;
@@ -17,7 +20,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Subcommand(typeof(ListAllCommandsManCommand))]
     [Subcommand(typeof(BuildManCommand))]
     [Subcommand(typeof(CompleteManCommand))]
-    [Subcommand(typeof(FiltersHelpCommand))]
+    [Subcommand(typeof(MarkdownManCommand))]
     [CommandAdditionalHelpTextAttribute(nameof(GetAdditionalHelpText))]
     internal class ManCommand {
         
@@ -62,42 +65,22 @@ In response files, you do not have to double quote arguments containing spaces, 
 
 If you want to help, you are welcome to contribute to the github repo. 
 You are invited to STAR the project on github to increase its visibility!");
-            
-            formatter.WriteOnNewLine(null);
-            formatter.WriteSectionTitle("LEARN MORE");
-            formatter.WriteOnNewLine("Learn more about specific topics using the command:");
-            formatter.WriteOnNewLine(null);
-            formatter.WriteOnNewLine($"{app.GetFullCommandLine()} <TOPIC>");
 
-            formatter.WriteOnNewLine(null);
-            formatter.WriteSectionTitle("TOPICS");
-            foreach (var command in app.Commands.ToList().OrderBy(c => c.Name)) {
-                formatter.WriteOnNewLine(command.Name.PadRight(30));
-                formatter.Write(command.Description, padding: 30);
+            if (app.Commands != null && app.Commands.Count > 0) {
+                formatter.WriteOnNewLine(null);
+                formatter.WriteSectionTitle("LEARN MORE");
+                formatter.WriteOnNewLine("Learn more about specific topics using the command:");
+                formatter.WriteOnNewLine(null);
+                formatter.WriteOnNewLine($"{app.GetFullCommandLine()} <TOPIC>");
+
+                formatter.WriteOnNewLine(null);
+                formatter.WriteSectionTitle("TOPICS");
+                foreach (var command in app.Commands.ToList().OrderBy(c => c.Name)) {
+                    formatter.WriteOnNewLine(command.Name.PadRight(30));
+                    formatter.Write(command.Description, padding: 30);
+                }
             }
-            
-            formatter.WriteOnNewLine(null);
-        }
-        
-        protected virtual int OnExecute(CommandLineApplication app, IConsole console) {
-            GetAdditionalHelpText(HelpGenerator.Singleton, app, 0);
-            return 0;
-        }
-        
-    }
-    
-    [Command(
-        Name, "fi",
-        Description = "How to use filters."
-    )]
-    [CommandAdditionalHelpTextAttribute(nameof(GetAdditionalHelpText))]
-    internal class FiltersHelpCommand {
-        
-        public const string Name = "filters";
 
-        public static void GetAdditionalHelpText(IHelpFormatter formatter, CommandLineApplication app, int firstColumnWidth) {
-            formatter.WriteOnNewLine(null);
-            formatter.WriteOnNewLine("Write something about the filters.");
             formatter.WriteOnNewLine(null);
         }
         
@@ -105,10 +88,11 @@ You are invited to STAR the project on github to increase its visibility!");
             GetAdditionalHelpText(HelpGenerator.Singleton, app, 0);
             return 0;
         }
+        
     }
     
     [Command(
-        "allcmd", "all", "al",
+        "list", "li",
         Description = "List all the commands of this tool."
     )]
     [CommandAdditionalHelpTextAttribute(nameof(GetAdditionalHelpText))]
@@ -128,7 +112,7 @@ You are invited to STAR the project on github to increase its visibility!");
 
         private static void ListCommands(IHelpFormatter formatter, List<CommandLineApplication> subCommands, string linePrefix) {
             var i = 0;
-            foreach (var subCommand in subCommands) {
+            foreach (var subCommand in subCommands.OrderBy(c => c.Name)) {
                 formatter.WriteOnNewLine($"{linePrefix}{(i == subCommands.Count - 1 ? "└─ " : "├─ ")}{subCommand.Name}".PadRight(30));
                 var linePrefixForNewLine = $"{linePrefix}{(i == subCommands.Count - 1 ? "   " : "│  ")}";
                 formatter.Write(subCommand.Description, padding: 30, prefixForNewLines: linePrefixForNewLine);
@@ -147,20 +131,106 @@ You are invited to STAR the project on github to increase its visibility!");
     
     [Command(
         "complete", "co",
-        Description = "Generate ."
+        Description = "Print the help of each command of this tool ."
     )]
     [CommandAdditionalHelpTextAttribute(nameof(GetAdditionalHelpText))]
     internal class CompleteManCommand {
         
         public static void GetAdditionalHelpText(IHelpFormatter formatter, CommandLineApplication app, int firstColumnWidth) {
             formatter.WriteOnNewLine(null);
-            // TODO: list all get help of all the commands
+            app.Parent.Commands.Remove(app);
+            var rootCommand = app;
+            while (rootCommand.Parent != null) {
+                rootCommand = rootCommand.Parent;
+            }
+            ListCommands(formatter, rootCommand.Commands);
             formatter.WriteOnNewLine(null);
+        }
+
+        private static void ListCommands(IHelpFormatter formatter, List<CommandLineApplication> subCommands) {
+            var i = 0;
+            foreach (var subCommand in subCommands.OrderBy(c => c.Name)) {
+                formatter.WriteSectionTitle("================");
+                formatter.WriteSectionTitle(subCommand.GetFullCommandLine());
+                formatter.WriteSectionTitle("================");
+                subCommand.ShowHelp();
+                if (subCommand.Commands != null && subCommand.Commands.Count > 0) {
+                    ListCommands(formatter, subCommand.Commands);
+                }
+                i++;
+            }
         }
         
         protected virtual int OnExecute(CommandLineApplication app, IConsole console) {
             GetAdditionalHelpText(HelpGenerator.Singleton, app, 0);
             return 0;
+        }
+    }
+    
+    
+    [Command(
+        "markdown-file", "mf",
+        Description = "Print the help of each command of this tool in a markdown file.",
+        ShowInHelpText = false
+    )]
+    internal class MarkdownManCommand {
+        
+        [Required]
+        [LegalFilePath]
+        [Argument(0, "<file>", "The file in which to print this markdown manual.")]
+        public string OutputFile { get; set; }
+        
+        protected virtual int OnExecute(CommandLineApplication app, IConsole console) {
+            app.Parent.Commands.Clear();
+            
+            using (var stream = new FileStream(OutputFile, FileMode.Create)) {
+                using (var writer = new StreamWriter(stream, Encoding.UTF8)) {
+                    writer.WriteLine("# SAKOE");
+                    writer.WriteLine();
+                    
+                    var rootCommand = app;
+                    while (rootCommand.Parent != null) {
+                        rootCommand = rootCommand.Parent;
+                    }
+
+                    var mdGenerator = new MarkdownHelpGenerator(writer);
+                    
+                    writer.WriteLine("## About");
+                    writer.WriteLine();
+                    ManCommand.GetAdditionalHelpText(mdGenerator, app.Parent, 0);
+                    
+                    writer.WriteLine("## Table of content");
+                    writer.WriteLine();
+                    WriteToc(writer, rootCommand.Commands, "");
+                    writer.WriteLine();
+                    
+                    ListCommands(mdGenerator, rootCommand.Commands);
+                }
+            }
+            return 0;
+        }
+        
+        private static void WriteToc(StreamWriter writer, List<CommandLineApplication> subCommands, string linePrefix) {
+            var i = 0;
+            foreach (var subCommand in subCommands.OrderBy(c => c.Name)) {
+                writer.WriteLine($"{linePrefix}- [{subCommand.Name}](#{subCommand.GetFullCommandLine().Replace(" ", "-")})");
+                if (subCommand.Commands != null && subCommand.Commands.Count > 0) {
+                    WriteToc(writer, subCommand.Commands, $"{linePrefix}  ");
+                }
+                i++;
+            }
+        }
+        
+        private static void ListCommands(MarkdownHelpGenerator mdGenerator, List<CommandLineApplication> subCommands) {
+            var i = 0;
+            foreach (var subCommand in subCommands.OrderBy(c => c.Name)) {
+                mdGenerator.WriteOnNewLine($"## {subCommand.GetFullCommandLine()}");
+                mdGenerator.GenerateCommandHelp(subCommand);
+                if (subCommand.Commands != null && subCommand.Commands.Count > 0) {
+                    ListCommands(mdGenerator, subCommand.Commands);
+                }
+                i++;
+            }
         }
     }
     

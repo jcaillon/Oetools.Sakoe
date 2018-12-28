@@ -25,7 +25,9 @@ using System.Threading;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder.Utilities;
 using Oetools.Sakoe.Command.Exceptions;
+using Oetools.Sakoe.ConLog;
 using Oetools.Sakoe.Utilities;
+using ILogger = Oetools.Builder.Utilities.ILogger;
 
 namespace Oetools.Sakoe.Command {
     
@@ -78,11 +80,11 @@ namespace Oetools.Sakoe.Command {
         /// <returns></returns>
         // ReSharper disable once UnusedMember.Global
         protected int OnExecute(CommandLineApplication app, IConsole console) {
-            Log = ConsoleIo.Singleton;
-            Out = ConsoleIo.Singleton;
+            Log = ConsoleLogger2.Singleton;
+            Out = ConsoleLogger2.Singleton;
             HelpFormatter = HelpGenerator.Singleton;
-            ConsoleIo.Singleton.LogTheshold = Verbosity;
-            ConsoleIo.Singleton.ProgressBarDisplayMode = ProgressBarDisplayMode ?? ConsoleProgressBarDisplayMode.On;
+            ConsoleLogger2.Singleton.LogTheshold = Verbosity;
+            ConsoleLogger2.Singleton.ProgressBarDisplayMode = ProgressBarDisplayMode ?? ConsoleProgressBarDisplayMode.On;
             if (LogOutputFilePath.HasValue) {
                 var logFilePath = LogOutputFilePath.Value;
                 if (string.IsNullOrEmpty(logFilePath)) {
@@ -92,7 +94,7 @@ namespace Oetools.Sakoe.Command {
                         logFilePath = Path.Combine(Directory.GetCurrentDirectory(), "sakoe.log");
                     }
                 }
-                ConsoleIo.Singleton.LogOutputFilePath = logFilePath;
+                ConsoleLogger2.Singleton.LogOutputFilePath = logFilePath;
             }
             
             
@@ -100,7 +102,7 @@ namespace Oetools.Sakoe.Command {
             console.CancelKeyPress += ConsoleOnCancelKeyPress;
             
             if (IsLogoOn) {
-                Out.DrawLogo();
+                MainCommand.DrawLogo(Out);
             }
             
             int exitCode = FatalExitCode;
@@ -144,7 +146,7 @@ namespace Oetools.Sakoe.Command {
         /// <returns></returns>
         // ReSharper disable once UnusedMember.Global
         public int OnValidationError(ValidationResult r) {
-            var log = ConsoleIo.Singleton;
+            var log = ConsoleLogger2.Singleton;
             var faultyMembers = string.Join(", ", r.MemberNames);
             log.Error($"{(faultyMembers.Length > 0 ? $"{faultyMembers} : ": "")}{r.ErrorMessage}");
             log.Info($"Specify {MainCommand.HelpLongName} for a list of available options and commands.");
@@ -161,7 +163,7 @@ namespace Oetools.Sakoe.Command {
         /// <returns></returns>
         protected virtual int ExecuteCommand(CommandLineApplication app, IConsole console) {
             if (!IsLogoOn && app.Parent == null) {
-                Out.DrawLogo();
+                MainCommand.DrawLogo(Out);
             }
             app.ShowHelp();
             Log.Warn(HelpGenerator.GetHelpProvideCommand(app));

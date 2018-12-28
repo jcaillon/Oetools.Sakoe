@@ -1,7 +1,7 @@
 #region header
 // ========================================================================
 // Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
-// This file (IConsoleImplementation.cs) is part of Oetools.Sakoe.
+// This file (ConsoleImplementation2.cs) is part of Oetools.Sakoe.
 // 
 // Oetools.Sakoe is a free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,15 +19,16 @@
 #endregion
 
 using McMaster.Extensions.CommandLineUtils;
+using Oetools.Sakoe.ConLog;
 
 namespace Oetools.Sakoe.Utilities {
-    public interface IConsoleImplementation : IConsole {
-        int CursorTop { get; set; }
-        int WindowWidth { get; set; }
-        bool CursorVisible { get; set; }
-        void SetCursorPosition(int left, int top);
-        void Write(string text = null);
-        void WriteLine(string text = null);
-        bool IsConsoleFullFeatured { get; }
+    public class ConsoleImplementation2 : ConsoleImplementation, IConsole {
+        
+        private static ConsoleImplementation2 _instance;
+
+        /// <summary>
+        /// A singleton instance of <see cref="ConsoleImplementation" />.
+        /// </summary>
+        public new static ConsoleImplementation2 Singleton => _instance ?? (_instance = new ConsoleImplementation2());
     }
 }

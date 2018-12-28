@@ -21,6 +21,7 @@
 using System;
 
 namespace Oetools.Sakoe.Utilities {
+    
     /// <summary>
     /// Special attribute that allows to know the name of the method that should be used in order to get additional help text of the command.
     /// </summary>

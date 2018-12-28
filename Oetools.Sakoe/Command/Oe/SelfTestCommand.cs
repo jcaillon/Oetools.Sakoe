@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Threading;
 using McMaster.Extensions.CommandLineUtils;
-using Oetools.Sakoe.ShellProgressBar;
 using Oetools.Sakoe.Utilities;
 using Oetools.Sakoe.Utilities.Extension;
 using Oetools.Utilities.Openedge.Database;
