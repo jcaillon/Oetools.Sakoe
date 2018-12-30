@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- https://docs.microsoft.com/en-us/visualstudio/msbuild/msbuild-project-file-schema-reference?view=vs-2017 -->
+
+  <PropertyGroup Label="Assembly info">
+    <!-- https://docs.microsoft.com/en-us/visualstudio/msbuild/common-msbuild-project-properties?view=vs-2017 -->
+    <!-- https://docs.microsoft.com/en-us/dotnet/core/tools/csproj -->
+    <OutputType>$(ProjOutputType)</OutputType>
+    <AssemblyName>$(ProjAssemblyName)</AssemblyName>
+    <RootNamespace>$(ProjRootNamespace)</RootNamespace>
+    <!-- VersionPrefix: major.minor.patch[.build] (a SemVer three-digit string, but it can be up to four digits) -->
+    <!-- VersionSuffix: [0-9A-Za-z-]* (the pre-release label, is an alphanumeric-plus-hyphen string) -->
+    <!-- Version: major.minor.patch[.build][-[0-9A-Za-z-]*] = $(VersionPrefix)-$(VersionSuffix) -->
+    <Version>$(ProjVersion)</Version>
+    <!-- InformationalVersion: .* = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion = $(InformationalVersion) -->
+    <!-- ProductVersion: .* = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductVersion = $(InformationalVersion) -->
+    <InformationalVersion>$(ProjProductVersion)</InformationalVersion>
+    <!-- InformationalVersion has $(SourceRevisionId) appended if the property is present -->
+    <IncludeSourceRevisionInInformationalVersion>true</IncludeSourceRevisionInInformationalVersion>
+    <!-- AssemblyVersion: major.minor.patch.build = Assembly.GetExecutingAssembly().GetName().Version = $(AssemblyVersion) = $(VersionPrefix) but extended if necessary to make a 4 digit version -->
+    <!-- AssemblyVersion: Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyVersionAttribute>().AssemblyVersion = $(AssemblyVersion) -->
+    <AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
+    <!-- FileVersion: major.minor.patch.build = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion = $(FileVersion) = $(VersionPrefix) but extended if necessary to make a 4 digit version -->
+    <!-- FileVersion: Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyFileVersionAttribute>().FileVersion = $(FileVersion) -->
+    <FileVersion>$(VersionPrefix)</FileVersion>
+    <!-- AssemblyTitle: .* = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyTitleAttribute>().AssemblyTitle = $(AssemblyTitle) -->
+    <AssemblyTitle>$(ProjFileDescription)</AssemblyTitle>
+    <!-- Copyright: .* = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyCopyrightAttribute>().Copyright = $(Copyright) -->
+    <Copyright>$(ProjCopyright)</Copyright>
+    <!-- Company: .* = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyCompanyAttribute>().Company = $(Company) -->
+    <Company>$(ProjCompany)</Company>
+    <!-- Product: .* = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyProductAttribute>().Product = $(Product) -->
+    <Product>$(ProjProductName)</Product>
+    <!-- Description: .* = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyDescriptionAttribute>().Description = $(Description) -->
+    <Description>$(ProjFileDescription)</Description>
+    <ApplicationIcon Condition=" '$(ProjApplicationIcon)'!='' ">$(ProjApplicationIcon)</ApplicationIcon>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Package info">
+    <IsPackable Condition=" '$(ProjOutputType)'=='Library' ">true</IsPackable>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Authors>$(ProjAuthor)</Authors>
+    <PackageId>$(ProjCompany).$(ProjAssemblyName)</PackageId>
+    <!-- Small text that will appear under the package name in nuget -->
+    <Title>$(ProjAssemblyName)</Title>
+    <!-- The package description -->
+    <PackageDescription>$(ProjPackageDescription)</PackageDescription>
+    <PackageVersion>$(Version)</PackageVersion>
+    <PackageTags>$(ProjPackageTags)</PackageTags>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>$(ProjLicence)</PackageLicenseExpression>
+    <PackageProjectUrl>https://$(ProjRepositoryOwner).github.io/$(ProjRepositoryName)</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/$(ProjRepositoryOwner)/$(ProjRepositoryName).git</RepositoryUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/$(ProjRepositoryOwner)/$(ProjRepositoryName)/master/$(ProjPackageIconPath)</PackageIconUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReleaseNotes><![CDATA[
+Learn more about this project on github: $(PackageProjectUrl).
+
+See more details about this release on github: https://github.com/$(ProjRepositoryOwner)/$(ProjRepositoryName)/releases.]]>
+    </PackageReleaseNotes>
+    <PackageOutputPath>$(OutputPath)</PackageOutputPath>
+    <!-- allow pdb to be packed with the the nuget package (instead of having a separate pack for debug symbols) -->
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <IncludeSource>true</IncludeSource>
+    <IncludeSymbols>true</IncludeSymbols>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Compilation info">
+    <!-- https://docs.microsoft.com/en-us/dotnet/standard/frameworks -->
+    <TargetFrameworks>$(ProjDefaultTargetFrameworks)</TargetFrameworks>
+    <!-- The operating system you are building for: "Any CPU", "x86", and "x64" -->
+    <Platform>Any Cpu</Platform>
+    <Configuration>Release</Configuration>
+    <SolutionDir Condition=" $(SolutionDir) == ''">..\</SolutionDir>
+    <Optimize Condition=" '$(Configuration)' == 'Release' ">true</Optimize>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
+    <BuildProjectReferences>true</BuildProjectReferences>
+    <IsNetStandard Condition=" $(TargetFramework.Contains('netstandard')) OR $(TargetFramework.Contains('netcoreapp')) ">true</IsNetStandard>
+    <IsNetStandard Condition=" '$(IsNetStandard)'=='' ">false</IsNetStandard>
+    <IsNetFramework Condition=" $(IsNetStandard) ">false</IsNetFramework>
+    <IsNetFramework Condition=" !$(IsNetStandard) ">true</IsNetFramework>
+    <IsOutputLibrary>false</IsOutputLibrary>
+    <IsOutputLibrary Condition=" '$(ProjOutputType)'=='Library' ">true</IsOutputLibrary>
+  </PropertyGroup>
+
+  <PropertyGroup Label="SourceLink info">
+    <!-- https://github.com/dotnet/sourcelink -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+  </PropertyGroup>
+  <ItemGroup Label="SourceLink reference">
+    <!-- PackageReference specific for your source control provider -->
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-18618-05" PrivateAssets="All" />
+  </ItemGroup>
+
+  <PropertyGroup Label="Debug type">
+    <!-- DebugType -->
+    <!-- Need to be full if you want .pdb files to work for .net framework <= 4.7.1, otherwise portable is ok -->
+    <!-- pdbonly = you get line numbers, full = you can attach the debugger! so use pdbonly for releases, none/embedded/portable -->
+    <!-- portable = new .pdb format to use since dotnet and >= 4.7.1, embedded = same as portable excepct the .pdb is inside the .dll -->
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType Condition=" $(IsNetStandard) ">embedded</DebugType>
+    <DebugType Condition=" $(IsNetFramework) AND '$(Configuration)'=='Debug' ">full</DebugType>
+    <DebugType Condition=" $(IsNetFramework) AND '$(Configuration)'!='Debug' ">pdbonly</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Extra stuff">
+    <DefineConstants Condition=" $(IsNetFramework) ">$(DefineConstants);WINDOWSONLYBUILD</DefineConstants>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- throw an exception on overflow instead of failing quietly -->
+    <CheckForOverflowUnderflow Condition=" '$(Configuration)'=='Release' ">true</CheckForOverflowUnderflow>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <GenerateDocumentationFile>$(IsOutputLibrary)</GenerateDocumentationFile>    
+    <!-- don't fail the build on comment no present -->
+    <!-- <NoWarn>$(NoWarn),1591</NoWarn> -->
+  </PropertyGroup>
+
+</Project>

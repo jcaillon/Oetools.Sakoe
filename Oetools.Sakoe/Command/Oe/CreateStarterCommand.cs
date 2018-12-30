@@ -10,7 +10,7 @@ namespace Oetools.Sakoe.Command.Oe {
 #if !WINDOWSONLYBUILD
     [Command(
         "starter", "cs",
-        Description = "Create a platform specific starter script for sakoe to allow a more natural way of calling this tool: 'sakoe [command]'.",
+        Description = "Create a platform specific starter script for sakoe to allow a more natural way of calling this tool: `sakoe [command]`.",
         ExtendedHelpText = ""
     )]
     internal class CreateStarterCommand : ABaseCommand {
@@ -56,9 +56,9 @@ dotnet exec ""$DIR/" + Path.GetFileName(Assembly.GetExecutingAssembly().Location
             HelpFormatter.WriteOnNewLine(@"
 A starter script has been created in the same directory as this executable: " + starterFilePath.PrettyQuote() + @".
 
-It allows you to call this tool in a more natural way: 'sakoe [command]'. This strips the need to run the .dll with dotnet (the script does that for you).
+It allows you to call this tool in a more natural way: `sakoe [command]`. This strips the need to run the .dll with dotnet (the script does that for you).
 
-The directory containing the starter script created should be added to your system PATH in order to be able to call 'sakoe [command]' from anywhere on your system.
+The directory containing the starter script created should be added to your system PATH in order to be able to call `sakoe [command]` from anywhere on your system.
 
 The command to add this directory to your path is:");
             HelpFormatter.WriteOnNewLine(null);

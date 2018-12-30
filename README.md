@@ -10,8 +10,8 @@ Status | Info
 [![GitHub release](https://img.shields.io/github/release/jcaillon/Oetools.Sakoe.svg)](https://github.com/jcaillon/Oetools.Sakoe/releases/latest) | Latest github release
 [![Total downloads](https://img.shields.io/github/downloads/jcaillon/Oetools.Sakoe/total.svg)](https://github.com/jcaillon/Oetools.Sakoe/releases) | Total download
 [![GPLv3 licence](https://img.shields.io/badge/License-GPLv3-74A5C2.svg)](https://github.com/jcaillon/Oetools.Sakoe/blob/master/LICENSE) | GPLv3 License
-[![.net frmwk 4.6.1+](https://img.shields.io/badge/Requires%20.NET%20Framework-4.6.1+-C8597A.svg)](http://go.microsoft.com/fwlink/?LinkId=671743) | .net framwork 4.6.1+
-[![.net core 2.1+](https://img.shields.io/badge/Requires%20.NET%20core-2.1+-C8597A.svg)](https://dotnet.microsoft.com/download/dotnet-core/2.2) | or .net core 2.1+
+[![.net frmwk 4.6.1+](https://img.shields.io/badge/.NET%20Framework-4.6.1+-C8597A.svg)](http://go.microsoft.com/fwlink/?LinkId=671743) | Targets .NET framework 4.6.1+
+[![.net core 2.1+](https://img.shields.io/badge/.NET%20core-2.1+-C8597A.svg)](https://dotnet.microsoft.com/download/dotnet-core/2.2) | Targets .NET core 2.1+
 
 [AppVeyor]:http://www.appveyor.com/
 

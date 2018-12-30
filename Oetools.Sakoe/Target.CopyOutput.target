@@ -1,31 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- https://docs.microsoft.com/en-us/visualstudio/msbuild/msbuild-project-file-schema-reference?view=vs-2017 -->
 
-  <PropertyGroup Label="Compute ReleaseDirectoryName">
-    <ReleaseDirectoryName>$(AssemblyName)</ReleaseDirectoryName>
-    <ReleaseDirectoryName Condition=" '$(Platform)'=='x64' ">$(ReleaseDirectoryName)_x64</ReleaseDirectoryName>
-    <ReleaseDirectoryName Condition="$(TargetFramework.Contains('netstandard')) OR $(TargetFramework.Contains('netcoreapp'))">$(ReleaseDirectoryName)_core</ReleaseDirectoryName>
+  <PropertyGroup Label="IsNetStandard" Condition=" '$(IsNetStandard)'=='' ">
+    <IsNetStandard Condition=" $(TargetFramework.Contains('netstandard')) OR $(TargetFramework.Contains('netcoreapp')) ">true</IsNetStandard>
+    <IsNetStandard Condition=" '$(IsNetStandard)'=='' ">false</IsNetStandard>
+    <IsNetFramework Condition=" $(IsNetStandard) ">false</IsNetFramework>
+    <IsNetFramework Condition=" !$(IsNetStandard) ">true</IsNetFramework>
   </PropertyGroup>
 
- 
   <!-- ============================================================= -->
   <!-- Setting default properties -->
   <PropertyGroup Label="Default properties">
+    <ReleaseDirectoryName>$(AssemblyName)</ReleaseDirectoryName>
+    <ReleaseDirectoryName Condition=" '$(Platform)'=='x64' ">$(ReleaseDirectoryName)_x64</ReleaseDirectoryName>
+    <ReleaseDirectoryName Condition=" $(IsNetStandard) ">$(ReleaseDirectoryName)_core</ReleaseDirectoryName>
     <!-- the folder in which to copy the output files -->
-    <ReleaseBinPath Condition=" '$(ReleaseBinPath)'=='' ">$(ProjectDir)bin\$(ReleaseDirectoryName)\</ReleaseBinPath>
+    <ReleaseBinPath Condition=" '$(ReleaseBinPath)'=='' ">bin\$(ReleaseDirectoryName)</ReleaseBinPath>
     <!-- true if the output folder should be zipped afterward -->
     <ZipCopiedOutput Condition=" '$(ZipCopiedOutput)'=='' ">false</ZipCopiedOutput>
     <!-- default path of the output .zip path -->
-    <ZipPath Condition=" '$(ZipPath)'=='' ">$(ReleaseBinPath)..\$([System.IO.Path]::GetFileName('$([System.IO.Path]::GetDirectoryName('$(ReleaseBinPath)'))')).zip</ZipPath>
+    <ZipPath Condition=" '$(ZipPath)'=='' ">$(ReleaseBinPath)\..\$([System.IO.Path]::GetFileName('$(ReleaseBinPath)')).zip</ZipPath>
   </PropertyGroup>
-
 
   <!-- ============================================================= -->
   <!-- CleanReleaseBinPath : clean the output dir before copying any files in it-->
   <Target 
     Name="CleanReleaseBinPath" 
     AfterTargets="BeforeBuild">
-    <RemoveDir Directories="$(ReleaseBinPath)" />
+    <!-- <ItemGroup>
+      <FilesToDelete Include="$(ReleaseBinPath)\*" />
+    </ItemGroup>   
+    <Delete Files="@(FilesToDelete)" />  -->
+    <RemoveDir Directories="$(ReleaseBinPath)" /> 
   </Target>
 
 
@@ -34,7 +41,7 @@
   <Target 
     Name="CopyOutputNETFramework" 
     AfterTargets="CoreBuild" 
-    Condition="'$(TargetFrameworkIdentifier)'=='.NETFramework'">
+    Condition=" $(IsNetFramework) ">
     
     <!-- list the outputfiles which are : .exe/.dll,.pdb -->
     <ItemGroup>
@@ -61,11 +68,11 @@
   <Target 
     Name="ZipNETFramework" 
     AfterTargets="CopyOutputNETFramework" 
-    Condition=" '$(TargetFrameworkIdentifier)'=='.NETFramework' AND '$(ZipCopiedOutput)'=='true' ">
+    Condition=" $(IsNetFramework) AND $(ZipCopiedOutput) ">
 
     <!-- list all the files to zip (use the output of the Target.CopyOutput.target if possible) -->
     <ItemGroup>
-      <ZipFiles Include="$(ReleaseBinPath)*" />
+      <ZipFiles Include="$(ReleaseBinPath)\*" />
     </ItemGroup>   
 
     <!-- create output directory -->
@@ -86,17 +93,18 @@
 
   <!-- ============================================================= -->
   <!-- .net CORE : Case of a dotnet core application, we want to change the publish directory instead -->
-  <PropertyGroup Condition="$(TargetFramework.Contains('netstandard')) OR $(TargetFramework.Contains('netcoreapp'))">
+  <PropertyGroup 
+    Condition=" $(IsNetStandard) ">
     <PublishDir>$(ReleaseBinPath)</PublishDir>
   </PropertyGroup>
 
   <Target 
-    Name="CopyOutputNETCore" 
+    Name="ListOutputNETCore" 
     AfterTargets="Publish"
-    Condition="'$(TargetFrameworkIdentifier)'!='.NETFramework'">
+    Condition=" $(IsNetStandard) ">
 
     <ItemGroup>
-      <OutputFiles Include="$(ReleaseBinPath)*"></OutputFiles>
+      <OutputFiles Include="$(ReleaseBinPath)\*"></OutputFiles>
     </ItemGroup>
       
     <Message Importance="high" Text="=========================="/>
@@ -106,8 +114,8 @@
 
   <Target 
     Name="ZipNETCore" 
-    AfterTargets="CopyOutputNETCore" 
-    Condition=" '$(TargetFrameworkIdentifier)'!='.NETFramework' AND '$(ZipCopiedOutput)'=='true' ">
+    AfterTargets="ListOutputNETCore" 
+    Condition=" $(IsNetStandard) AND $(ZipCopiedOutput) ">
 
     <!-- list all the files to zip -->
     <!--     
@@ -118,7 +126,7 @@
     </ItemGroup> 
     -->
     <ItemGroup>
-      <ZipFilesPublished Include="$(ReleaseBinPath)*" />
+      <ZipFilesPublished Include="$(ReleaseBinPath)\*" Exclude="**\*.xml" />
     </ItemGroup>
 
     <!-- create output directory -->
@@ -162,7 +170,7 @@
           {
             foreach (var inputFileName in InputFileNames.Select(f => f.ItemSpec))
             {
-              var archiveEntry = archive.CreateEntry(inputFileName.Contains(FolderPath) ? inputFileName.Replace(FolderPath, "") : Path.GetFileName(inputFileName));
+              var archiveEntry = archive.CreateEntry(inputFileName.Contains(FolderPath) ? inputFileName.Replace(FolderPath, "").TrimStart('\\') : Path.GetFileName(inputFileName));
  
               using (var fs = new FileStream(inputFileName, FileMode.Open))
               {

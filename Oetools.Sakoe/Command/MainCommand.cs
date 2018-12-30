@@ -7,6 +7,7 @@ using Oetools.Sakoe.ConLog;
 using Oetools.Sakoe.Utilities;
 using Oetools.Sakoe.Utilities.Extension;
 using Oetools.Utilities.Lib;
+using Oetools.Utilities.Lib.Extension;
 
 namespace Oetools.Sakoe.Command {
     
@@ -25,15 +26,13 @@ namespace Oetools.Sakoe.Command {
     [Subcommand(typeof(ManCommand))]
     [Subcommand(typeof(UpdateCommand))]
     [Subcommand(typeof(DatabaseCommand))]
-    [Subcommand(typeof(LintCommand))]
     [Subcommand(typeof(ProjectCommand))]
     [Subcommand(typeof(BuildCommand))]
     [Subcommand(typeof(ShowVersionCommand))]
-    [Subcommand(typeof(XcodeCommand))]
+//    [Subcommand(typeof(XcodeCommand))]
     [Subcommand(typeof(HashCommand))]
     [Subcommand(typeof(ProHelpCommand))]
     [Subcommand(typeof(ProUtilitiesCommand))]
-    [Subcommand(typeof(ProlibCommand))]
 #if !WINDOWSONLYBUILD
     [Subcommand(typeof(CreateStarterCommand))]
 #endif
@@ -45,8 +44,8 @@ namespace Oetools.Sakoe.Command {
         public static void GetAdditionalHelpText(IHelpFormatter formatter, CommandLineApplication application, int firstColumnWidth) {
             formatter.WriteOnNewLine(null);
             formatter.WriteSectionTitle("HOW TO");
-            formatter.WriteOnNewLine($"Start by reading the manual for this tool: {typeof(ManCommand).GetFullCommandLine()}.");
-            formatter.WriteOnNewLine($"Get a full list of commands available: {typeof(ListAllCommandsManCommand).GetFullCommandLine()}.");
+            formatter.WriteOnNewLine($"Start by reading the manual for this tool: {typeof(ManCommand).GetFullCommandLine().PrettyQuote()}.");
+            formatter.WriteOnNewLine($"Get a full list of commands available: {typeof(ListAllCommandsManCommand).GetFullCommandLine().PrettyQuote()}.");
 
         }
         

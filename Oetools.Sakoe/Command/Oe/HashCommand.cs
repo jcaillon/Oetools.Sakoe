@@ -33,8 +33,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Command(
         "hash", "ha",
         Description = "Compute hash values of files or strings using the Openedge ENCODE function.", 
-        ExtendedHelpText = "", 
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+        ExtendedHelpText = ""
     )]
     [Subcommand(typeof(HashStringCommand))]
     [Subcommand(typeof(HashFilesCommand))]
@@ -43,9 +42,7 @@ namespace Oetools.Sakoe.Command.Oe {
     
     [Command(
         "string", "encode", "st",
-        Description = "Returns a 16 byte hash value from a string.", 
-        ExtendedHelpText = "", 
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+        Description = "Returns a 16 byte hash value from a string."
     )]
     internal class HashStringCommand : ABaseCommand {
         
@@ -66,8 +63,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Command(
         "files", "fi",
         Description = "Returns 16 byte hash values computed from the content of input files.", 
-        ExtendedHelpText = "", 
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+        ExtendedHelpText = ""
     )]
     internal class HashFilesCommand : ProcessFileListBaseCommand {
 

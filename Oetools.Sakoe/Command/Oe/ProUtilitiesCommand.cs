@@ -18,11 +18,9 @@
 // ========================================================================
 #endregion
 
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using McMaster.Extensions.CommandLineUtils;
-using Oetools.Sakoe.Command.Oe.Abstract;
 using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge;
 
@@ -31,8 +29,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Command(
         "utilities", "ut",
         Description = "Miscellaneous utility commands.", 
-        ExtendedHelpText = "", 
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+        ExtendedHelpText = ""
     )]
     [Subcommand(typeof(GetConnectionStringUtilitiesCommand))]
     [Subcommand(typeof(GetProExecPathUtilitiesCommand))]
@@ -44,9 +41,8 @@ namespace Oetools.Sakoe.Command.Oe {
     [Command(
         "connectstr", "co",
         Description = "Returns a single line connection string from a .pf file.", 
-        ExtendedHelpText = @"This command will skip unnecessary whitespaces and new lines.
-It will also ignore comment lines starting with #.", 
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+        ExtendedHelpText = @"- This command will skip unnecessary whitespaces and new lines.
+- This command will ignore comment lines starting with #."
     )]
     internal class GetConnectionStringUtilitiesCommand : ABaseCommand {
         
@@ -66,8 +62,7 @@ It will also ignore comment lines starting with #.",
     [Command(
         "execpath", "ex",
         Description = "Returns the pro executable full path.", 
-        ExtendedHelpText = @"", 
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+        ExtendedHelpText = @""
     )]
     internal class GetProExecPathUtilitiesCommand : AOeDlcCommand {
         
@@ -85,11 +80,10 @@ It will also ignore comment lines starting with #.",
     [Command(
         "propathfromini", "pr",
         Description = "Returns PROPATH value found in a .ini file.", 
-        ExtendedHelpText = @"This command returns only absolute path.
-Relative path are converted to absolute using the command folder option.
-It returns only existing directories or .pl files.
-It also expands environment variables like %TEMP% or $DLC.", 
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+        ExtendedHelpText = @"- This command returns only absolute path.
+- Relative path are converted to absolute using the command folder option.
+- This command returns only existing directories or .pl files.
+- This command expands environment variables like %TEMP% or $DLC."
     )]
     internal class GetPropathFromIniUtilitiesCommand : AOeDlcCommand {
         
@@ -118,9 +112,7 @@ It also expands environment variables like %TEMP% or $DLC.",
     
     [Command(
         "version", "ve",
-        Description = "Returns the version found for the Openedge installation.", 
-        ExtendedHelpText = @"", 
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+        Description = "Returns the version found for the Openedge installation."
     )]
     internal class GetProVersionUtilitiesCommand : AOeDlcCommand {
 

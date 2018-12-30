@@ -66,9 +66,7 @@ namespace Oetools.Sakoe.Utilities {
             if (additionalHelpTextAttribute != null) {
             var methodInfo = commandType.GetMethod(additionalHelpTextAttribute.MethodName, BindingFlags.Public | BindingFlags.Static);
                 if (methodInfo != null) {
-                    WriteOnNewLine("```");
                     methodInfo.Invoke(null, new object[]{ this, application, 0 });
-                    WriteOnNewLine("```");
                 }
             }
             
@@ -103,7 +101,7 @@ namespace Oetools.Sakoe.Utilities {
                 if (Attribute.GetCustomAttribute(remainingArgs, typeof(DescriptionAttribute), true) is DescriptionAttribute description) {
                     Write($" {description.Description}");
                 } else {
-                    Write(" [[--] \\<arg\\>...]");
+                    Write(" [[--] <arg>...]");
                 }
             }
             Write("`");
@@ -120,7 +118,7 @@ namespace Oetools.Sakoe.Utilities {
                 WriteOnNewLine("| --- | --- |");
                 
                 foreach (var arg in visibleArguments) {
-                    WriteOnNewLine($"| {arg.Name.Replace("[", "").Replace("]", "").Replace("<", "\\<").Replace(">", "\\>")} | {arg.Description?.Replace("\n", " ").Replace("\r", "")} |");
+                    WriteOnNewLine($"| {arg.Name.Replace("[", "").Replace("]", "").Replace("<", "\\<").Replace(">", "\\>")} | {ReplaceNewLines(arg.Description)} |");
                 }
             }
         }
@@ -132,15 +130,15 @@ namespace Oetools.Sakoe.Utilities {
             if (visibleOptions.Any()) {
                 WriteOnNewLine(null);
                 WriteSectionTitle("Options");
-                WriteOnNewLine("| Option | Description |");
-                WriteOnNewLine("| --- | --- |");
+                WriteOnNewLine("| Short name | Long name | Description |");
+                WriteOnNewLine("| --- | --- | --- |");
                 
                 foreach (var opt in visibleOptions) {
                     var text = opt.Description;
                     if (opt.OptionType == CommandOptionType.MultipleValue) {
                         text = $"(Can be used multiple times) {text}";
                     }
-                    WriteOnNewLine($"| {opt.Template.Replace("|", ", ")} | {text.Replace("\n", " ").Replace("\r", "")} |");
+                    WriteOnNewLine($"| {opt.ShortName?.PadLeft(opt.ShortName.Length + 1, '-')} | {opt.LongName?.PadLeft(opt.LongName.Length + 2, '-')} | {ReplaceNewLines(text)} |");
                 }
             }
         }
@@ -152,24 +150,28 @@ namespace Oetools.Sakoe.Utilities {
             if (visibleCommands.Any()) {
                 WriteOnNewLine(null);
                 WriteSectionTitle("Commands");
-                WriteOnNewLine("| Command | Description |");
-                WriteOnNewLine("| --- | --- |");
+                WriteOnNewLine("| Short name | Long name | Description |");
+                WriteOnNewLine("| --- | --- | --- |");
 
                 foreach (var cmd in visibleCommands.OrderBy(c => c.Name)) {
-                    WriteOnNewLine($"| {cmd.Name} | {cmd.Description?.Replace("\n", " ").Replace("\r", "")} |");
+                    WriteOnNewLine($"| {(cmd.Names != null && cmd.Names.Count() > 1 ? cmd.Names.ElementAt(1) : "")} | {cmd.Name} | {ReplaceNewLines(cmd.Description)} |");
                 }
             }
         }
+
+        private string ReplaceNewLines(string text) => text?.Replace("\n", " ").Replace("\r", "");
+        
+        private string ReplaceBulletList(string text) => text?.Replace("├─ ", "- ").Replace("└─ ", "- ").Replace("│  ", "  ");
         
         /// <inheritdoc cref="IConsoleOutput.WriteOnNewLine"/>
         public virtual void WriteOnNewLine(string result, ConsoleColor? color = null, int padding = 0, string prefixForNewLines = null) {
             _writer.WriteLine();
-            _writer.Write(result);
+            _writer.Write(ReplaceBulletList(result));
         }
         
         /// <inheritdoc cref="IConsoleOutput.Write"/>
         public virtual void Write(string result, ConsoleColor? color = null, int padding = 0, string prefixForNewLines = null) {
-            _writer.Write(result);
+            _writer.Write(ReplaceBulletList(result));
         }
         
         public virtual void WriteSectionTitle(string result, int padding = 0) {

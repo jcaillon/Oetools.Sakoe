@@ -65,10 +65,10 @@ Each pair should specify the name of the variable to set and the value that shou
             formatter.WriteSectionTitle("BUILD PROPERTIES");
             
             foreach (var property in GetAvailableBuildProperties().OrderBy(p => p.Key)) {
-                formatter.WriteOnNewLine($"-p \"{property.Key}={property.Value ?? ""}\"");
+                formatter.WriteOnNewLine($"* -p \"{property.Key}={property.Value ?? ""}\"");
             }
             formatter.WriteOnNewLine(null);
-            formatter.WriteTip($"Display the full documentation of each build property by running '{application.GetFullCommandLine()} {PropertyHelpLongName}'.");
+            formatter.WriteTip($"Display the full documentation of each build property by running {$"{application.GetFullCommandLine()} {PropertyHelpLongName}".PrettyQuote()}.");
             
             formatter.WriteOnNewLine(null);
             formatter.WriteSectionTitle("EXTRA CONFIG");
@@ -86,9 +86,9 @@ p2" + OeBuilderConstants.OeProjectExtension + @"
    │  └─ Configuration6
    └─ Configuration7
 
-We use the following command line to start a build:", padding: 2);
+We use the following command line to start a build:");
             formatter.WriteOnNewLine(null);
-            formatter.WriteOnNewLine($"{application.GetFullCommandLine()} p1 {ConfigurationNameLongName} Configuration1 --{ExtraConfigOption} p2=Configuration6 --{ExtraConfigOption} Configuration2 ", padding: 4);
+            formatter.WriteOnNewLine($"{application.GetFullCommandLine()} p1 {ConfigurationNameLongName} Configuration1 --{ExtraConfigOption} p2=Configuration6 --{ExtraConfigOption} Configuration2".PrettyQuote(), padding: 2);
             formatter.WriteOnNewLine(null);
             formatter.WriteOnNewLine(@"Below is the equivalent of how build configurations are nested in this scenario:
 
@@ -98,7 +98,7 @@ Configuration1
       └─ Configuration6
          └─ Configuration2
 
-This allow a lot of flexibility for organizing and partitioning your build process.", padding: 2);
+This allow a lot of flexibility for organizing and partitioning your build process.");
             
             formatter.WriteOnNewLine(null);
             formatter.WriteSectionTitle("NOTES");

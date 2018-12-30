@@ -1,3 +1,6 @@
 [submodule "Oetools.Builder"]
 	path = Oetools.Builder
 	url = ../Oetools.Builder.git
+[submodule "GithubUpdater"]
+	path = GithubUpdater
+	url = ../GithubUpdater.git

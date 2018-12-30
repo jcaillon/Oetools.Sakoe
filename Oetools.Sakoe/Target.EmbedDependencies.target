@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- https://docs.microsoft.com/en-us/visualstudio/msbuild/msbuild-project-file-schema-reference?view=vs-2017 -->
  
   <!-- Setting default properties -->
   <PropertyGroup Label="Default properties">
@@ -14,8 +15,8 @@
 
     <!-- list all the files referenced in this project (which are not part of the framework and need to be published with the final build) -->
     <ItemGroup>
-      <ReferencedAssemblies Include="@(ReferenceCopyLocalPaths)" />
-      <ReferencedAssemblies Include="@(RuntimeCopyLocalItems)" />
+      <ReferencedAssemblies Include="@(ReferenceCopyLocalPaths)" Condition=" '%(Extension)'!='.xml' " />
+      <ReferencedAssemblies Include="@(RuntimeCopyLocalItems)" Condition=" '%(Extension)'!='.xml' " />
     </ItemGroup>
 
     <!-- remove duplicates, ReferencedAssemblies will contain the final list of files to copy -->

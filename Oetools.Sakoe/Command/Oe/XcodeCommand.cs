@@ -99,8 +99,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Command(
         "decrypt", "de",
         Description = "Decrypt files using the XCODE algorithm. Output the list of processed files.", 
-        ExtendedHelpText = "", 
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+        ExtendedHelpText = ""
     )]
     internal class DecryptXcodeCommand : EncryptXcodeCommand {
 
@@ -118,8 +117,7 @@ namespace Oetools.Sakoe.Command.Oe {
   List only the encrypted files in a list of files in argument.
     sakoe xcode list -r -vb none -nop
   Get a raw list of all the encrypted files in the current directory (recursive).
-    sakoe xcode list -r -vb none -nop", 
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+    sakoe xcode list -r -vb none -nop"
     )]
     internal class ListXcodeCommand : ProcessFileListBaseCommand {
         

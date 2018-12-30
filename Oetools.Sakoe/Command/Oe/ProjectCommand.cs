@@ -105,9 +105,8 @@ For git repositories, use the command " + typeof(ProjectGitignoreCommand).GetFul
     [Command(
         "gitignore", "gi", 
         Description = "Initialize a .gitignore file adapted for sakoe projects (or append to, if it exists).", 
-        ExtendedHelpText = "", 
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase)
-    ]
+        ExtendedHelpText = ""
+    )]
     internal class ProjectGitignoreCommand : ABaseCommand {
 
         [DirectoryExists]
@@ -169,9 +168,8 @@ bin/
     [Command(
         "list", "li", 
         Description = "List all the project files or list the build configurations in a project file.", 
-        ExtendedHelpText = "", 
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase)
-    ]
+        ExtendedHelpText = ""
+    )]
     internal class ProjectListCommand : AOeCommand {
 
         [LegalFilePath]

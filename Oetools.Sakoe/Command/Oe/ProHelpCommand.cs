@@ -35,8 +35,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Command(
         "prohelp", "ph",
         Description = "Access the Openedge help.", 
-        ExtendedHelpText = "", 
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+        ExtendedHelpText = ""
     )]
     [Subcommand(typeof(ProMsgCommand))]
     [Subcommand(typeof(ListChmProHelpCommand))]
@@ -48,8 +47,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Command(
         "promsg", "pm",
         Description = "Displays the extended error message using an error number.", 
-        ExtendedHelpText = "This command uses the content of files located in $DLC/prohelp/msgdata to display information.", 
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+        ExtendedHelpText = "This command uses the content of files located in $DLC/prohelp/msgdata to display information."
     )]
     internal class ProMsgCommand : AOeDlcCommand {
         
@@ -95,8 +93,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Command(
         "chm", "ch",
         Description = "Opens a .chm file (windows help file) present in $DLC/prohelp.", 
-        ExtendedHelpText = "", 
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+        ExtendedHelpText = ""
     )]
     internal class ChmProHelpCommand : ChmDisplayProHelpCommand {
         
@@ -128,9 +125,7 @@ namespace Oetools.Sakoe.Command.Oe {
     
     [Command(
         "keyword", "ke",
-        Description = "Look for help on the given Openedge keyword in the language windows help file.", 
-        ExtendedHelpText = "", 
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+        Description = "Look for help on the given Openedge keyword in the language windows help file."
     )]
     internal class KeywordProHelpCommand : ChmDisplayProHelpCommand {
         
@@ -154,9 +149,7 @@ namespace Oetools.Sakoe.Command.Oe {
     
     [Command(
         "listchm", "li",
-        Description = "List all the .chm files (windows help files) available in $DLC/prohelp.", 
-        ExtendedHelpText = "", 
-        OptionsComparison = StringComparison.CurrentCultureIgnoreCase
+        Description = "List all the .chm files (windows help files) available in $DLC/prohelp."
     )]
     internal class ListChmProHelpCommand : AOeDlcCommand {
         

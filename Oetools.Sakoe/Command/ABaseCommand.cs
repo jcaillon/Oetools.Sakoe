@@ -40,13 +40,13 @@ namespace Oetools.Sakoe.Command {
         
         private const string VerbosityShortName = "-vb";
         
-        [Option(VerbosityShortName + "|--verbosity <level>", "Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to 'none'. Specifying this option without a level value sets the verbosity to 'debug'. Not specifying the option defaults to 'info'.", CommandOptionType.SingleOrNoValue)]
+        [Option(VerbosityShortName + "|--verbosity <level>", "Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`.", CommandOptionType.SingleOrNoValue)]
         public (bool HasValue, ConsoleLogThreshold? Value) VerbosityThreshold { get; set; }
         
-        [Option("-pm|--progress-mode <mode>", "Sets the display mode of progress bars. Specify 'off' to hide progress bars and 'stay' to make them persistent. Defaults to 'on', which show progress bars but hide them when done.", CommandOptionType.SingleValue)]
+        [Option("-pm|--progress-mode <mode>", "Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done.", CommandOptionType.SingleValue)]
         public ConsoleProgressBarDisplayMode? ProgressBarDisplayMode { get; set; }
         
-        [Option("-do|--debug-output <file>", "Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file 'sakoe.log'.", CommandOptionType.SingleOrNoValue)]
+        [Option("-do|--debug-output <file>", "Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`.", CommandOptionType.SingleOrNoValue)]
         public (bool HasValue, string Value) LogOutputFilePath { get; set; }
         
         [Option("-wl|--with-logo", "Always show the logo on start.", CommandOptionType.NoValue)]

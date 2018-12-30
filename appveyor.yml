@@ -45,7 +45,7 @@ install:
 #---------------------------------#
 
 build_script:
-  - cmd: pushd Oetools.Builder && update_xsd.bat && popd && build.bat
+  - cmd: pushd GithubUpdater && build_simple_updater.bat && popd && pushd Oetools.Builder && update_xsd.bat && popd && build.bat
 
 #---------------------------------#
 #       tests configuration       #
