@@ -26,6 +26,9 @@ popd
 echo.=========================
 echo.[%time:~0,8% INFO] BUILDING RELEASE SAKOE
 
+set "CHANGE_DEFAULT_TARGETFRAMEWORK=true"
+set TARGETED_FRAMEWORKS=(net461)
+set "CUSTOM_BUILD_PARAMS=/p:ZipCopiedOutput=false"
 call build.bat
 if not "!ERRORLEVEL!"=="0" (
 	GOTO ENDINERROR

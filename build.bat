@@ -43,8 +43,7 @@ if not "%VERSION_TO_BUILD%"=="" (
 
 REM @@@@@@@@@@@@@@
 REM Verbosity
-set MSBUILD_VERBOSITY=m
-if "%IS_CI_BUILD%"=="true" set MSBUILD_VERBOSITY=n
+if "%MSBUILD_VERBOSITY%"=="" set MSBUILD_VERBOSITY=m
 
 REM @@@@@@@@@@@@@@
 REM Solution name

@@ -1,8 +1,7 @@
 #region header
-
 // ========================================================================
 // Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
-// This file (AProgressBar.cs) is part of Oetools.Sakoe.
+// This file (ConsoleProgressBar.cs) is part of Oetools.Sakoe.
 // 
 // Oetools.Sakoe is a free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,9 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
-
 #endregion
-
 using System;
 using System.Diagnostics;
 using System.Threading;

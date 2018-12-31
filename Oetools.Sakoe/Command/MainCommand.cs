@@ -1,4 +1,23 @@
-﻿using System;
+﻿#region header
+// ========================================================================
+// Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
+// This file (MainCommand.cs) is part of Oetools.Sakoe.
+//
+// Oetools.Sakoe is a free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Oetools.Sakoe is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
+// ========================================================================
+#endregion
+using System;
 using System.IO;
 using System.Reflection;
 using McMaster.Extensions.CommandLineUtils;
@@ -10,7 +29,7 @@ using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
 
 namespace Oetools.Sakoe.Command {
-    
+
     /// <summary>
     /// The main command of the application, called when the user passes no arguments/commands
     /// </summary>
@@ -40,7 +59,7 @@ namespace Oetools.Sakoe.Command {
     internal class MainCommand : AExpectSubCommand {
 
         public const string HelpLongName = "--help";
-        
+
         public static void GetAdditionalHelpText(IHelpFormatter formatter, CommandLineApplication application, int firstColumnWidth) {
             formatter.WriteOnNewLine(null);
             formatter.WriteSectionTitle("HOW TO");
@@ -48,7 +67,7 @@ namespace Oetools.Sakoe.Command {
             formatter.WriteOnNewLine($"Get a full list of commands available: {typeof(ListAllCommandsManCommand).GetFullCommandLine().PrettyQuote()}.");
 
         }
-        
+
         public static int ExecuteMainCommand(string[] args) {
             // TODO: global configuration in an .xml next to sakoe.exe that store default verbosity, log path, http proxy and so on...
             var console = ConsoleImplementation2.Singleton;
@@ -62,7 +81,7 @@ namespace Oetools.Sakoe.Command {
             } catch (Exception ex) {
                 var log = ConsoleLogger2.Singleton;
                 log.LogTheshold = ConsoleLogThreshold.Debug;
-                
+
                 if (ex is CommandParsingException) {
                     //if (ex is UnrecognizedCommandParsingException unrecognizedCommandParsingException) {
                     //    log.Info($"Did you mean {unrecognizedCommandParsingException.NearestMatch}?");
@@ -83,7 +102,7 @@ namespace Oetools.Sakoe.Command {
                 console.CursorVisible = true;
             }
         }
-        
+
         /// <summary>
         /// Draw the logo of this tool.
         /// </summary>

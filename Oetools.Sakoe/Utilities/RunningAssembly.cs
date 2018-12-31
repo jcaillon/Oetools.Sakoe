@@ -17,7 +17,6 @@
 // along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
-
 using System.Diagnostics;
 using System.Reflection;
 
