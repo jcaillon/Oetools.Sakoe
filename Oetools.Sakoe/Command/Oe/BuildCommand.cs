@@ -2,17 +2,17 @@
 // ========================================================================
 // Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
 // This file (BuildCommand.cs) is part of Oetools.Sakoe.
-// 
+//
 // Oetools.Sakoe is a free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // Oetools.Sakoe is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
@@ -39,26 +39,26 @@ using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge.Execution;
 
 namespace Oetools.Sakoe.Command.Oe {
-    
+
     [Command(
         Name, "bu",
         Description = "Build automation for Openedge projects. This command is the bread and butter of this tool."
     )]
     [CommandAdditionalHelpTextAttribute(nameof(GetAdditionalHelpText))]
     internal class BuildCommand : AOeCommand {
-        
+
         public const string Name = "build";
         private const string PropertyHelpLongName = "--property-help";
         private const string ConfigurationNameLongName = "--config-name";
         private const string ExtraConfigOption = "extra-config";
-        
+
         [LegalFilePath]
-        [Argument(0, "[<project>]", "Path or name of the project file. The " + OeBuilderConstants.OeProjectExtension + " extension is optional. Defaults to the " + OeBuilderConstants.OeProjectExtension + " file found.\nThe search is done in the current directory and in the " + OeBuilderConstants.OeProjectDirectory + " directory when it exists.")]
+        [Argument(0, "[<project>]", "Path or name of the project file. The " + OeBuilderConstants.OeProjectExtension + " extension is optional. Defaults to the first " + OeBuilderConstants.OeProjectExtension + " file found.\nThe search is done in the current directory and in the " + OeBuilderConstants.OeProjectDirectory + " directory when it exists.")]
         public string ProjectFile { get; set; }
 
         [Option("-c|" + ConfigurationNameLongName + " <config>", "The name of the build configuration to use for the build. This name is found in the " + OeBuilderConstants.OeProjectExtension + " file.\nDefaults to the first build configuration found in the project file.", CommandOptionType.SingleValue)]
         public string ConfigurationName { get; set; }
-        
+
         [Option(CommandOptionType.MultipleValue, ShortName = "e", LongName = ExtraConfigOption, ValueName = "project=config", Description = @"In addition to the base build configuration specified by <project> and " + ConfigurationNameLongName + @", you can dynamically add a child configuration to the base configuration with this option. This option can be used multiple times, each new configuration will be added as a child of the previously defined configuration.
 This option allows you to share, with your colleagues, a common project file that holds the property of your application and have an extra configuration in local (just for you) which you can use to build the project in a specific local directory.
 For each extra configuration, specify the path or the name of the project file and the configuration name to use. If the project file name if empty, the main <project> is used.")]
@@ -72,7 +72,7 @@ Use the option " + PropertyHelpLongName + " to see the full list of properties a
         [Option(CommandOptionType.MultipleValue, ShortName = "v", LongName = "variable", ValueName = "key=value", Description = @"A pair of key/value to dynamically set a variable for this build. A variable set this way will prevail over a variable with the same name defined in a project file.
 Each pair should specify the name of the variable to set and the value that should be used.")]
         public string[] BuildVariables { get; set; }
-        
+
         [Option("-ph|" + PropertyHelpLongName, "Shows the list of each build property usable with its full documentation.", CommandOptionType.NoValue)]
         public bool ShowBuildPropertyHelp { get; set; }
 
@@ -82,13 +82,13 @@ Each pair should specify the name of the variable to set and the value that shou
         public static void GetAdditionalHelpText(IHelpFormatter formatter, CommandLineApplication application, int firstColumnWidth) {
             formatter.WriteOnNewLine(null);
             formatter.WriteSectionTitle("BUILD PROPERTIES");
-            
+
             foreach (var property in GetAvailableBuildProperties().OrderBy(p => p.Key)) {
                 formatter.WriteOnNewLine($"* -p \"{property.Key}={property.Value ?? ""}\"");
             }
             formatter.WriteOnNewLine(null);
             formatter.WriteTip($"Display the full documentation of each build property by running {$"{application.GetFullCommandLine()} {PropertyHelpLongName}".PrettyQuote()}.");
-            
+
             formatter.WriteOnNewLine(null);
             formatter.WriteSectionTitle("EXTRA CONFIG");
             formatter.WriteOnNewLine($"The example below illustrate the usage of the --{ExtraConfigOption} option:");
@@ -118,7 +118,7 @@ Configuration1
          └─ Configuration2
 
 This allow a lot of flexibility for organizing and partitioning your build process.");
-            
+
             formatter.WriteOnNewLine(null);
             formatter.WriteSectionTitle("NOTES");
             formatter.WriteOnNewLine($"Create a new project file using the command: {typeof(ProjectInitCommand).GetFullCommandLine().PrettyQuote()}.");
@@ -128,12 +128,12 @@ This allow a lot of flexibility for organizing and partitioning your build proce
         /// <inheritdoc />
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             // TODO: show task error and compilation error
-            
+
             // show help.
             if (ShowBuildPropertyHelp) {
                 HelpFormatter.WriteOnNewLine(null);
                 HelpFormatter.WriteSectionTitle("BUILD PROPERTIES");
-            
+
                 foreach (var property in GetAvailableBuildProperties().OrderBy(p => p.Key)) {
                     HelpFormatter.WriteOnNewLine(property.Key);
                     HelpFormatter.WriteOnNewLine(BuilderHelp.GetPropertyDocumentation(property.Key), padding: 20);
@@ -148,7 +148,7 @@ This allow a lot of flexibility for organizing and partitioning your build proce
                 ProjectFile = GetProjectFilePath(ProjectFile);
             }
             Log?.Debug($"Base project file: {ProjectFile.PrettyQuote()}.");
-            
+
             // get extra config
             var configQueue = new Queue<Tuple<string, string>>();
             configQueue.Enqueue(new Tuple<string, string>(ProjectFile, ConfigurationName));
@@ -197,7 +197,7 @@ This allow a lot of flexibility for organizing and partitioning your build proce
                     }
                 }
             }
-            
+
             // check variables
             List<OeVariable> addedVariables = null;
             if (BuildVariables != null) {
@@ -213,7 +213,7 @@ This allow a lot of flexibility for organizing and partitioning your build proce
                     });
                 }
             }
-            
+
             var config = OeProject.GetConfiguration(configQueue);
             using (var builder = new BuilderAuto(config)) {
                 builder.BuildConfiguration.Properties.SetPropertiesFromKeyValuePairs(keyValueProperties);
@@ -224,7 +224,7 @@ This allow a lot of flexibility for organizing and partitioning your build proce
                 builder.Log = Log;
                 builder.Build();
 
-                
+
                 // display compilation error.
                 var compilationProblems = builder.CompilationProblems;
                 if (compilationProblems.Count > 0) {
@@ -243,7 +243,7 @@ This allow a lot of flexibility for organizing and partitioning your build proce
                         i++;
                     }
                 }
-                
+
                 // display exceptions.
                 var taskExceptions = builder.TaskExecutionExceptions;
                 if (taskExceptions.Count > 0) {
@@ -298,7 +298,7 @@ This allow a lot of flexibility for organizing and partitioning your build proce
                             }
                             properties.Add(name, defaultValue);
                         }
-                        
+
                     }
                 }
             }
@@ -306,6 +306,6 @@ This allow a lot of flexibility for organizing and partitioning your build proce
         }
 
     }
-    
-    
+
+
 }

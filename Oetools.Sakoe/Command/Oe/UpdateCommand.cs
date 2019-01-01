@@ -2,17 +2,17 @@
 // ========================================================================
 // Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
 // This file (UpdateCommand.cs) is part of Oetools.Sakoe.
-// 
+//
 // Oetools.Sakoe is a free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // Oetools.Sakoe is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
@@ -21,7 +21,6 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using GithubUpdater;
 using GithubUpdater.GitHub;
@@ -32,42 +31,42 @@ using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
 
 namespace Oetools.Sakoe.Command.Oe {
-       
+
     [Command(
         "update", "up",
         Description = "Update this tool with the latest release found on github.",
         ExtendedHelpText = ""
     )]
     internal class UpdateCommand : ABaseCommand {
-        
+
         private const string RepoOwner = "jcaillon";
         private const string RepoName = "Oetools.Sakoe";
         private const string GitHubToken = "MmViMDJlNWVlYWZlMTIzNGIxN2VmOTkxMGQ1NzljMTRkM2E1ZDEyMw==";
-        
-        [Option("-b|--get-beta", "Accept to update from new 'beta' (i.e. pre-release) versions of the tool.\nThis option will be used by default if the current version of the tool is a beta version. Otherwise, only stable releases will be used for updates. ", CommandOptionType.NoValue)]
-        public bool GetBeta { get; set; }
-        
+
+        [Option("-b|--get-pre-release", "Accept to update from new pre-release (i.e. 'beta') versions of the tool.\nThis option will be used by default if the current version of the tool is a pre-release version. Otherwise, only stable releases will be used for updates. ", CommandOptionType.NoValue)]
+        public bool GetPreRelease { get; set; }
+
         [Option("-p|--proxy", "The http proxy to use for this update. Useful if you are behind a corporate firewall.\nThe expected format is: 'http(s)://[user:password@]host[:port]'.\nIt is also possible to use the environment variable HTTP_PROXY to set this value.", CommandOptionType.SingleValue)]
         public string HttpProxy { get; set; }
-        
+
         [Option("-c|--check-only", "Check for new releases but exit the command before actually updating the tool.", CommandOptionType.NoValue)]
         public bool CheckOnly { get; set; }
-        
+
         [Option("-u|--override-github-url", "Use an alternative url for the github api. This option is here to allow updates from a different location (a private server for instance) but should not be used in most cases.", CommandOptionType.SingleValue)]
         public string OverrideGithubUrl { get; set; }
-        
+
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
 
-            var usePreRelease = GetBeta || RunningAssembly.IsPreRelease;
+            var usePreRelease = GetPreRelease || RunningAssembly.Info.IsPreRelease;
             Log.Debug(usePreRelease ? "Getting pre-releases." : "Skipping pre-releases.");
-            
+
             var httpProxyFromEnv = Environment.GetEnvironmentVariable("HTTP_PROXY");
 
             if (string.IsNullOrEmpty(HttpProxy) && !string.IsNullOrEmpty(httpProxyFromEnv)) {
                 Log.Debug($"Using the proxy found in the HTTP_PROXY environment variable: {httpProxyFromEnv.PrettyQuote()}.");
                 HttpProxy = httpProxyFromEnv;
             }
-            
+
             var updater = new GitHubUpdater();
 
             if (!string.IsNullOrEmpty(OverrideGithubUrl)) {
@@ -84,8 +83,8 @@ namespace Oetools.Sakoe.Command.Oe {
                 Log.Debug($"Using http proxy: {HttpProxy.PrettyQuote()}.");
                 updater.UseProxy($"{host}{(port > 0 ? $":{port}" : "")}", userName, password);
             }
-            
-            var currentVersion = UpdaterHelper.StringToVersion(RunningAssembly.FileVersion);
+
+            var currentVersion = RunningAssembly.Info.AssemblyVersion;
             Log.Info($"Current local version: {currentVersion}.");
 
             var releases = updater.FetchNewReleases(currentVersion);
@@ -95,14 +94,14 @@ namespace Oetools.Sakoe.Command.Oe {
                 Log.Debug($"Removing pre-release: {first.TagName}.");
                 releases.RemoveAt(0);
             }
-            
+
             if (releases.Count == 0) {
                 Log.Done("Your version is up to date.");
                 return 0;
             }
 
             var latestRelease = releases[0];
-            
+
             Log.Info($"{releases.Count} new releases found on github:");
             foreach (var release in releases) {
                 Log.Info($"- {release.TagName}, {release.Name.PrettyQuote()}: {release.HtmlUrl}");
@@ -123,7 +122,7 @@ namespace Oetools.Sakoe.Command.Oe {
             if (latestAsset == null) {
                 throw new CommandException("Could not find a matching asset in the latest github release.");
             }
-            
+
             Log.Debug($"Downloading the latest release asset: {latestAsset.BrowserDownloadUrl}.");
             var tempFilePath = updater.DownloadToTempFile(latestAsset.BrowserDownloadUrl, progress => {
                 Log.ReportProgress(100, (int) Math.Round((decimal) progress.NumberOfBytesDoneTotal / progress.NumberOfBytesTotal * 100), "Downloading update.");
@@ -134,16 +133,16 @@ namespace Oetools.Sakoe.Command.Oe {
             using (var zip = ZipFile.Open(tempFilePath, ZipArchiveMode.Read)) {
                 zip.ExtractToDirectory(tempExtractionDir);
             }
-            
+
             var fileUpdater = SimpleFileUpdater.Instance;
-            var toolDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var toolDirectory = Path.GetDirectoryName(RunningAssembly.Info.Location);
             if (string.IsNullOrEmpty(toolDirectory)) {
                 throw new CommandException("Could not find the directory in which this tool is installed.");
             }
             foreach (var file in Utils.EnumerateAllFiles(tempExtractionDir)) {
                 fileUpdater.AddFileToMove(file, Path.Combine(toolDirectory, file.Replace(tempExtractionDir, "").TrimStartDirectorySeparator()));
             }
-            
+
             File.Delete(tempFilePath);
 
             if (fileUpdater.IsAdminRightsNeeded) {
@@ -152,7 +151,7 @@ namespace Oetools.Sakoe.Command.Oe {
 
             fileUpdater.Start();
             Log.Done("Update successful.");
-            
+
             return 0;
         }
     }

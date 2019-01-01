@@ -49,7 +49,7 @@ namespace Oetools.Sakoe.Command {
     [Subcommand(typeof(BuildCommand))]
     [Subcommand(typeof(ShowVersionCommand))]
 //    [Subcommand(typeof(XcodeCommand))]
-    [Subcommand(typeof(HashCommand))]
+//    [Subcommand(typeof(HashCommand))]
     [Subcommand(typeof(ProHelpCommand))]
     [Subcommand(typeof(ProUtilitiesCommand))]
 #if !WINDOWSONLYBUILD
@@ -130,7 +130,7 @@ namespace Oetools.Sakoe.Command {
             console.Write(@"  /;/", ConsoleColor.Gray);
             console.Write(@"       \ \\      ", ConsoleColor.DarkGray);
             console.Write("Version ", ConsoleColor.DarkGray);
-            console.Write(typeof(HelpGenerator).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion, ConsoleColor.Gray);
+            console.Write(RunningAssembly.Info.ProductShortVersion, ConsoleColor.Gray);
             console.Write(".", ConsoleColor.DarkGray);
             console.WriteOnNewLine(@"   \ \", ConsoleColor.DarkGray);
             console.Write(@"/", ConsoleColor.Gray);

@@ -2,60 +2,61 @@
 // ========================================================================
 // Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
 // This file (CreateStarterCommand.cs) is part of Oetools.Sakoe.
-// 
+//
 // Oetools.Sakoe is a free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // Oetools.Sakoe is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
-using System;
+
+#if !WINDOWSONLYBUILD
 using System.IO;
 using System.Reflection;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Command.Exceptions;
+using Oetools.Sakoe.Utilities;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
 
 namespace Oetools.Sakoe.Command.Oe {
-#if !WINDOWSONLYBUILD
+
     [Command(
-        "starter", "cs",
-        Description = "Create a platform specific starter script for sakoe to allow a more natural way of calling this tool: `sakoe [command]`.",
-        ExtendedHelpText = ""
+        "starter", "st",
+        Description = "Create a platform specific starter script for sakoe to allow a more natural way of calling this tool: `sakoe [command]`."
     )]
     internal class CreateStarterCommand : ABaseCommand {
 
         public static string StartScriptFilePath {
             get {
                 string starterFilePath = null;
-                string executableDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string executableDir = Path.GetDirectoryName(RunningAssembly.Info.Location);
                 if (!string.IsNullOrEmpty(executableDir)) {
                     starterFilePath = Path.Combine(executableDir, Utils.IsRuntimeWindowsPlatform ? "sakoe.cmd" : "sakoe.sh");
                 }
                 return starterFilePath;
             }
         }
-        
+
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            string executableDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string executableDir = Path.GetDirectoryName(RunningAssembly.Info.Location);
             if (string.IsNullOrEmpty(executableDir)) {
-                throw new CommandException($"Could not find the directory of the executing assembly: {Assembly.GetExecutingAssembly().Location}.");
+                throw new CommandException($"Could not find the directory of the executing assembly: {RunningAssembly.Info.Location}.");
             }
-            
+
             var starterFilePath = StartScriptFilePath;
             Log.Debug($"Creating starter script: {starterFilePath.PrettyQuote()}.");
-            
+
             if (Utils.IsRuntimeWindowsPlatform) {
-                File.WriteAllText(starterFilePath, $"@echo off\r\ndotnet exec \"%~dp0{Path.GetFileName(Assembly.GetExecutingAssembly().Location)}\" %*");
+                File.WriteAllText(starterFilePath, $"@echo off\r\ndotnet exec \"%~dp0{Path.GetFileName(RunningAssembly.Info.Location)}\" %*");
             } else {
                 File.WriteAllText(starterFilePath, @"#!/bin/bash
 SOURCE=""${BASH_SOURCE[0]}""
@@ -65,9 +66,9 @@ while [ -h ""$SOURCE"" ]; do
     [[ $SOURCE != /* ]] && SOURCE=""$DIR/$SOURCE""
 done
 DIR=""$( cd -P ""$( dirname ""$SOURCE"" )"" && pwd )""
-dotnet exec ""$DIR/" + Path.GetFileName(Assembly.GetExecutingAssembly().Location) + @""" ""$@""".Replace("\r", ""));
+dotnet exec ""$DIR/" + Path.GetFileName(RunningAssembly.Info.Location) + @""" ""$@""".Replace("\r", ""));
             }
-            
+
             Log.Info($"Starter script created: {starterFilePath.PrettyQuote()}.");
 
             HelpFormatter.WriteOnNewLine(null);
@@ -81,17 +82,18 @@ The directory containing the starter script created should be added to your syst
 
 The command to add this directory to your path is:");
             HelpFormatter.WriteOnNewLine(null);
-            
+
             if (Utils.IsRuntimeWindowsPlatform) {
                 Out.WriteResultOnNewLine("for /f \"usebackq tokens=2,*\" %A in (`reg query HKCU\\Environment /v PATH`) do set my_user_path=%B && SetX Path \"%my_user_path%;" + Path.GetDirectoryName(starterFilePath) + "\"");
             } else {
                 Out.WriteResultOnNewLine("echo $\"export PATH=\\$PATH:" + Path.GetDirectoryName(starterFilePath) + "\" >> ~/.bashrc && source ~/.bashrc && chmod +x \"" + starterFilePath + "\"");
             }
-            
+
             HelpFormatter.WriteOnNewLine(null);
-            
+
             return 0;
         }
     }
-#endif
 }
+
+#endif

@@ -2,17 +2,17 @@
 // ========================================================================
 // Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
 // This file (ManCommand.cs) is part of Oetools.Sakoe.
-// 
+//
 // Oetools.Sakoe is a free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // Oetools.Sakoe is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
@@ -42,9 +42,9 @@ namespace Oetools.Sakoe.Command.Oe {
     [Subcommand(typeof(MarkdownManCommand))]
     [CommandAdditionalHelpTextAttribute(nameof(GetAdditionalHelpText))]
     internal class ManCommand {
-        
+
         public const string Name = "manual";
-        
+
         public static void GetAdditionalHelpText(IHelpFormatter formatter, CommandLineApplication app, int firstColumnWidth) {
             formatter.WriteOnNewLine(null);
             formatter.WriteSectionTitle("WHAT IS THIS TOOL");
@@ -55,14 +55,14 @@ namespace Oetools.Sakoe.Command.Oe {
             formatter.WriteOnNewLine(@"The goal of this manual is to provide KEY concepts that are necessary to understand to use this tool to its fullest.
 
 Each command is well documented on its own, don't be afraid to use the " + MainCommand.HelpLongName.PrettyQuote() + " option.");
-            
+
             formatter.WriteOnNewLine(null);
             formatter.WriteSectionTitle("COMMAND LINE USAGE");
             formatter.WriteOnNewLine(@"How to use this command line interface tool:
   - You can escape white spaces in argument/option values by using double quotes (i.e. ""my value"").
   - If you need to use a double quote within a double quote, you can do so by double the double quote (i.e. ""my """"special"""" value"").
   - In the 'USAGE' help section, arguments between brackets (i.e. []) are optionals.");
-            
+
             formatter.WriteOnNewLine(null);
             formatter.WriteSectionTitle("RESPONSE FILE PARSING");
             formatter.WriteOnNewLine(@"Instead of using a long command line (which is limited in size on every platform), you can use a response file that contains each argument/option that should be used.
@@ -71,20 +71,20 @@ Everything that is usually separated by a space in the command line should be se
 In response files, you do not have to double quote arguments containing spaces, they will be considered as a whole as long as they are on a separated line.
 
   `sakoe @responsefile.txt`");
-            
+
             formatter.WriteOnNewLine(null);
             formatter.WriteSectionTitle("EXIT CODE");
             formatter.WriteOnNewLine(@"The convention followed by this tool is the following.
   - 0 : used when a command completed successfully, without errors nor warnings.
   - 1-8 : used when a command completed but with warnings, the level can be used to pinpoint different kind of warnings.
   - 9 : used when a command does not complete and ends up in error.");
-            
+
             formatter.WriteOnNewLine(null);
             formatter.WriteSectionTitle("WEBSITE");
             formatter.WriteOnNewLine(@"The official page of this tool is:
   https://jcaillon.github.io/Oetools.Sakoe/.
 
-If you want to help, you are welcome to contribute to the github repo. 
+If you want to help, you are welcome to contribute to the github repo.
 You are invited to STAR the project on github to increase its visibility!");
 
             if (app.Commands != null && app.Commands.Count > 0) {
@@ -104,21 +104,21 @@ You are invited to STAR the project on github to increase its visibility!");
 
             formatter.WriteOnNewLine(null);
         }
-        
+
         protected virtual int OnExecute(CommandLineApplication app, IConsole console) {
             GetAdditionalHelpText(HelpGenerator.Singleton, app, 0);
             return 0;
         }
-        
+
     }
-    
+
     [Command(
         "list", "li",
         Description = "List all the commands of this tool."
     )]
     [CommandAdditionalHelpTextAttribute(nameof(GetAdditionalHelpText))]
     internal class ListAllCommandsManCommand {
-        
+
         public static void GetAdditionalHelpText(IHelpFormatter formatter, CommandLineApplication app, int firstColumnWidth) {
             formatter.WriteOnNewLine(null);
             formatter.WriteSectionTitle("LIST OF ALL THE COMMANDS");
@@ -143,22 +143,22 @@ You are invited to STAR the project on github to increase its visibility!");
                 i++;
             }
         }
-        
+
         protected virtual int OnExecute(CommandLineApplication app, IConsole console) {
             GetAdditionalHelpText(HelpGenerator.Singleton, app, 0);
             return 0;
         }
     }
-    
+
     [Command(
         Name, "co",
         Description = "Print the help of each command of this tool ."
     )]
     [CommandAdditionalHelpTextAttribute(nameof(GetAdditionalHelpText))]
     internal class CompleteManCommand {
-        
+
         public const string Name = "complete";
-        
+
         public static void GetAdditionalHelpText(IHelpFormatter formatter, CommandLineApplication app, int firstColumnWidth) {
             formatter.WriteOnNewLine(null);
             app.Parent.Commands.Remove(app);
@@ -183,70 +183,71 @@ You are invited to STAR the project on github to increase its visibility!");
                 i++;
             }
         }
-        
+
         protected virtual int OnExecute(CommandLineApplication app, IConsole console) {
             GetAdditionalHelpText(HelpGenerator.Singleton, app, 0);
             return 0;
         }
     }
-    
-    
+
+
     [Command(
         "markdown-file", "mf",
         Description = "Print the documentation of this tool in a markdown file."
     )]
     internal class MarkdownManCommand {
-        
+
         [Required]
         [LegalFilePath]
         [Argument(0, "<file>", "The file in which to print this markdown manual.")]
         public string OutputFile { get; set; }
-        
+
         protected virtual int OnExecute(CommandLineApplication app, IConsole console) {
             app.Parent.Commands.Clear();
-            
+
             using (var stream = new FileStream(OutputFile, FileMode.Create)) {
                 using (var writer = new StreamWriter(stream, Encoding.UTF8)) {
                     writer.WriteLine("# SAKOE");
                     writer.WriteLine();
-                    
+                    writer.WriteLine($"> This markdown can be generated using the command: {app.GetFullCommandLine().PrettyQuote()}.");
+                    writer.WriteLine();
+
                     var rootCommand = app;
                     while (rootCommand.Parent != null) {
                         rootCommand = rootCommand.Parent;
                     }
-
                     var mdGenerator = new MarkdownHelpGenerator(writer);
-                    
+
                     writer.WriteLine("## ABOUT");
                     writer.WriteLine();
                     ManCommand.GetAdditionalHelpText(mdGenerator, app.Parent, 0);
                     writer.WriteLine();
-                    
+
                     writer.WriteLine("## TABLE OF CONTENT");
                     writer.WriteLine();
                     writer.WriteLine("- [Commands overview](#commands-overview)");
                     writer.WriteLine("- [About the build command](#about-the-build-command)");
                     WriteToc(writer, rootCommand.Commands, "");
                     writer.WriteLine();
-                    
+
                     writer.WriteLine("## COMMANDS OVERVIEW");
                     writer.WriteLine();
                     writer.WriteLine("| Full command line | Short description |");
                     writer.WriteLine("| --- | --- |");
                     WriteAllCommands(writer, rootCommand.Commands);
                     writer.WriteLine();
-                    
+
                     writer.WriteLine("## ABOUT THE BUILD COMMAND");
                     writer.WriteLine();
                     BuildManCommand.GetAdditionalHelpText(mdGenerator, app.Parent, 0);
                     writer.WriteLine();
-                    
+
                     ListCommands(mdGenerator, rootCommand.Commands);
                 }
             }
             return 0;
         }
-        
+
         private static void WriteToc(StreamWriter writer, List<CommandLineApplication> subCommands, string linePrefix) {
             var i = 0;
             foreach (var subCommand in subCommands.OrderBy(c => c.Name)) {
@@ -257,7 +258,7 @@ You are invited to STAR the project on github to increase its visibility!");
                 i++;
             }
         }
-        
+
         private static void WriteAllCommands(StreamWriter writer, List<CommandLineApplication> subCommands) {
             var i = 0;
             foreach (var subCommand in subCommands.OrderBy(c => c.Name)) {
@@ -268,7 +269,7 @@ You are invited to STAR the project on github to increase its visibility!");
                 i++;
             }
         }
-        
+
         private static void ListCommands(MarkdownHelpGenerator mdGenerator, List<CommandLineApplication> subCommands) {
             var i = 0;
             foreach (var subCommand in subCommands.OrderBy(c => c.Name)) {
@@ -282,14 +283,14 @@ You are invited to STAR the project on github to increase its visibility!");
             }
         }
     }
-    
+
     [Command(
         "build", "bu",
         Description = "What is a build and how to configure it."
     )]
     [CommandAdditionalHelpTextAttribute(nameof(GetAdditionalHelpText))]
     internal class BuildManCommand {
-        
+
         public static void GetAdditionalHelpText(IHelpFormatter formatter, CommandLineApplication app, int firstColumnWidth) {
             formatter.WriteOnNewLine(null);
             formatter.WriteSectionTitle("OVERVIEW");
@@ -309,36 +310,36 @@ You can create them with the command: " + typeof(ProjectInitCommand).GetFullComm
             formatter.WriteOnNewLine("An incremental build is the opposite of a full build. In incremental mode, only the files that were added/modified/deleted since the previous build are taken into account. Unchanged files are simply not rebuilt.");
             formatter.WriteOnNewLine(null);
             formatter.WriteOnNewLine("The chapters below contain more details about a project, build configuration, properties and tasks. ");
-            
+
             // TODO: list all the node and their documentation, use a tree
-            
+
             formatter.WriteOnNewLine(null);
             formatter.WriteSectionTitle("PROJECT");
             formatter.WriteOnNewLine(BuilderHelp.GetPropertyDocumentation(typeof(OeProject).GetXmlName()));
-            
+
             formatter.WriteOnNewLine(null);
             formatter.WriteSectionTitle("BUILD CONFIGURATION");
             formatter.WriteOnNewLine(BuilderHelp.GetPropertyDocumentation(typeof(OeProject).GetXmlName(nameof(OeProject.BuildConfigurations))));
-            
+
             formatter.WriteOnNewLine(null);
             formatter.WriteSectionTitle("BUILD CONFIGURATION VARIABLES");
             formatter.WriteOnNewLine(BuilderHelp.GetPropertyDocumentation(typeof(OeBuildConfiguration).GetXmlName(nameof(OeBuildConfiguration.Variables))));
-            
+
             formatter.WriteOnNewLine(null);
             formatter.WriteSectionTitle("BUILD CONFIGURATION PROPERTIES");
             formatter.WriteOnNewLine(BuilderHelp.GetPropertyDocumentation(typeof(OeBuildConfiguration).GetXmlName(nameof(OeBuildConfiguration.Properties))));
-            
+
             formatter.WriteOnNewLine(null);
             formatter.WriteSectionTitle("BUILD STEPS");
             formatter.WriteOnNewLine(BuilderHelp.GetPropertyDocumentation(typeof(OeBuildConfiguration).GetXmlName(nameof(OeBuildConfiguration.BuildSteps))));
-            
+
             formatter.WriteOnNewLine(null);
         }
-        
+
         protected virtual int OnExecute(CommandLineApplication app, IConsole console) {
             GetAdditionalHelpText(HelpGenerator.Singleton, app, 0);
             return 0;
         }
     }
-    
+
 }

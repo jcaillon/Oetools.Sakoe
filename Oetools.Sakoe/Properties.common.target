@@ -18,7 +18,7 @@
     <!-- InformationalVersion has $(SourceRevisionId) appended if the property is present -->
     <IncludeSourceRevisionInInformationalVersion>true</IncludeSourceRevisionInInformationalVersion>
     <!-- AssemblyVersion: major.minor.patch.build = Assembly.GetExecutingAssembly().GetName().Version = $(AssemblyVersion) = $(VersionPrefix) but extended if necessary to make a 4 digit version -->
-    <!-- AssemblyVersion: Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyVersionAttribute>().AssemblyVersion = $(AssemblyVersion) -->
+    <!-- AssemblyVersion: Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyVersionAttribute>().Version = $(AssemblyVersion) -->
     <AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
     <!-- FileVersion: major.minor.patch.build = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion = $(FileVersion) = $(VersionPrefix) but extended if necessary to make a 4 digit version -->
     <!-- FileVersion: Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyFileVersionAttribute>().FileVersion = $(FileVersion) -->

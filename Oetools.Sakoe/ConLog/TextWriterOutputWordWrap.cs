@@ -2,17 +2,17 @@
 // ========================================================================
 // Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
 // This file (TextWriterOutputWordWrap.cs) is part of Oetools.Sakoe.
-// 
+//
 // Oetools.Sakoe is a free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // Oetools.Sakoe is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
@@ -21,12 +21,12 @@ using System;
 using System.IO;
 
 namespace Oetools.Sakoe.ConLog {
-    
+
     /// <summary>
     /// This class provides methods to output text to a <see cref="TextWriter"/> with word wrap.
     /// </summary>
     internal class TextWriterOutputWordWrap {
-        
+
         /// <summary>
         /// The text writer where to write to.
         /// </summary>
@@ -38,7 +38,7 @@ namespace Oetools.Sakoe.ConLog {
             }
             UnderLyingWriter = writer;
         }
-        
+
         /// <summary>
         /// Has this writer alright wrote thing to the output?
         /// Allows to know when to write a new line.
@@ -69,7 +69,7 @@ namespace Oetools.Sakoe.ConLog {
         /// <param name="indentation">Apply indentation when writing on a new line.</param>
         /// <param name="prefixForNewLines">The text to put at the beginning of each new line that need to be created because of word wrap.</param>
         public void Write(string message, int maxLineWidth, bool writeToNewLine, int indentation = 0, string prefixForNewLines = null) {
-            
+
             // handle null message
             if (message == null) {
                 // write a new line
@@ -79,10 +79,10 @@ namespace Oetools.Sakoe.ConLog {
                 HasWroteToOuput = true;
                 return;
             }
-            
+
             // check indentation
-            if (maxLineWidth > 0 && indentation >= maxLineWidth) {
-                indentation = maxLineWidth - 1;
+            if (maxLineWidth > 0 && indentation >= maxLineWidth - 10) {
+                indentation = maxLineWidth - 10;
             }
             indentation = Math.Max(indentation, 0);
 
@@ -99,11 +99,11 @@ namespace Oetools.Sakoe.ConLog {
                 HasWroteToOuput = true;
                 return;
             }
-            
+
             // for each line of text
             int lineStartPos, nextLineStartPos;
             for (lineStartPos = 0; lineStartPos < message.Length; lineStartPos = nextLineStartPos) {
-                
+
                 int eolPosition = message.IndexOf('\n', lineStartPos);
                 if (eolPosition == -1) {
                     nextLineStartPos = eolPosition = message.Length;
@@ -120,7 +120,7 @@ namespace Oetools.Sakoe.ConLog {
                 // we need to keep the same indentation for each new line
                 bool newInputLineStarting = true;
                 int paragraphIndent = 0;
-                
+
                 if (eolPosition > lineStartPos) {
                     do {
                         // write a new line
@@ -133,11 +133,11 @@ namespace Oetools.Sakoe.ConLog {
                                 _currentLineSpaceTaken += newLinePrefix.Length;
                             }
                         }
-                        
+
                         int lineLength = eolPosition - lineStartPos;
                         int totalIndent = _currentLineSpaceTaken > 0 ? 0 : indentation + paragraphIndent;
                         int currentConsoleLineSpaceLeft = maxLineWidth - _currentLineSpaceTaken - totalIndent;
-                        
+
                         if (lineLength > currentConsoleLineSpaceLeft) {
                             lineLength = GetLineLengthToKeep(message, lineStartPos, currentConsoleLineSpaceLeft, !writeToNewLine && message.Length <= maxLineWidth - totalIndent);
                         }
@@ -149,13 +149,13 @@ namespace Oetools.Sakoe.ConLog {
                             _currentLineSpaceTaken += line.Length;
                             HasWroteToOuput = true;
                         }
-                        
+
                         if (newInputLineStarting && writeToNewLine) {
                             while (lineStartPos + paragraphIndent < message.Length && char.IsWhiteSpace(message[lineStartPos + paragraphIndent])) {
                                 paragraphIndent++;
                             }
-                            if (paragraphIndent >= maxLineWidth) {
-                                paragraphIndent = maxLineWidth - 1;
+                            if (indentation + paragraphIndent >= maxLineWidth) {
+                                paragraphIndent = maxLineWidth - indentation - 10;
                             }
                         }
                         newInputLineStarting = false;
@@ -170,7 +170,7 @@ namespace Oetools.Sakoe.ConLog {
                 }
             }
         }
-        
+
         /// <summary>
         /// Returns the length to keep for this line in order to wrap words.
         /// </summary>

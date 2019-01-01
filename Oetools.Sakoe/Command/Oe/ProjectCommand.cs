@@ -2,17 +2,17 @@
 // ========================================================================
 // Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
 // This file (ProjectCommand.cs) is part of Oetools.Sakoe.
-// 
+//
 // Oetools.Sakoe is a free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // Oetools.Sakoe is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
@@ -31,7 +31,7 @@ using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge;
 
 namespace Oetools.Sakoe.Command.Oe {
-    
+
     [Command(
         "project", "pr",
         Description = "Commands related to an Openedge project (.oe directory).",
@@ -42,30 +42,30 @@ namespace Oetools.Sakoe.Command.Oe {
     [Subcommand(typeof(ProjectListCommand))]
     internal class ProjectCommand : AExpectSubCommand {
     }
-    
+
     [Command(
         "init", "in",
         Description = "Initialize a new Openedge project file (" + OeBuilderConstants.OeProjectExtension + ").",
         ExtendedHelpText = ""
     )]
     internal class ProjectInitCommand : ABaseCommand {
-        
+
         [DirectoryExists]
         [Argument(0, "<directory>", "The directory in which to initialize the project. Defaults to the current directory.")]
         public string SourceDirectory { get; set; }
-        
+
         [LegalFilePath]
         [Option("-p|--project-name <name>", "The name of the project to create. Defaults to the current directory name.", CommandOptionType.SingleValue)]
         public string ProjectName { get; set; }
-        
+
         [Option("-l|--local", "Create the new project file for local use only. A local project should contain build configurations specific to your machine and thus should not be shared or versioned in your source control system.", CommandOptionType.NoValue)]
         public bool IsLocalProject { get; set; }
-        
+
         [Option("-f|--force", "Force the creation of the project file by replacing an older project file, if it exists. By default, the command will fail if the project file already exists.", CommandOptionType.NoValue)]
         public bool Force { get; set; }
-        
+
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            
+
             if (string.IsNullOrEmpty(SourceDirectory)) {
                 SourceDirectory = Directory.GetCurrentDirectory();
                 Log.Trace?.Write($"Using current directory to initialize the project: {SourceDirectory.PrettyQuote()}.");
@@ -75,7 +75,7 @@ namespace Oetools.Sakoe.Command.Oe {
 
             if (string.IsNullOrEmpty(ProjectName)) {
                 ProjectName = Path.GetFileName(SourceDirectory);
-                Log.Trace?.Write($"Using directory name for the project name: {ProjectName.PrettyQuote()}.");
+                Log.Info($"Using directory name for the project name: {ProjectName.PrettyQuote()}.");
             }
 
             var projectDirectory = IsLocalProject ? OeBuilderConstants.GetProjectDirectoryLocal(SourceDirectory) : OeBuilderConstants.GetProjectDirectory(SourceDirectory);
@@ -85,7 +85,7 @@ namespace Oetools.Sakoe.Command.Oe {
 
             Log.Trace?.Write("Generating a default project.");
             var project = OeProject.GetStandardProject();
-            
+
             var projectFilePath = Path.Combine(projectDirectory, $"{ProjectName}{OeBuilderConstants.OeProjectExtension}");
             if (File.Exists(projectFilePath)) {
                 if (Force) {
@@ -94,10 +94,10 @@ namespace Oetools.Sakoe.Command.Oe {
                     throw new CommandValidationException($"The project file already exists, delete it first: {projectFilePath.PrettyQuote()}.");
                 }
             }
-            
+
             Log.Info($"Creating Openedge project file: {projectFilePath.PrettyQuote()}.");
             project.Save(projectFilePath);
-            
+
             Log.Info($"Project created: {projectFilePath.PrettyQuote()}.");
 
             HelpFormatter.WriteOnNewLine(null);
@@ -114,7 +114,7 @@ Example of xml editors with out-of-the-box intellisense (autocomplete) features 
 
 Drag and drop the created " + OeBuilderConstants.OeProjectExtension + @" file into the editor of your choice and start configuring your build.
 The file " + Path.Combine(OeBuilderConstants.GetProjectDirectory(""), $"{ProjectName}{OeBuilderConstants.OeProjectExtension}").PrettyQuote() + @" should be versioned in your source repository to allow anyone who clones your application to build it.
-If you need to have a project file containing build configurations specific to your local machine, you can use the option " + (GetCommandOptionFromPropertyName(nameof(IsLocalProject))?.Template ?? "").PrettyQuote() + @". This will create the project file into the directory " + OeBuilderConstants.GetProjectDirectoryLocal("").PrettyQuote() + @" which should NOT be versioned. 
+If you need to have a project file containing build configurations specific to your local machine, you can use the option " + (GetCommandOptionFromPropertyName(nameof(IsLocalProject))?.Template ?? "").PrettyQuote() + @". This will create the project file into the directory " + OeBuilderConstants.GetProjectDirectoryLocal("").PrettyQuote() + @" which should NOT be versioned.
 For git repositories, use the command " + typeof(ProjectGitignoreCommand).GetFullCommandLine().PrettyQuote() + @" to set up your .gitignore file for sakoe projects.");
             HelpFormatter.WriteOnNewLine(null);
             return 0;
@@ -122,8 +122,8 @@ For git repositories, use the command " + typeof(ProjectGitignoreCommand).GetFul
     }
 
     [Command(
-        "gitignore", "gi", 
-        Description = "Initialize a .gitignore file adapted for sakoe projects (or append to, if it exists).", 
+        "gitignore", "gi",
+        Description = "Initialize a .gitignore file adapted for sakoe projects (or append to, if it exists).",
         ExtendedHelpText = ""
     )]
     internal class ProjectGitignoreCommand : ABaseCommand {
@@ -137,14 +137,14 @@ For git repositories, use the command " + typeof(ProjectGitignoreCommand).GetFul
             var gitIgnorePath = Path.Combine(SourceDirectory, ".gitignore");
 
             bool hasCarriageReturn = false;
-            
+
             if (File.Exists(gitIgnorePath)) {
                 var gitIgnoreContent = File.ReadAllText(gitIgnorePath);
                 if (gitIgnoreContent.Contains(".oe/local/")) {
                     Log?.Info("The .gitignore already exists and seems to already contain the appropriate exclusions.");
                     return 0;
                 }
-                
+
                 hasCarriageReturn = gitIgnoreContent.IndexOf('\r') >= 0;
             }
 
@@ -175,18 +175,18 @@ bin/
             if (hasCarriageReturn) {
                 ignoreContent.Replace("\n", "\r\n");
             }
-            
+
             File.AppendAllText(gitIgnorePath, ignoreContent.ToString());
-            
+
             Log?.Info($"File written: {gitIgnorePath}.");
 
             return 0;
         }
     }
-    
+
     [Command(
-        "list", "li", 
-        Description = "List all the project files or list the build configurations in a project file.", 
+        "list", "li",
+        Description = "List all the project files or list the build configurations in a project file.",
         ExtendedHelpText = ""
     )]
     internal class ProjectListCommand : AOeCommand {
@@ -214,14 +214,14 @@ bin/
             }
 
             var projectFile = GetProjectFilePath(PathToList);
-            
+
             var project = OeProject.Load(projectFile);
 
             foreach (var buildConfiguration in project.GetAllBuildConfigurations()) {
                 Out.WriteResultOnNewLine((string.IsNullOrEmpty(buildConfiguration.Name) ? "Unnamed configuration" : "Named configuration").PadRight(30));
                 Out.WriteResult(string.IsNullOrEmpty(buildConfiguration.Name) ? buildConfiguration.GetId().ToString() : buildConfiguration.Name);
             }
-            
+
             return 0;
         }
     }
