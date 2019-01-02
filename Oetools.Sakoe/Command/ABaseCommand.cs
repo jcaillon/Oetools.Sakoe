@@ -96,8 +96,6 @@ namespace Oetools.Sakoe.Command {
                 ConsoleLogger2.Singleton.LogOutputFilePath = logFilePath;
             }
 
-
-            _cancelSource = new CancellationTokenSource();
             console.CancelKeyPress += ConsoleOnCancelKeyPress;
 
             if (IsLogoOn) {
@@ -108,9 +106,13 @@ namespace Oetools.Sakoe.Command {
 
             try {
                 Log.Debug($"Starting execution: {DateTime.Now:yyyy MMM dd} @ {DateTime.Now:HH:mm:ss}.");
-                ExecutePreCommand(app, console);
-                exitCode = ExecuteCommand(app, console);
-                ExecutePostCommand(app, console);
+
+                using (_cancelSource = new CancellationTokenSource()) {
+                    ExecutePreCommand(app, console);
+                    exitCode = ExecuteCommand(app, console);
+                    ExecutePostCommand(app, console);
+                }
+
                 if (exitCode.Equals(0)) {
                     Log.Done("Exit code 0");
                 } else {
