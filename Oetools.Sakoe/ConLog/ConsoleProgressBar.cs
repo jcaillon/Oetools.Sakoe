@@ -2,17 +2,17 @@
 // ========================================================================
 // Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
 // This file (ConsoleProgressBar.cs) is part of Oetools.Sakoe.
-// 
+//
 // Oetools.Sakoe is a free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // Oetools.Sakoe is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
@@ -21,20 +21,21 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Timers;
+using Oetools.Utilities.Lib;
 
 namespace Oetools.Sakoe.ConLog {
-    
+
     /// <summary>
     /// A progress bar displayed in the console.
     /// </summary>
     public class ConsoleProgressBar : IDisposable {
-        
+
         public ConsoleColor ForegroundColor { get; set; } = ConsoleColor.White;
 
         public ConsoleColor? ForegroundColorDone { get; set; } = ConsoleColor.Green;
 
         public ConsoleColor? BackgroundColor { get; set; } = ConsoleColor.DarkGray;
-        
+
         public ConsoleColor? ForegroundColorUncomplete { get; set; } = ConsoleColor.Red;
 
         public ConsoleColor TextColor { get; set; }
@@ -53,7 +54,7 @@ namespace Oetools.Sakoe.ConLog {
         /// The lower the smoother the animation. But low value degrade performances.
         /// </summary>
         public int MinimumRefreshRateInMilliseconds { get; set; } = 100;
-        
+
         /// <summary>
         /// The maximum time interval that should elapse between 2 refresh of the progress bar.
         /// Should be less than 1s to correctly display the clock.
@@ -123,7 +124,7 @@ namespace Oetools.Sakoe.ConLog {
             if (_stopwatch == null) {
                 return false;
             }
-            
+
             _console.CursorVisible = true;
             _console.ResetColor();
             _timer?.Close();
@@ -143,9 +144,13 @@ namespace Oetools.Sakoe.ConLog {
                     }
                 }
             }
-            
+
             _stopwatch = null;
-            TaskbarProgress.SetState(TaskbarProgress.TaskbarStates.NoProgress);
+            if (Utils.IsRuntimeWindowsPlatform) {
+                if (Utils.IsRuntimeWindowsPlatform) {
+                    TaskbarProgress.SetState(TaskbarProgress.TaskbarStates.NoProgress);
+                }
+            }
             return true;
         }
 
@@ -180,7 +185,7 @@ namespace Oetools.Sakoe.ConLog {
                     _drawStopWatch?.Restart();
                 }
             }
-            
+
             if (_currentTick.Equals(_maxTicks)) {
                 _stopwatch.Stop();
             }
@@ -197,7 +202,9 @@ namespace Oetools.Sakoe.ConLog {
             // line1, progress bar
             _console.ForegroundColor = _timer == null ? (_maxTicks == _currentTick ? ForegroundColorDone : ForegroundColorUncomplete) ?? ForegroundColor : ForegroundColor;
             var progress = Math.Min(1, (double) _currentTick / _maxTicks);
-            TaskbarProgress.SetValue(progress * 100, 100);
+            if (Utils.IsRuntimeWindowsPlatform) {
+                TaskbarProgress.SetValue(progress * 100, 100);
+            }
             var progressWidth = (int) Math.Round(progress * maxWidth);
             if (progressWidth < maxWidth) {
                 _console.Write(new string(ForegroundCharacter, progressWidth));
@@ -263,7 +270,9 @@ namespace Oetools.Sakoe.ConLog {
             _console.WriteLine();
             _console.WriteLine();
             _lastWindowWidth = _console.WindowWidth;
-            TaskbarProgress.SetState(TaskbarProgress.TaskbarStates.Normal);
+            if (Utils.IsRuntimeWindowsPlatform) {
+                TaskbarProgress.SetState(TaskbarProgress.TaskbarStates.Normal);
+            }
 
             _timer = new System.Timers.Timer(MaximumRefreshRateInMilliseconds);
             _timer.Elapsed += OnTimerElapsed;

@@ -19,6 +19,7 @@
 #endregion
 using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Command.Oe;
@@ -83,12 +84,10 @@ namespace Oetools.Sakoe.Command {
                 log.LogTheshold = ConsoleLogThreshold.Debug;
 
                 if (ex is CommandParsingException) {
-                    //if (ex is UnrecognizedCommandParsingException unrecognizedCommandParsingException) {
-                    //    log.Info($"Did you mean {unrecognizedCommandParsingException.NearestMatch}?");
-                    //}
-                    var nearestMatch = ex.GetType().GetProperty("NearestMatch")?.GetValue(ex) as string;
                     log.Error(ex.Message);
-                    log.If(!string.IsNullOrEmpty(nearestMatch))?.Info($"Did you mean {nearestMatch}?");
+                    if (ex is UnrecognizedCommandParsingException unrecognizedCommandParsingException && unrecognizedCommandParsingException.NearestMatches.Any()) {
+                        log.Info($"Did you mean {unrecognizedCommandParsingException.NearestMatches.First()}?");
+                    }
                     log.Info($"Specify {HelpLongName} for a list of available options and commands.");
                 } else {
                     log.Error(ex.Message, ex);
@@ -108,13 +107,13 @@ namespace Oetools.Sakoe.Command {
         /// </summary>
         public static void DrawLogo(IConsoleOutput console) {
             console.WriteOnNewLine(null);
-            console.WriteOnNewLine(@"                '`.        ", ConsoleColor.DarkGray);
-            console.Write(@"============ ", ConsoleColor.DarkGray);
+            console.WriteOnNewLine(@"                '`.        ", ConsoleColor.Gray);
+            console.Write(@"============ ", ConsoleColor.Gray);
             console.Write(@"SAKOE", ConsoleColor.Yellow);
-            console.Write(@" ============", ConsoleColor.DarkGray);
-            console.WriteOnNewLine(@" '`.    ", ConsoleColor.DarkGray);
-            console.Write(@".^", ConsoleColor.Gray);
-            console.Write(@"      \  \       ", ConsoleColor.DarkGray);
+            console.Write(@" ============", ConsoleColor.Gray);
+            console.WriteOnNewLine(@" '`.    ", ConsoleColor.Gray);
+            console.Write(@".^", ConsoleColor.White);
+            console.Write(@"      \  \       ", ConsoleColor.Gray);
             console.Write(@"A ");
             console.Write(@"S", ConsoleColor.Yellow);
             console.Write(@"wiss ");
@@ -126,32 +125,32 @@ namespace Oetools.Sakoe.Command {
             console.Write(@"pen");
             console.Write(@"E", ConsoleColor.Yellow);
             console.Write(@"dge.");
-            console.WriteOnNewLine(@"  \ \", ConsoleColor.DarkGray);
-            console.Write(@"  /;/", ConsoleColor.Gray);
-            console.Write(@"       \ \\      ", ConsoleColor.DarkGray);
-            console.Write("Version ", ConsoleColor.DarkGray);
-            console.Write(RunningAssembly.Info.ProductShortVersion, ConsoleColor.Gray);
-            console.Write(".", ConsoleColor.DarkGray);
-            console.WriteOnNewLine(@"   \ \", ConsoleColor.DarkGray);
-            console.Write(@"/", ConsoleColor.Gray);
+            console.WriteOnNewLine(@"  \ \", ConsoleColor.Gray);
+            console.Write(@"  /;/", ConsoleColor.White);
+            console.Write(@"       \ \\      ", ConsoleColor.Gray);
+            console.Write("Version ", ConsoleColor.Gray);
+            console.Write(RunningAssembly.Info.ProductShortVersion, ConsoleColor.White);
+            console.Write(".", ConsoleColor.Gray);
+            console.WriteOnNewLine(@"   \ \", ConsoleColor.Gray);
+            console.Write(@"/", ConsoleColor.White);
             console.Write(@"_", ConsoleColor.Red);
-            console.Write(@"/", ConsoleColor.Gray);
+            console.Write(@"/", ConsoleColor.White);
             console.Write(@"_________", ConsoleColor.Red);
-            console.Write(@"\", ConsoleColor.DarkGray);
+            console.Write(@"\", ConsoleColor.Gray);
             console.Write(@"__", ConsoleColor.Red);
-            console.Write(@"\     ", ConsoleColor.DarkGray);
-            console.Write($"Running with {(Utils.IsNetFrameworkBuild ? ".netframework" : $".netcore-{(Utils.IsRuntimeWindowsPlatform ? "win" : "unix")}")}.", ConsoleColor.DarkGray);
-            console.WriteOnNewLine(@"    `", ConsoleColor.DarkGray);
+            console.Write(@"\     ", ConsoleColor.Gray);
+            console.Write($"Running with {(Utils.IsNetFrameworkBuild ? ".netframework" : $".netcore-{(Utils.IsRuntimeWindowsPlatform ? "win" : "unix")}")}.", ConsoleColor.Gray);
+            console.WriteOnNewLine(@"    `", ConsoleColor.Gray);
             console.Write(@"/ ", ConsoleColor.Red);
             console.Write(@".           _", ConsoleColor.White);
             console.Write(@"  \    ", ConsoleColor.Red);
-            console.Write("Session started on ", ConsoleColor.DarkGray);
-            console.Write($"{DateTime.Now:yy-MM-dd} at {DateTime.Now:HH:mm:ss}", ConsoleColor.Gray);
-            console.Write(".", ConsoleColor.DarkGray);
+            console.Write("Session started on ", ConsoleColor.Gray);
+            console.Write($"{DateTime.Now:yy-MM-dd} at {DateTime.Now:HH:mm:ss}", ConsoleColor.White);
+            console.Write(".", ConsoleColor.Gray);
             console.WriteOnNewLine(@"     \________________/    ", ConsoleColor.Red);
-            console.Write(@"Source code on ", ConsoleColor.DarkGray);
-            console.Write(@"github.com/jcaillon", ConsoleColor.Gray);
-            console.Write(@".", ConsoleColor.DarkGray);
+            console.Write(@"Source code on ", ConsoleColor.Gray);
+            console.Write(@"github.com/jcaillon", ConsoleColor.White);
+            console.Write(@".", ConsoleColor.Gray);
             console.WriteOnNewLine(null);
         }
     }

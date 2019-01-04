@@ -60,7 +60,7 @@ Each command is well documented on its own, don't be afraid to use the " + MainC
             formatter.WriteSectionTitle("COMMAND LINE USAGE");
             formatter.WriteOnNewLine(@"How to use this command line interface tool:
   - You can escape white spaces in argument/option values by using double quotes (i.e. ""my value"").
-  - If you need to use a double quote within a double quote, you can do so by double the double quote (i.e. ""my """"special"""" value"").
+  - If you need to use a double quote within a double quote, you can do so by double quoting the double quotes (i.e. ""my """"special"""" value"").
   - In the 'USAGE' help section, arguments between brackets (i.e. []) are optionals.");
 
             formatter.WriteOnNewLine(null);
@@ -76,7 +76,7 @@ In response files, you do not have to double quote arguments containing spaces, 
             formatter.WriteSectionTitle("EXIT CODE");
             formatter.WriteOnNewLine(@"The convention followed by this tool is the following.
   - 0 : used when a command completed successfully, without errors nor warnings.
-  - 1-8 : used when a command completed but with warnings, the level can be used to pinpoint different kind of warnings.
+  - 1-8 : used when a command completed but with warnings, the level can be used to pinpoint different kinds of warnings.
   - 9 : used when a command does not complete and ends up in error.");
 
             formatter.WriteOnNewLine(null);

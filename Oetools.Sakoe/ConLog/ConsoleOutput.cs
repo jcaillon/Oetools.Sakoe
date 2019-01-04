@@ -62,37 +62,37 @@ namespace Oetools.Sakoe.ConLog {
 
         /// <inheritdoc />
         public virtual void WriteResult(string text, ConsoleColor? color = null) {
-            _console.ForegroundColor = color ?? _originalForegroundColor;
+            _console.ForegroundColor = color ?? ConsoleColor.White;
             _wordWrapWriter.Write(text, 0, false);
         }
 
         /// <inheritdoc />
         public virtual void WriteResultOnNewLine(string text, ConsoleColor? color = null) {
-            _console.ForegroundColor = color ?? _originalForegroundColor;
+            _console.ForegroundColor = color ?? ConsoleColor.White;
             _wordWrapWriter.Write(text, 0, true);
         }
 
         /// <inheritdoc />
         public virtual void Write(string text, ConsoleColor? color = null, int indentation = 0, string prefixForNewLines = null) {
-            _console.ForegroundColor = color ?? _originalForegroundColor;
+            _console.ForegroundColor = color ?? ConsoleColor.White;
             _wordWrapWriter.Write(text, _console.IsOutputRedirected ? 0 : _console.WindowWidth - 1, false, indentation, string.IsNullOrEmpty(prefixForNewLines) ? _treeNewLinePrefix : $"{prefixForNewLines}{_treeNewLinePrefix}");
         }
 
         /// <inheritdoc />
         public virtual void WriteOnNewLine(string text, ConsoleColor? color = null, int indentation = 0, string prefixForNewLines = null) {
-            _console.ForegroundColor = color ?? _originalForegroundColor;
+            _console.ForegroundColor = color ?? ConsoleColor.White;
             _wordWrapWriter.Write(GetText(text), _console.IsOutputRedirected ? 0 : _console.WindowWidth - 1, true, indentation, string.IsNullOrEmpty(prefixForNewLines) ? _treeNewLinePrefix : $"{prefixForNewLines}{_treeNewLinePrefix}");
         }
 
         /// <inheritdoc />
         public virtual void WriteError(string text, ConsoleColor? color = null, int indentation = 0, string prefixForNewLines = null) {
-            _console.ForegroundColor = color ?? _originalForegroundColor;
+            _console.ForegroundColor = color ?? ConsoleColor.White;
             _wordWrapWriter.Write(text, _console.IsOutputRedirected ? 0 : _console.WindowWidth - 1, false, indentation, string.IsNullOrEmpty(prefixForNewLines) ? _treeNewLinePrefix : $"{prefixForNewLines}{_treeNewLinePrefix}");
         }
 
         /// <inheritdoc />
         public virtual void WriteErrorOnNewLine(string text, ConsoleColor? color = null, int indentation = 0, string prefixForNewLines = null) {
-            _console.ForegroundColor = color ?? _originalForegroundColor;
+            _console.ForegroundColor = color ?? ConsoleColor.White;
             _wordWrapWriter.Write(GetText(text), _console.IsOutputRedirected ? 0 : _console.WindowWidth - 1, true, indentation, string.IsNullOrEmpty(prefixForNewLines) ? _treeNewLinePrefix : $"{prefixForNewLines}{_treeNewLinePrefix}");
         }
 

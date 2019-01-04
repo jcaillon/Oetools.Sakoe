@@ -2,17 +2,17 @@
 // ========================================================================
 // Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
 // This file (ConsoleLogger.cs) is part of Oetools.Sakoe.
-// 
+//
 // Oetools.Sakoe is a free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // Oetools.Sakoe is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
@@ -21,7 +21,7 @@ using System;
 using System.Diagnostics;
 
 namespace Oetools.Sakoe.ConLog {
-    
+
     public class ConsoleLogger : ConsoleOutput, ILogger, ITraceLogger {
 
         private static ConsoleLogger _instance;
@@ -38,7 +38,7 @@ namespace Oetools.Sakoe.ConLog {
             _stopwatch = Stopwatch.StartNew();
             _console = console;
         }
-        
+
         private readonly IConsoleImplementation _console;
         protected Stopwatch _stopwatch;
         private ConsoleProgressBar _progressBar;
@@ -62,7 +62,7 @@ namespace Oetools.Sakoe.ConLog {
             _progressBar?.Dispose();
             _progressBar = null;
         }
-        
+
         /// <inheritdoc />
         public void Fatal(string message, Exception e = null) {
             Log(ConsoleLogThreshold.Fatal, message, e);
@@ -77,7 +77,7 @@ namespace Oetools.Sakoe.ConLog {
         public void Warn(string message, Exception e = null) {
             Log(ConsoleLogThreshold.Warn, message, e);
         }
-        
+
         /// <inheritdoc />
         public void Info(string message, Exception e = null) {
             Log(ConsoleLogThreshold.Info, message, e);
@@ -116,13 +116,13 @@ namespace Oetools.Sakoe.ConLog {
                 Debug($"[{$"{(int) Math.Round((decimal) current / max * 100, 2)}%".PadLeft(4)}] {message}");
                 return;
             }
-            
-            
+
+
             try {
                 if (_progressBar == null) {
                     _progressBar = new ConsoleProgressBar(_console, max, message) {
                         ClearProgressBarOnStop = ProgressBarDisplayMode == ConsoleProgressBarDisplayMode.On,
-                        TextColor = ConsoleColor.DarkGray
+                        TextColor = ConsoleColor.Gray
                     };
                 }
                 if (!_progressBar.IsRunning) {
@@ -162,7 +162,7 @@ namespace Oetools.Sakoe.ConLog {
             StopProgressBar();
             base.WriteResultOnNewLine(text, color);
         }
-        
+
         /// <inheritdoc />
         public override void Write(string text, ConsoleColor? color = null, int indentation = 0, string prefixForNewLines = null) {
             StopProgressBar();
@@ -174,7 +174,7 @@ namespace Oetools.Sakoe.ConLog {
             StopProgressBar();
             base.WriteOnNewLine(text, color, indentation, prefixForNewLines);
         }
-        
+
         /// <inheritdoc />
         public override void WriteError(string text, ConsoleColor? color = null, int indentation = 0, string prefixForNewLines = null) {
             StopProgressBar();
@@ -195,18 +195,18 @@ namespace Oetools.Sakoe.ConLog {
         /// <param name="e"></param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         protected virtual void Log(ConsoleLogThreshold level, string message, Exception e = null) {
-            StopProgressBar();           
-            
+            StopProgressBar();
+
             if (level < LogTheshold) {
                 return;
             }
             var elapsed = _stopwatch.Elapsed;
             var logPrefix = $"{level.ToString().ToUpper().PadRight(5, ' ')} [{elapsed.Minutes:D2}:{elapsed.Seconds:D2}.{elapsed.Milliseconds:D3}] ";
-            
+
             ConsoleColor outputColor;
             switch (level) {
                 case ConsoleLogThreshold.Debug:
-                    outputColor = ConsoleColor.DarkGray;
+                    outputColor = ConsoleColor.Gray;
                     break;
                 case ConsoleLogThreshold.Info:
                     outputColor = ConsoleColor.Cyan;
@@ -228,8 +228,8 @@ namespace Oetools.Sakoe.ConLog {
             }
 
             if (e != null && LogTheshold <= ConsoleLogThreshold.Debug) {
-                base.WriteErrorOnNewLine(logPrefix, ConsoleColor.DarkGray);
-                base.WriteError(e.ToString(), ConsoleColor.DarkGray, logPrefix.Length);
+                base.WriteErrorOnNewLine(logPrefix, ConsoleColor.Gray);
+                base.WriteError(e.ToString(), ConsoleColor.Gray, logPrefix.Length);
             }
             if (level >= ConsoleLogThreshold.Error) {
                 base.WriteErrorOnNewLine(logPrefix, outputColor);

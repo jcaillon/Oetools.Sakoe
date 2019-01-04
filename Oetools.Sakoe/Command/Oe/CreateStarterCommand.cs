@@ -40,7 +40,7 @@ namespace Oetools.Sakoe.Command.Oe {
                 string starterFilePath = null;
                 string executableDir = Path.GetDirectoryName(RunningAssembly.Info.Location);
                 if (!string.IsNullOrEmpty(executableDir)) {
-                    starterFilePath = Path.Combine(executableDir, Utils.IsRuntimeWindowsPlatform ? "sakoe.cmd" : "sakoe.sh");
+                    starterFilePath = Path.Combine(executableDir, Utils.IsRuntimeWindowsPlatform ? "sakoe.cmd" : "sakoe");
                 }
                 return starterFilePath;
             }
@@ -58,7 +58,7 @@ namespace Oetools.Sakoe.Command.Oe {
             if (Utils.IsRuntimeWindowsPlatform) {
                 File.WriteAllText(starterFilePath, $"@echo off\r\ndotnet exec \"%~dp0{Path.GetFileName(RunningAssembly.Info.Location)}\" %*");
             } else {
-                File.WriteAllText(starterFilePath, @"#!/bin/bash
+                File.WriteAllText(starterFilePath, (@"#!/bin/bash
 SOURCE=""${BASH_SOURCE[0]}""
 while [ -h ""$SOURCE"" ]; do
     DIR=""$( cd -P ""$( dirname ""$SOURCE"" )"" && pwd )""
@@ -66,7 +66,7 @@ while [ -h ""$SOURCE"" ]; do
     [[ $SOURCE != /* ]] && SOURCE=""$DIR/$SOURCE""
 done
 DIR=""$( cd -P ""$( dirname ""$SOURCE"" )"" && pwd )""
-dotnet exec ""$DIR/" + Path.GetFileName(RunningAssembly.Info.Location) + @""" ""$@""".Replace("\r", ""));
+dotnet exec ""$DIR/" + Path.GetFileName(RunningAssembly.Info.Location) + @""" ""$@""").Replace("\r", ""));
             }
 
             Log.Info($"Starter script created: {starterFilePath.PrettyQuote()}.");
