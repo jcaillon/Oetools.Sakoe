@@ -20,12 +20,16 @@
 
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.IO;
+using System.Text;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Command.Exceptions;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
+using Oetools.Utilities.Openedge;
 using Oetools.Utilities.Openedge.Database;
+using Oetools.Utilities.Openedge.Execution;
 
 namespace Oetools.Sakoe.Command.Oe {
 
@@ -44,9 +48,63 @@ namespace Oetools.Sakoe.Command.Oe {
     [Subcommand(typeof(CopyDatabaseCommand))]
     [Subcommand(typeof(DumpDatabaseCommand))]
     [Subcommand(typeof(LoadDatabaseCommand))]
+    [Subcommand(typeof(DatabaseAdminCommand))]
+    [Subcommand(typeof(DatabaseDictionaryCommand))]
     // TODO: project database manipulation!
 //    [Subcommand(typeof(ProjectDatabaseCommand))]
     internal class DatabaseCommand : AExpectSubCommand {
+    }
+
+    [Command(
+        "dictionary", "di", "dic",
+        Description = "Open the database dictionary tool."
+    )]
+    internal class DatabaseDictionaryCommand : DatabaseAdminCommand {
+
+        protected override string ProgramName => "_dict.p";
+
+        protected override string ExtraParameters => "";
+    }
+
+    [Command(
+        "admin", "ad",
+        Description = "Open the database administration tool."
+    )]
+    internal class DatabaseAdminCommand : ADatabaseCommand {
+
+        [Description("[[--] <connection string>...]")]
+        public string[] RemainingArgs { get; set; }
+
+        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
+            var dlcPath = GetDlcPath();
+            var connectionString = RemainingArgs != null ? string.Join(" ", RemainingArgs) : null;
+            if (!string.IsNullOrEmpty(connectionString)) {
+                Log.Info($"Connection string used: {connectionString.PrettyQuote()}.");
+            } else {
+                SetTargetDatabasePath();
+                connectionString = new UoeDatabaseOperator(dlcPath) {
+                    Log = Log
+                }.GetConnectionString(TargetDatabasePath);
+            }
+
+            if (UoeUtilities.CanProVersionUseNoSplashParameter(UoeUtilities.GetProVersionFromDlc(dlcPath))) {
+                connectionString = $"{connectionString ?? ""} -nosplash";
+            }
+
+            var process = new Process {
+                StartInfo = new ProcessStartInfo {
+                    FileName = UoeUtilities.GetProExecutableFromDlc(dlcPath),
+                    Arguments = $"-p {ProgramName} {connectionString} {ExtraParameters}"
+                }
+            };
+            process.Start();
+
+            return 0;
+        }
+
+        protected virtual string ProgramName => "_admin.p";
+
+        protected virtual string ExtraParameters => "";
     }
 
     [Command(

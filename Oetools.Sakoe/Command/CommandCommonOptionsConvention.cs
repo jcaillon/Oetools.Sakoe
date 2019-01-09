@@ -28,6 +28,8 @@ namespace Oetools.Sakoe.Command {
             if (context.ModelType == null) {
                 return;
             }
+
+            context.Application.ClusterOptions = false;
             context.Application.OptionsComparison = StringComparison.CurrentCultureIgnoreCase;
             context.Application.ResponseFileHandling = ResponseFileHandling.ParseArgsAsLineSeparated;
             context.Application.MakeSuggestionsInErrorMessage = true;

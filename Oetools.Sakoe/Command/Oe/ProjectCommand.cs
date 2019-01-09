@@ -17,7 +17,6 @@
 // along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
-using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -40,8 +39,10 @@ namespace Oetools.Sakoe.Command.Oe {
     [Subcommand(typeof(ProjectInitCommand))]
     [Subcommand(typeof(ProjectGitignoreCommand))]
     [Subcommand(typeof(ProjectListCommand))]
+    [Subcommand(typeof(ProjectUpdateCommand))]
     internal class ProjectCommand : AExpectSubCommand {
     }
+
 
     [Command(
         "init", "in",
@@ -103,7 +104,7 @@ namespace Oetools.Sakoe.Command.Oe {
             HelpFormatter.WriteOnNewLine(null);
             HelpFormatter.WriteSectionTitle("IMPORTANT README:");
             HelpFormatter.WriteOnNewLine(@"
-The project file created (" + OeBuilderConstants.OeProjectExtension + @") is defined in XML format and has a provided XML schema definition file (Project.xsd).
+The project file created (" + OeBuilderConstants.OeProjectExtension + @") is defined in XML format and has a provided XML schema definition file (" + OeProject.XsdName + @").
 
 The project XML schema is fully documented and should be used to enable intellisense in your favorite editor.
 Example of xml editors with out-of-the-box intellisense (autocomplete) features for xml:
@@ -114,6 +115,8 @@ Example of xml editors with out-of-the-box intellisense (autocomplete) features 
 
 Drag and drop the created " + OeBuilderConstants.OeProjectExtension + @" file into the editor of your choice and start configuring your build.
 The file " + Path.Combine(OeBuilderConstants.GetProjectDirectory(""), $"{ProjectName}{OeBuilderConstants.OeProjectExtension}").PrettyQuote() + @" should be versioned in your source repository to allow anyone who clones your application to build it.
+The file " + OeProject.XsdName.PrettyQuote() + @", however, should not be versioned with your application because it depends on the version of this tool (sakoe). If this tool is updated, use the command " + typeof(ProjectUpdateCommand).GetFullCommandLine().PrettyQuote() + @" to update the " + OeProject.XsdName.PrettyQuote() + @" to the latest version.
+
 If you need to have a project file containing build configurations specific to your local machine, you can use the option " + (GetCommandOptionFromPropertyName(nameof(IsLocalProject))?.Template ?? "").PrettyQuote() + @". This will create the project file into the directory " + OeBuilderConstants.GetProjectDirectoryLocal("").PrettyQuote() + @" which should NOT be versioned.
 For git repositories, use the command " + typeof(ProjectGitignoreCommand).GetFullCommandLine().PrettyQuote() + @" to set up your .gitignore file for sakoe projects.");
             HelpFormatter.WriteOnNewLine(null);
@@ -158,6 +161,9 @@ For git repositories, use the command " + typeof(ProjectGitignoreCommand).GetFul
 
 # do not push the bin directory
 bin/
+
+# do not version the project xsd
+Project.xsd
 
 # file extensions that should not be versioned
 ");
@@ -220,6 +226,40 @@ bin/
             foreach (var buildConfiguration in project.GetAllBuildConfigurations()) {
                 Out.WriteResultOnNewLine((string.IsNullOrEmpty(buildConfiguration.Name) ? "Unnamed configuration" : "Named configuration").PadRight(30));
                 Out.WriteResult(string.IsNullOrEmpty(buildConfiguration.Name) ? buildConfiguration.GetId().ToString() : buildConfiguration.Name);
+            }
+
+            return 0;
+        }
+    }
+
+    [Command(
+        "update", "up",
+        Description = "Update the `" + OeProject.XsdName + "` file of the project with the latest version embedded in this tool.",
+        ExtendedHelpText = ""
+    )]
+    internal class ProjectUpdateCommand : AOeCommand {
+
+        [DirectoryExists]
+        [Argument(0, "<directory>", "The directory in which the project is located. Defaults to the current directory.")]
+        public string ProjectDirectory { get; set; }
+
+        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
+
+            var directory = ProjectDirectory ?? Directory.GetCurrentDirectory();
+
+            if (Directory.EnumerateFiles(directory, $"*{OeBuilderConstants.OeProjectExtension}", SearchOption.TopDirectoryOnly).Any()) {
+                OeProject.SaveXsd(directory);
+            } else {
+                directory = OeBuilderConstants.GetProjectDirectory(directory);
+                if (Directory.EnumerateFiles(directory, $"*{OeBuilderConstants.OeProjectExtension}", SearchOption.TopDirectoryOnly).Any()) {
+                    OeProject.SaveXsd(directory);
+                } else {
+                    directory = null;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(directory)) {
+                Log.Info($"The file {Path.Combine(directory, OeProject.XsdName)} has been updated with the latest version.");
             }
 
             return 0;
