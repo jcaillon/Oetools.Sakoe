@@ -41,52 +41,35 @@ namespace Oetools.Sakoe.Command.Oe {
 
         private const string RepoOwner = "jcaillon";
         private const string RepoName = "Oetools.Sakoe";
-        private const string GitHubToken = "MmViMDJlNWVlYWZlMTIzNGIxN2VmOTkxMGQ1NzljMTRkM2E1ZDEyMw==";
+        public const string GitHubToken = "MmViMDJlNWVlYWZlMTIzNGIxN2VmOTkxMGQ1NzljMTRkM2E1ZDEyMw==";
 
         [Option("-b|--get-pre-release", "Accept to update from new pre-release (i.e. 'beta') versions of the tool.\nThis option will be used by default if the current version of the tool is a pre-release version. Otherwise, only stable releases will be used for updates. ", CommandOptionType.NoValue)]
         public bool GetPreRelease { get; set; }
 
-        [Option("-p|--proxy", "The http proxy to use for this update. Useful if you are behind a corporate firewall.\nThe expected format is: 'http(s)://[user:password@]host[:port]'.\nIt is also possible to use the environment variable HTTP_PROXY to set this value.", CommandOptionType.SingleValue)]
+        [Option("-p|--proxy", "The http proxy to use for this update. Useful if you are behind a corporate firewall.\nThe expected format is: 'http(s)://[user:password@]host[:port]'.\nIt is also possible to use the environment variables OE_HTTP_PROXY or HTTP_PROXY to set this value.", CommandOptionType.SingleValue)]
         public string HttpProxy { get; set; }
 
         [Option("-c|--check-only", "Check for new releases but exit the command before actually updating the tool.", CommandOptionType.NoValue)]
         public bool CheckOnly { get; set; }
-
-        [Option("-u|--override-github-url", "Use an alternative url for the github api. This option is here to allow updates from a different location (a private server for instance) but should not be used in most cases.", CommandOptionType.SingleValue)]
-        public string OverrideGithubUrl { get; set; }
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
 
             var usePreRelease = GetPreRelease || RunningAssembly.Info.IsPreRelease;
             Log.Debug(usePreRelease ? "Getting pre-releases." : "Skipping pre-releases.");
 
-            var httpProxyFromEnv = Environment.GetEnvironmentVariable("HTTP_PROXY");
-
-            if (string.IsNullOrEmpty(HttpProxy) && !string.IsNullOrEmpty(httpProxyFromEnv)) {
-                Log.Debug($"Using the proxy found in the HTTP_PROXY environment variable: {httpProxyFromEnv.PrettyQuote()}.");
-                HttpProxy = httpProxyFromEnv;
-            }
-
             var updater = new GitHubUpdater();
 
-            if (!string.IsNullOrEmpty(OverrideGithubUrl)) {
-                Log.Debug($"Using alternative base url for github api: {OverrideGithubUrl.PrettyQuote()}.");
-                updater.UseAlternativeBaseUrl(OverrideGithubUrl);
-            }
+            SetUpdaterProxy(updater, HttpProxy, Log);
 
             updater.UseAuthorizationToken(Encoding.ASCII.GetString(Convert.FromBase64String(GitHubToken)));
             updater.SetRepo(RepoOwner, RepoName);
             updater.UseCancellationToken(CancelToken);
             updater.UseMaxNumberOfReleasesToFetch(10);
 
-            if (!string.IsNullOrEmpty(HttpProxy) && HttpProxy.ParseHttpAddress(out var userName, out var password, out var host, out var port)) {
-                Log.Debug($"Using http proxy: {HttpProxy.PrettyQuote()}.");
-                updater.UseProxy($"{host}{(port > 0 ? $":{port}" : "")}", userName, password);
-            }
-
             var currentVersion = RunningAssembly.Info.AssemblyVersion;
             Log.Info($"Current local version: {currentVersion}.");
 
+            Log.Debug("Fetching latest releases from github api.");
             var releases = updater.FetchNewReleases(currentVersion);
 
             GitHubRelease first;
@@ -153,6 +136,27 @@ namespace Oetools.Sakoe.Command.Oe {
             Log.Done("Update successful.");
 
             return 0;
+        }
+
+        public static void SetUpdaterProxy(GitHubUpdater updater, string httpProxy, ILog log) {
+            var httpProxyFromEnv = Environment.GetEnvironmentVariable("OE_HTTP_PROXY");
+
+            if (string.IsNullOrEmpty(httpProxy) && !string.IsNullOrEmpty(httpProxyFromEnv)) {
+                log.Debug($"Using the proxy found in the environment variable OE_HTTP_PROXY: {httpProxyFromEnv.PrettyQuote()}.");
+                httpProxy = httpProxyFromEnv;
+            }
+
+            httpProxyFromEnv = Environment.GetEnvironmentVariable("HTTP_PROXY");
+
+            if (string.IsNullOrEmpty(httpProxy) && !string.IsNullOrEmpty(httpProxyFromEnv)) {
+                log.Debug($"Using the proxy found in the environment variable HTTP_PROXY: {httpProxyFromEnv.PrettyQuote()}.");
+                httpProxy = httpProxyFromEnv;
+            }
+
+            if (!string.IsNullOrEmpty(httpProxy) && httpProxy.ParseHttpAddress(out var userName, out var password, out var host, out var port)) {
+                log.Debug($"Using http proxy: {httpProxy.PrettyQuote()}.");
+                updater.UseProxy($"{host}{(port > 0 ? $":{port}" : "")}", userName, password);
+            }
         }
     }
 

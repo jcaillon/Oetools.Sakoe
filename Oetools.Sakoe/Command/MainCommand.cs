@@ -53,6 +53,7 @@ namespace Oetools.Sakoe.Command {
 //    [Subcommand(typeof(HashCommand))]
     [Subcommand(typeof(ProHelpCommand))]
     [Subcommand(typeof(ProUtilitiesCommand))]
+    [Subcommand(typeof(ExternalTools))]
 #if !WINDOWSONLYBUILD
     [Subcommand(typeof(CreateStarterCommand))]
 #endif

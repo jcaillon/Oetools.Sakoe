@@ -45,7 +45,7 @@ namespace Oetools.Sakoe.Command.Oe {
         Description = "Build automation for Openedge projects. This command is the bread and butter of this tool."
     )]
     [CommandAdditionalHelpTextAttribute(nameof(GetAdditionalHelpText))]
-    internal class BuildCommand : AOeCommand {
+    internal class BuildCommand : AOeDlcCommand {
 
         public const string Name = "build";
         private const string PropertyHelpLongName = "--property-help";
@@ -220,6 +220,7 @@ This allow a lot of flexibility for organizing and partitioning your build proce
                 if (addedVariables != null) {
                     builder.BuildConfiguration.Variables.AddRange(addedVariables);
                 }
+                builder.BuildConfiguration.Properties.DlcDirectoryPath = GetDlcPath();
                 builder.CancelToken = CancelToken;
                 builder.Log = Log;
                 builder.Build();
