@@ -25,6 +25,7 @@ using System.IO;
 using System.Text;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Command.Exceptions;
+using Oetools.Sakoe.Utilities.Extension;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge;
@@ -50,9 +51,36 @@ namespace Oetools.Sakoe.Command.Oe {
     [Subcommand(typeof(LoadDatabaseCommand))]
     [Subcommand(typeof(DatabaseAdminCommand))]
     [Subcommand(typeof(DatabaseDictionaryCommand))]
+    [Subcommand(typeof(DatabaseDataDiggerCommand))]
     // TODO: project database manipulation!
 //    [Subcommand(typeof(ProjectDatabaseCommand))]
     internal class DatabaseCommand : AExpectSubCommand {
+    }
+
+    [Command(
+        "datadigger", "dd",
+        Description = "Open a new DataDigger instance.",
+        ExtendedHelpText = "Please note that when running DataDigger, the DataDigger.pf file of the installation path is used."
+    )]
+    internal class DatabaseDataDiggerCommand : DatabaseAdminCommand {
+
+        [Option("-ro|--read-only", "Start DataDigger in read-only mode (records will not modifiable).", CommandOptionType.NoValue)]
+        public bool ReadOnly { get; set; } = false;
+
+        protected override string ToolArguments => $"{DataDiggerCommand.DataDiggerStartUpParameters(ReadOnly)}";
+
+        protected override string ExecutionWorkingDirectory => DataDiggerCommand.DataDiggerInstallationDirectory;
+
+        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
+            if (!Utils.IsRuntimeWindowsPlatform) {
+                throw new CommandException("DataDigger can only run on windows platform.");
+            }
+            if (!DataDiggerCommand.IsDataDiggerInstalled) {
+                throw new CommandException($"DataDigger is not installed yet, use the command {typeof(DataDiggerInstallCommand).GetFullCommandLine().PrettyQuote()}.");
+            }
+
+            return base.ExecuteCommand(app, console);
+        }
     }
 
     [Command(
@@ -61,9 +89,8 @@ namespace Oetools.Sakoe.Command.Oe {
     )]
     internal class DatabaseDictionaryCommand : DatabaseAdminCommand {
 
-        protected override string ProgramName => "_dict.p";
+        protected override string ToolArguments => "-p _dict.p";
 
-        protected override string ExtraParameters => "";
     }
 
     [Command(
@@ -91,10 +118,15 @@ namespace Oetools.Sakoe.Command.Oe {
                 connectionString = $"{connectionString ?? ""} -nosplash";
             }
 
+            var args = $"{ToolArguments} {connectionString}";
+
+            Log?.Debug($"Arguments used: {args.PrettyQuote()}");
+
             var process = new Process {
                 StartInfo = new ProcessStartInfo {
                     FileName = UoeUtilities.GetProExecutableFromDlc(dlcPath),
-                    Arguments = $"-p {ProgramName} {connectionString} {ExtraParameters}"
+                    Arguments = args,
+                    WorkingDirectory = ExecutionWorkingDirectory ?? Directory.GetCurrentDirectory()
                 }
             };
             process.Start();
@@ -102,9 +134,9 @@ namespace Oetools.Sakoe.Command.Oe {
             return 0;
         }
 
-        protected virtual string ProgramName => "_admin.p";
+        protected virtual string ToolArguments => "-p _admin.p";
 
-        protected virtual string ExtraParameters => "";
+        protected virtual string ExecutionWorkingDirectory => null;
     }
 
     [Command(

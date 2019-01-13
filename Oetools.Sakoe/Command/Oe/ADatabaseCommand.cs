@@ -31,4 +31,9 @@ namespace Oetools.Sakoe.Command.Oe {
             }
         }
     }
+
+    internal abstract class ADatabaseCsCommand : ADatabaseCommand {
+
+
+    }
 }
