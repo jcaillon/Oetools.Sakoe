@@ -2,17 +2,17 @@
 // ========================================================================
 // Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
 // This file (MarkdownHelpGenerator.cs) is part of Oetools.Sakoe.
-// 
+//
 // Oetools.Sakoe is a free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // Oetools.Sakoe is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
@@ -28,11 +28,11 @@ using Oetools.Sakoe.ConLog;
 using Oetools.Sakoe.Utilities.Extension;
 
 namespace Oetools.Sakoe.Utilities {
-    
+
     public class MarkdownHelpGenerator : IHelpFormatter {
 
         private readonly StreamWriter _writer;
-        
+
         /// <summary>
         /// Initializes a new instance of <see cref="HelpGenerator"/>.
         /// </summary>
@@ -41,7 +41,7 @@ namespace Oetools.Sakoe.Utilities {
         }
 
         public virtual void GenerateCommandHelp(CommandLineApplication application) {
-            
+
             var arguments = application.Arguments.Where(a => a.ShowInHelpText).ToList();
             var options = application.GetOptions().Where(o => o.ShowInHelpText).ToList();
             var commands = application.Commands.Where(c => c.ShowInHelpText).ToList();
@@ -53,9 +53,9 @@ namespace Oetools.Sakoe.Utilities {
                 WriteSectionTitle("Synopsis");
                 WriteOnNewLine(application.Description);
             }
-            
+
             var commandType = application.GetTypeFromCommandLine();
-            
+
             GenerateUsage(fullCommandLine, arguments, options, commands, commandType.GetProperty("RemainingArgs"));
             GenerateArguments(arguments);
             GenerateOptions(options);
@@ -68,13 +68,13 @@ namespace Oetools.Sakoe.Utilities {
                     methodInfo.Invoke(null, new object[]{ this, application, 0 });
                 }
             }
-            
+
             if (!string.IsNullOrEmpty(application.ExtendedHelpText)) {
                 WriteOnNewLine(null);
                 WriteSectionTitle("Description");
                 WriteOnNewLine(application.ExtendedHelpText);
             }
-            
+
             WriteOnNewLine(null);
         }
 
@@ -84,9 +84,9 @@ namespace Oetools.Sakoe.Utilities {
         protected virtual void GenerateUsage(string thisCommandLine, IReadOnlyList<CommandArgument> visibleArguments, IReadOnlyList<CommandOption> visibleOptions, IReadOnlyList<CommandLineApplication> visibleCommands, PropertyInfo remainingArgs) {
             WriteOnNewLine(null);
             WriteSectionTitle("Usage");
-            
+
             WriteOnNewLine($"`{thisCommandLine}");
-            
+
             foreach (var argument in visibleArguments) {
                 Write($" {argument.Name}");
             }
@@ -100,7 +100,7 @@ namespace Oetools.Sakoe.Utilities {
                 if (Attribute.GetCustomAttribute(remainingArgs, typeof(DescriptionAttribute), true) is DescriptionAttribute description) {
                     Write($" {description.Description}");
                 } else {
-                    Write(" [[--] <arg>...]");
+                    Write(" [-- <arg>...]");
                 }
             }
             Write("`");
@@ -115,7 +115,7 @@ namespace Oetools.Sakoe.Utilities {
                 WriteSectionTitle("Arguments");
                 WriteOnNewLine("| Argument | Description |");
                 WriteOnNewLine("| --- | --- |");
-                
+
                 foreach (var arg in visibleArguments) {
                     WriteOnNewLine($"| {arg.Name.Replace("[", "").Replace("]", "").Replace("<", "\\<").Replace(">", "\\>")} | {ReplaceNewLines(arg.Description)} |");
                 }
@@ -131,7 +131,7 @@ namespace Oetools.Sakoe.Utilities {
                 WriteSectionTitle("Options");
                 WriteOnNewLine("| Short name | Long name | Description |");
                 WriteOnNewLine("| --- | --- | --- |");
-                
+
                 foreach (var opt in visibleOptions) {
                     var text = opt.Description;
                     if (opt.OptionType == CommandOptionType.MultipleValue) {
@@ -159,20 +159,20 @@ namespace Oetools.Sakoe.Utilities {
         }
 
         private string ReplaceNewLines(string text) => text?.Replace("\n", " ").Replace("\r", "");
-        
+
         private string ReplaceBulletList(string text) => text?.Replace("├─ ", "- ").Replace("└─ ", "- ").Replace("│  ", "  ");
-        
+
         /// <inheritdoc cref="IConsoleOutput.WriteOnNewLine"/>
         public virtual void WriteOnNewLine(string result, ConsoleColor? color = null, int padding = 0, string prefixForNewLines = null) {
             _writer.WriteLine();
             _writer.Write(ReplaceBulletList(result));
         }
-        
+
         /// <inheritdoc cref="IConsoleOutput.Write"/>
         public virtual void Write(string result, ConsoleColor? color = null, int padding = 0, string prefixForNewLines = null) {
             _writer.Write(ReplaceBulletList(result));
         }
-        
+
         public virtual void WriteSectionTitle(string result, int padding = 0) {
             if (!string.IsNullOrEmpty(result) && result.Length > 1) {
                 _writer.WriteLine();
@@ -180,7 +180,7 @@ namespace Oetools.Sakoe.Utilities {
                 _writer.WriteLine();
             }
         }
-        
+
         /// <inheritdoc cref="IConsoleOutput.Write"/>
         /// <summary>Write a tip.</summary>
         public virtual void WriteTip(string result, int padding = 0, string prefixForNewLines = null) {
@@ -189,5 +189,5 @@ namespace Oetools.Sakoe.Utilities {
         }
 
     }
-    
+
 }

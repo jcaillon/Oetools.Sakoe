@@ -18,6 +18,7 @@
 // ========================================================================
 #endregion
 
+using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
@@ -62,12 +63,12 @@ namespace Oetools.Sakoe.Command.Oe {
         Description = "Open a new DataDigger instance.",
         ExtendedHelpText = "Please note that when running DataDigger, the DataDigger.pf file of the installation path is used."
     )]
-    internal class DatabaseDataDiggerCommand : DatabaseAdminCommand {
+    internal class DatabaseDataDiggerCommand : DatabaseToolCommand {
 
         [Option("-ro|--read-only", "Start DataDigger in read-only mode (records will not modifiable).", CommandOptionType.NoValue)]
         public bool ReadOnly { get; set; } = false;
 
-        protected override string ToolArguments => $"{DataDiggerCommand.DataDiggerStartUpParameters(ReadOnly)}";
+        protected override string ToolArguments() => $"{DataDiggerCommand.DataDiggerStartUpParameters(ReadOnly)}";
 
         protected override string ExecutionWorkingDirectory => DataDiggerCommand.DataDiggerInstallationDirectory;
 
@@ -78,7 +79,6 @@ namespace Oetools.Sakoe.Command.Oe {
             if (!DataDiggerCommand.IsDataDiggerInstalled) {
                 throw new CommandException($"DataDigger is not installed yet, use the command {typeof(DataDiggerInstallCommand).GetFullCommandLine().PrettyQuote()}.");
             }
-
             return base.ExecuteCommand(app, console);
         }
     }
@@ -87,9 +87,9 @@ namespace Oetools.Sakoe.Command.Oe {
         "dictionary", "di", "dic",
         Description = "Open the database dictionary tool."
     )]
-    internal class DatabaseDictionaryCommand : DatabaseAdminCommand {
+    internal class DatabaseDictionaryCommand : DatabaseToolCommand {
 
-        protected override string ToolArguments => "-p _dict.p";
+        protected override string ToolArguments() => "-p _dict.p";
 
     }
 
@@ -97,34 +97,37 @@ namespace Oetools.Sakoe.Command.Oe {
         "admin", "ad",
         Description = "Open the database administration tool."
     )]
-    internal class DatabaseAdminCommand : ADatabaseCommand {
+    internal class DatabaseAdminCommand : DatabaseToolCommand {
 
-        [Description("[[--] <connection string>...]")]
-        public string[] RemainingArgs { get; set; }
+        protected override string ToolArguments() => "-p _admin.p";
+    }
+
+    internal abstract class DatabaseToolCommand : ADatabaseWithProwinCommand {
+
+        protected abstract string ToolArguments();
+
+        protected virtual string ExecutionWorkingDirectory => null;
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             var dlcPath = GetDlcPath();
-            var connectionString = RemainingArgs != null ? string.Join(" ", RemainingArgs) : null;
-            if (!string.IsNullOrEmpty(connectionString)) {
-                Log.Info($"Connection string used: {connectionString.PrettyQuote()}.");
-            } else {
-                SetTargetDatabasePath();
-                connectionString = new UoeDatabaseOperator(dlcPath) {
-                    Log = Log
-                }.GetConnectionString(TargetDatabasePath);
-            }
+
+            var argsBuilder = new StringBuilder(ToolArguments());
+
+            argsBuilder.Append(' ').Append(GetConnectionString(dlcPath, app, false));
 
             if (UoeUtilities.CanProVersionUseNoSplashParameter(UoeUtilities.GetProVersionFromDlc(dlcPath))) {
-                connectionString = $"{connectionString ?? ""} -nosplash";
+                argsBuilder.Append(" -nosplash");
             }
 
-            var args = $"{ToolArguments} {connectionString}";
+            var args = argsBuilder.CliCompactWhitespaces().ToString();
 
-            Log?.Debug($"Arguments used: {args.PrettyQuote()}");
+            var executable = UoeUtilities.GetProExecutableFromDlc(dlcPath);
+
+            Log?.Debug($"Executing command:\n{executable.CliQuoter()} {args}");
 
             var process = new Process {
                 StartInfo = new ProcessStartInfo {
-                    FileName = UoeUtilities.GetProExecutableFromDlc(dlcPath),
+                    FileName = executable,
                     Arguments = args,
                     WorkingDirectory = ExecutionWorkingDirectory ?? Directory.GetCurrentDirectory()
                 }
@@ -133,10 +136,6 @@ namespace Oetools.Sakoe.Command.Oe {
 
             return 0;
         }
-
-        protected virtual string ToolArguments => "-p _admin.p";
-
-        protected virtual string ExecutionWorkingDirectory => null;
     }
 
     [Command(
@@ -149,10 +148,9 @@ namespace Oetools.Sakoe.Command.Oe {
         public string LogicalName { get; set; }
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            SetTargetDatabasePath();
             var res = new UoeDatabaseOperator(GetDlcPath()) {
                 Log = Log
-            }.GetConnectionString(TargetDatabasePath, LogicalName);
+            }.GetConnectionString(GetTargetDatabasePath(), LogicalName);
             Out.WriteResultOnNewLine(res);
             return 0;
         }
@@ -166,10 +164,9 @@ namespace Oetools.Sakoe.Command.Oe {
     internal class RepairDatabaseCommand : ADatabaseCommand {
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            SetTargetDatabasePath();
             new UoeDatabaseOperator(GetDlcPath()) {
                 Log = Log
-            }.ProstrctRepair(TargetDatabasePath);
+            }.ProstrctRepair(GetTargetDatabasePath());
             return 0;
         }
     }
@@ -181,11 +178,14 @@ namespace Oetools.Sakoe.Command.Oe {
     )]
     internal class DeleteDatabaseCommand : ADatabaseCommand {
 
+        [Required]
+        [Option("-f|--force", "Mandatory option to force the deletion and avoid bad manipulation.", CommandOptionType.NoValue)]
+        public bool Force { get; set; } = false;
+
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            SetTargetDatabasePath();
             new UoeDatabaseOperator(GetDlcPath()) {
                 Log = Log
-            }.Delete(TargetDatabasePath);
+            }.Delete(GetTargetDatabasePath());
             return 0;
         }
     }
@@ -197,11 +197,10 @@ namespace Oetools.Sakoe.Command.Oe {
     )]
     internal class StopDatabaseCommand : ADatabaseCommand {
 
-        [Description("[[--] <extra proshut parameters>...]")]
+        [Description("[-- <extra proshut parameters>...]")]
         public string[] RemainingArgs { get; set; }
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            SetTargetDatabasePath();
             var extra = RemainingArgs != null ? string.Join(" ", RemainingArgs) : null;
             if (!string.IsNullOrEmpty(extra)) {
                 Log.Info($"Extra parameters: {extra.PrettyQuote()}.");
@@ -210,7 +209,7 @@ namespace Oetools.Sakoe.Command.Oe {
             var dbOperator = new UoeDatabaseOperator(GetDlcPath()) {
                 Log = Log
             };
-            dbOperator.Proshut(TargetDatabasePath, extra);
+            dbOperator.Proshut(GetTargetDatabasePath(), extra);
             Log.Debug(dbOperator.LastOperationOutput);
 
             return 0;
@@ -281,11 +280,10 @@ namespace Oetools.Sakoe.Command.Oe {
         [Option("-nu|--nb-users", "Number of users that should be able to connect to this database simultaneously.", CommandOptionType.SingleValue)]
         public (bool HasValue, int value) NbUsers { get; set; }
 
-        [Description("[[--] <extra proserve parameters>...]")]
+        [Description("[-- <extra proserve parameters>...]")]
         public string[] RemainingArgs { get; set; }
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            SetTargetDatabasePath();
             var extra = RemainingArgs != null ? string.Join(" ", RemainingArgs) : null;
             if (!string.IsNullOrEmpty(extra)) {
                 Log.Info($"Extra parameters: {extra.PrettyQuote()}.");
@@ -306,10 +304,11 @@ namespace Oetools.Sakoe.Command.Oe {
                 throw new CommandException("The number of users can only be strictly superior to zero.");
             }
 
-            dbOperator.ProServe(TargetDatabasePath, HostName, ServiceName, NbUsers.value > 0 ? (int?) NbUsers.value : null, extra);
+            var targetDb = GetTargetDatabasePath();
+            dbOperator.ProServe(targetDb, HostName, ServiceName, NbUsers.value > 0 ? (int?) NbUsers.value : null, extra);
 
             Log.Info("Multi-user connection string:");
-            Out.WriteResultOnNewLine($"{UoeDatabaseOperator.GetMultiUserConnectionString(TargetDatabasePath, HostName, ServiceName)}");
+            Out.WriteResultOnNewLine($"{UoeDatabaseOperator.GetMultiUserConnectionString(targetDb, HostName, ServiceName)}");
             Log.Info("Database started successfully.");
 
             return 0;

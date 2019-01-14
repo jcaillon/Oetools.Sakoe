@@ -22,7 +22,7 @@ namespace Oetools.Sakoe.Command.Oe {
         "seq", "se",
         Description = "Dump the database sequence values in a plain text file (.d)."
     )]
-    internal class DumpSeqDatabaseCommand : ADatabaseCommand {
+    internal class DumpSeqDatabaseCommand : ADatabaseWithProwinCommand {
 
         [Required]
         [LegalFilePath]
@@ -30,10 +30,10 @@ namespace Oetools.Sakoe.Command.Oe {
         public string DumpFilePath { get; set; }
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            SetTargetDatabasePath();
-            using (var dbAdministrator = new UoeDatabaseAdministrator(GetDlcPath())) {
+            var dlcPath = GetDlcPath();
+            using (var dbAdministrator = new UoeDatabaseAdministrator(dlcPath)) {
                 dbAdministrator.Log = Log;
-                dbAdministrator.DumpSequenceData(TargetDatabasePath, DumpFilePath);
+                dbAdministrator.DumpSequenceData(GetConnectionString(dlcPath, app), DumpFilePath);
             }
             return 0;
         }
@@ -43,7 +43,7 @@ namespace Oetools.Sakoe.Command.Oe {
         "data", "da",
         Description = "Dump the database data in plain text files (.d)."
     )]
-    internal class DumpDataDatabaseCommand : ADatabaseCommand {
+    internal class DumpDataDatabaseCommand : ADatabaseWithProwinCommand {
 
         [Required]
         [LegalFilePath]
@@ -54,10 +54,10 @@ namespace Oetools.Sakoe.Command.Oe {
         public string TableName { get; set; } = "ALL";
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            SetTargetDatabasePath();
-            using (var dbAdministrator = new UoeDatabaseAdministrator(GetDlcPath())) {
+            var dlcPath = GetDlcPath();
+            using (var dbAdministrator = new UoeDatabaseAdministrator(dlcPath)) {
                 dbAdministrator.Log = Log;
-                dbAdministrator.DumpData(TargetDatabasePath, DumpFilePath, TableName);
+                dbAdministrator.DumpData(GetConnectionString(dlcPath, app), DumpFilePath, TableName);
             }
             return 0;
         }
@@ -67,7 +67,7 @@ namespace Oetools.Sakoe.Command.Oe {
         "schema", "df",
         Description = "Dump the schema definition (.df) of a database."
     )]
-    internal class DumpDfDatabaseCommand : ADatabaseCommand {
+    internal class DumpDfDatabaseCommand : ADatabaseWithProwinCommand {
 
         [Required]
         [LegalFilePath]
@@ -78,10 +78,10 @@ namespace Oetools.Sakoe.Command.Oe {
         public string TableName { get; set; } = "ALL";
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            SetTargetDatabasePath();
-            using (var dbAdministrator = new UoeDatabaseAdministrator(GetDlcPath())) {
+            var dlcPath = GetDlcPath();
+            using (var dbAdministrator = new UoeDatabaseAdministrator(dlcPath)) {
                 dbAdministrator.Log = Log;
-                dbAdministrator.DumpSchemaDefinition(TargetDatabasePath, DumpFilePath, TableName);
+                dbAdministrator.DumpSchemaDefinition(GetConnectionString(dlcPath, app), DumpFilePath, TableName);
             }
             return 0;
         }
@@ -125,9 +125,10 @@ Missing entries or entries with an empty new name are considered to have been de
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             OldDatabasePath = OldDatabasePath?.MakePathAbsolute();
             NewDatabasePath = NewDatabasePath?.MakePathAbsolute();
-            using (var dbAdministrator = new UoeDatabaseAdministrator(GetDlcPath())) {
+            var dlcPath = GetDlcPath();
+            using (var dbAdministrator = new UoeDatabaseAdministrator(dlcPath)) {
                 dbAdministrator.Log = Log;
-                dbAdministrator.DumpIncrementalSchemaDefinitionFromDatabases(OldDatabasePath, NewDatabasePath, DumpFilePath, RenameFilePath);
+                dbAdministrator.DumpIncrementalSchemaDefinitionFromDatabases($"{dbAdministrator.GetConnectionString(NewDatabasePath)} {dbAdministrator.GetConnectionString(OldDatabasePath)}", DumpFilePath, RenameFilePath);
             }
             return 0;
         }

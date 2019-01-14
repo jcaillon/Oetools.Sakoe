@@ -216,7 +216,7 @@ sakoe st input -b2 s1024",
         /// <summary>
         /// Holds the extra params given after --
         /// </summary>
-        [Description("[[--] <mon truc>...]")]
+        [Description("[-- <mon truc>...]")]
         public string[] RemainingArgs { get; }
 
         // You can use this pattern when the parent command may have options or methods you want to

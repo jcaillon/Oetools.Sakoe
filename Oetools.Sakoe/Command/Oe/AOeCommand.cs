@@ -82,5 +82,6 @@ namespace Oetools.Sakoe.Command.Oe {
             }
             throw new CommandException($"No project file ({OeBuilderConstants.OeProjectExtension}) named {projectFileName} found in the current folder {Directory.GetCurrentDirectory().PrettyQuote()} nor the {OeBuilderConstants.OeProjectDirectory} directory.");
         }
+
     }
 }

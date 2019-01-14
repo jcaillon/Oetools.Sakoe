@@ -86,7 +86,7 @@ Learn more here: https://datadigger.wordpress.com."
         [Option("-ro|--read-only", "Start DataDigger in read-only mode (records will not modifiable).", CommandOptionType.NoValue)]
         public bool ReadOnly { get; set; } = false;
 
-        [Description("[[--] <extra prowin parameters>...]")]
+        [Description("[-- <extra prowin parameters>...]")]
         public string[] RemainingArgs { get; set; }
 
         protected virtual string ConnectionString => null;

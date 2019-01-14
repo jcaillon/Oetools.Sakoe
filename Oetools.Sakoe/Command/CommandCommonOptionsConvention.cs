@@ -32,6 +32,7 @@ namespace Oetools.Sakoe.Command {
             context.Application.ClusterOptions = false;
             context.Application.OptionsComparison = StringComparison.CurrentCultureIgnoreCase;
             context.Application.ResponseFileHandling = ResponseFileHandling.ParseArgsAsLineSeparated;
+            context.Application.AllowArgumentSeparator = true;
             context.Application.MakeSuggestionsInErrorMessage = true;
         }
     }

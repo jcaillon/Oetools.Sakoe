@@ -2,17 +2,17 @@
 // ========================================================================
 // Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
 // This file (HelpGenerator.cs) is part of Oetools.Sakoe.
-// 
+//
 // Oetools.Sakoe is a free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // Oetools.Sakoe is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
@@ -34,9 +34,9 @@ using Oetools.Sakoe.Command.Oe;
 #endif
 
 namespace Oetools.Sakoe.Utilities {
-    
+
     public class HelpGenerator : IHelpTextGenerator, IHelpFormatter {
-        
+
         /// <summary>
         /// A singleton instance of <see cref="HelpGenerator" />.
         /// </summary>
@@ -48,7 +48,7 @@ namespace Oetools.Sakoe.Utilities {
         protected HelpGenerator(IConsoleOutput console) {
             _console = console;
         }
-        
+
         private static HelpGenerator _instance;
 
         private IConsoleOutput _console;
@@ -91,7 +91,7 @@ namespace Oetools.Sakoe.Utilities {
             firstColumnWidth = Math.Max(firstColumnWidth, arguments.Count > 0 ? arguments.Max(a => a.Name.IndexOf('[') < 0 ? a.Name.Length : a.Name.Length - 2) : 0);
             firstColumnWidth = Math.Max(firstColumnWidth, 20);
             firstColumnWidth = Math.Min(firstColumnWidth, 35);
-            
+
             if (firstColumnWidth != optionShortNameColumnWidth + optionLongNameColumnWidth) {
                 optionLongNameColumnWidth = firstColumnWidth - optionShortNameColumnWidth;
             }
@@ -103,9 +103,9 @@ namespace Oetools.Sakoe.Utilities {
                 WriteSectionTitle("SYNOPSIS");
                 WriteOnNewLine(application.Description);
             }
-            
+
             var commandType = application.GetTypeFromCommandLine();
-            
+
             GenerateUsage(fullCommandLine, arguments, options, commands, commandType.GetProperty("RemainingArgs"));
             GenerateArguments(arguments, firstColumnWidth);
             GenerateOptions(options, optionShortNameColumnWidth, optionLongNameColumnWidth);
@@ -118,13 +118,13 @@ namespace Oetools.Sakoe.Utilities {
                     methodInfo.Invoke(null, new object[]{ this, application, firstColumnWidth });
                 }
             }
-            
+
             if (!string.IsNullOrEmpty(application.ExtendedHelpText)) {
                 WriteOnNewLine(null);
                 WriteSectionTitle("DESCRIPTION");
                 WriteOnNewLine(application.ExtendedHelpText);
             }
-            
+
             WriteOnNewLine(null);
         }
 
@@ -135,7 +135,7 @@ namespace Oetools.Sakoe.Utilities {
             WriteOnNewLine(null);
             WriteSectionTitle("USAGE");
             WriteOnNewLine(thisCommandLine);
-            
+
             foreach (var argument in visibleArguments) {
                 Write($" {argument.Name}");
             }
@@ -149,10 +149,10 @@ namespace Oetools.Sakoe.Utilities {
                 if (Attribute.GetCustomAttribute(remainingArgs, typeof(DescriptionAttribute), true) is DescriptionAttribute description) {
                     Write($" {description.Description}");
                 } else {
-                    Write(" [[--] <arg>...]");
+                    Write(" [-- <arg>...]");
                 }
             }
-            
+
             #if !WINDOWSONLYBUILD
             if (!File.Exists(CreateStarterCommand.StartScriptFilePath)) {
                 WriteOnNewLine(null);
@@ -168,7 +168,7 @@ namespace Oetools.Sakoe.Utilities {
             if (visibleArguments.Any()) {
                 WriteOnNewLine(null);
                 WriteSectionTitle("ARGUMENTS");
-                
+
                 foreach (var arg in visibleArguments) {
                     var name = arg.Name.Replace("[", "").Replace("]", "");
                     WriteOnNewLine(name.PadRight(firstColumnWidth + 2));
@@ -189,7 +189,7 @@ namespace Oetools.Sakoe.Utilities {
             if (visibleOptions.Any()) {
                 WriteOnNewLine(null);
                 WriteSectionTitle("OPTIONS");
-                
+
                 foreach (var opt in visibleOptions) {
                     var shortName = string.IsNullOrEmpty(opt.SymbolName) ? string.IsNullOrEmpty(opt.ShortName) ? "" : $"-{opt.ShortName}, " : $"-{opt.SymbolName}, ";
                     var longName = string.IsNullOrEmpty(opt.LongName) ? "" : $"--{opt.LongName}";
@@ -243,18 +243,18 @@ namespace Oetools.Sakoe.Utilities {
         public virtual void WriteOnNewLine(string result, ConsoleColor? color = null, int padding = 0, string prefixForNewLines = null) {
             _console.WriteOnNewLine(result, color, padding + DefaultPadding + _currentPadding, DefaultPadding + _currentPadding == 0 || string.IsNullOrEmpty(prefixForNewLines) ? prefixForNewLines : prefixForNewLines.PadLeft(prefixForNewLines.Length + DefaultPadding + _currentPadding, ' '));
         }
-        
+
         /// <inheritdoc cref="IConsoleOutput.Write"/>
         public virtual void Write(string result, ConsoleColor? color = null, int padding = 0, string prefixForNewLines = null) {
             _console.Write(result, color, padding + DefaultPadding + _currentPadding, DefaultPadding + _currentPadding == 0 || string.IsNullOrEmpty(prefixForNewLines) ? prefixForNewLines : prefixForNewLines.PadLeft(prefixForNewLines.Length + DefaultPadding + _currentPadding, ' '));
         }
-        
+
         public virtual void WriteSectionTitle(string result, int padding = 0) {
             _currentPadding = 0;
             _console.WriteOnNewLine(result, ConsoleColor.Cyan, padding + DefaultPadding + _currentPadding);
             _currentPadding = SectionPadding;
         }
-        
+
         /// <inheritdoc cref="IConsoleOutput.Write"/>
         /// <summary>Write a tip.</summary>
         public virtual void WriteTip(string result, int padding = 0, string prefixForNewLines = null) {
