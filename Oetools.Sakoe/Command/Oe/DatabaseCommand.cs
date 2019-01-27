@@ -18,26 +18,20 @@
 // ========================================================================
 #endregion
 
-using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.IO;
-using System.Text;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Command.Exceptions;
 using Oetools.Sakoe.Utilities.Extension;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
-using Oetools.Utilities.Openedge;
 using Oetools.Utilities.Openedge.Database;
-using Oetools.Utilities.Openedge.Execution;
 
 namespace Oetools.Sakoe.Command.Oe {
 
-
     [Command(
-        "database", "da", "db",
+        "database", "db",
         Description = "Database manipulation tools."
     )]
     [Subcommand(typeof(CreateDatabaseCommand))]
@@ -63,7 +57,7 @@ namespace Oetools.Sakoe.Command.Oe {
         Description = "Open a new DataDigger instance.",
         ExtendedHelpText = "Please note that when running DataDigger, the DataDigger.pf file of the installation path is used."
     )]
-    internal class DatabaseDataDiggerCommand : DatabaseToolCommand {
+    internal class DatabaseDataDiggerCommand : ADatabaseToolCommand {
 
         [Option("-ro|--read-only", "Start DataDigger in read-only mode (records will not modifiable).", CommandOptionType.NoValue)]
         public bool ReadOnly { get; set; } = false;
@@ -87,7 +81,7 @@ namespace Oetools.Sakoe.Command.Oe {
         "dictionary", "di", "dic",
         Description = "Open the database dictionary tool."
     )]
-    internal class DatabaseDictionaryCommand : DatabaseToolCommand {
+    internal class DatabaseDictionaryCommand : ADatabaseToolCommand {
 
         protected override string ToolArguments() => "-p _dict.p";
 
@@ -97,61 +91,22 @@ namespace Oetools.Sakoe.Command.Oe {
         "admin", "ad",
         Description = "Open the database administration tool."
     )]
-    internal class DatabaseAdminCommand : DatabaseToolCommand {
+    internal class DatabaseAdminCommand : ADatabaseToolCommand {
 
         protected override string ToolArguments() => "-p _admin.p";
-    }
-
-    internal abstract class DatabaseToolCommand : ADatabaseWithProwinCommand {
-
-        protected abstract string ToolArguments();
-
-        protected virtual string ExecutionWorkingDirectory => null;
-
-        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            var dlcPath = GetDlcPath();
-
-            var argsBuilder = new StringBuilder(ToolArguments());
-
-            argsBuilder.Append(' ').Append(GetConnectionString(dlcPath, app, false));
-
-            if (UoeUtilities.CanProVersionUseNoSplashParameter(UoeUtilities.GetProVersionFromDlc(dlcPath))) {
-                argsBuilder.Append(" -nosplash");
-            }
-
-            var args = argsBuilder.CliCompactWhitespaces().ToString();
-
-            var executable = UoeUtilities.GetProExecutableFromDlc(dlcPath);
-
-            Log?.Debug($"Executing command:\n{executable.CliQuoter()} {args}");
-
-            var process = new Process {
-                StartInfo = new ProcessStartInfo {
-                    FileName = executable,
-                    Arguments = args,
-                    WorkingDirectory = ExecutionWorkingDirectory ?? Directory.GetCurrentDirectory()
-                }
-            };
-            process.Start();
-
-            return 0;
-        }
     }
 
     [Command(
         "connect", "co",
         Description = "Get the connection string to use to connect to a database."
     )]
-    internal class ConnectDatabaseCommand : ADatabaseCommand {
+    internal class ConnectDatabaseCommand : ADatabaseSingleLocationCommand {
 
         [Option("-l|--logical-name", "The logical name to use for the database in the connection string.", CommandOptionType.SingleValue)]
         public string LogicalName { get; set; }
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            var res = new UoeDatabaseOperator(GetDlcPath()) {
-                Log = Log
-            }.GetConnectionString(GetTargetDatabasePath(), LogicalName);
-            Out.WriteResultOnNewLine(res);
+            Out.WriteResultOnNewLine(GetOperator().GetDatabaseConnection(GetSingleDatabaseLocation(), LogicalName).ToString());
             return 0;
         }
     }
@@ -161,12 +116,10 @@ namespace Oetools.Sakoe.Command.Oe {
         Description = "Repair the structure of a database.",
         ExtendedHelpText = "Update the database control information, usually done after an extent has been moved or renamed."
     )]
-    internal class RepairDatabaseCommand : ADatabaseCommand {
+    internal class RepairDatabaseCommand : ADatabaseSingleLocationWithAccessArgsCommand {
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            new UoeDatabaseOperator(GetDlcPath()) {
-                Log = Log
-            }.ProstrctRepair(GetTargetDatabasePath());
+            GetOperator().RepairDatabaseControlInfo(GetSingleDatabaseLocation(), DatabaseAccessStartupParameters);
             return 0;
         }
     }
@@ -176,42 +129,29 @@ namespace Oetools.Sakoe.Command.Oe {
         Description = "Delete a database.",
         ExtendedHelpText = "All the files composing the database are deleted without confirmation."
     )]
-    internal class DeleteDatabaseCommand : ADatabaseCommand {
+    internal class DeleteDatabaseCommand : ADatabaseSingleLocationCommand {
 
         [Required]
         [Option("-f|--force", "Mandatory option to force the deletion and avoid bad manipulation.", CommandOptionType.NoValue)]
         public bool Force { get; set; } = false;
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            new UoeDatabaseOperator(GetDlcPath()) {
-                Log = Log
-            }.Delete(GetTargetDatabasePath());
+            GetOperator().Delete(GetSingleDatabaseLocation());
             return 0;
         }
     }
 
     [Command(
-        "stop", "proshut", "sp",
-        Description = "Stop a database that was started for multi-users.",
-        AllowArgumentSeparator = true
+        "stop", "sp",
+        Description = "Stop a database that was started for multi-users."
     )]
-    internal class StopDatabaseCommand : ADatabaseCommand {
+    internal class StopDatabaseCommand : ADatabaseSingleLocationCommand {
 
-        [Description("[-- <extra proshut parameters>...]")]
+        [Description("[-- <extra proshut args>...]")]
         public string[] RemainingArgs { get; set; }
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            var extra = RemainingArgs != null ? string.Join(" ", RemainingArgs) : null;
-            if (!string.IsNullOrEmpty(extra)) {
-                Log.Info($"Extra parameters: {extra.PrettyQuote()}.");
-            }
-
-            var dbOperator = new UoeDatabaseOperator(GetDlcPath()) {
-                Log = Log
-            };
-            dbOperator.Proshut(GetTargetDatabasePath(), extra);
-            Log.Debug(dbOperator.LastOperationOutput);
-
+            GetOperator().Shutdown(GetSingleDatabaseLocation(), GetRemainingArgsAsProArgs(RemainingArgs));
             return 0;
         }
     }
@@ -220,29 +160,26 @@ namespace Oetools.Sakoe.Command.Oe {
         "copy", "cp",
         Description = "Copy a database."
     )]
-    internal class CopyDatabaseCommand : AOeDlcCommand {
+    internal class CopyDatabaseCommand : ADatabaseCommand {
 
         [Required]
         [LegalFilePath]
-        [Argument(0, "<source db path>", "The path to the 'source' database. The .db extension is optional.")]
+        [Argument(0, "<source db path>", "Path to the source database (" + UoeDatabaseLocation.Extension + " file). The " + UoeDatabaseLocation.Extension + " extension is optional and the path can be relative to the current directory.")]
         public string SourceDatabasePath { get; set; }
 
         [Required]
         [LegalFilePath]
-        [Argument(1, "<target db path>", "The path to the 'target' database. The .db extension is optional.")]
+        [Argument(1, "<target db path>", "Path to the target database (" + UoeDatabaseLocation.Extension + " file). The " + UoeDatabaseLocation.Extension + " extension is optional and the path can be relative to the current directory.")]
         public string TargetDatabasePath { get; set; }
 
-        [Option("-ni|--newinstance", "Use -newinstance in the procopy command.", CommandOptionType.NoValue)]
+        [Option("-ni|--new-instance", "Specifies that a new GUID be created for the target database.", CommandOptionType.NoValue)]
         public bool NewInstance { get; } = false;
 
-        [Option("-rp|--relativepath", "Use -relativepath in the procopy command.", CommandOptionType.NoValue)]
+        [Option("-rp|--relative-path", "Use relative path in the structure file.", CommandOptionType.NoValue)]
         public bool RelativePath { get; } = false;
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            var dbOperator = new UoeDatabaseOperator(GetDlcPath()) {
-                Log = Log
-            };
-            dbOperator.Procopy(TargetDatabasePath, SourceDatabasePath, NewInstance, RelativePath);
+            GetOperator().Copy(new UoeDatabaseLocation(TargetDatabasePath), new UoeDatabaseLocation(SourceDatabasePath), NewInstance, RelativePath);
             return 0;
         }
     }
@@ -260,11 +197,10 @@ namespace Oetools.Sakoe.Command.Oe {
     }
 
     [Command(
-        "start", "proserve", "st",
-        Description = "Start a database in order to use it in multi-users mode.",
-        AllowArgumentSeparator = true
+        "start", "st",
+        Description = "Start a database in order to use it in multi-users mode."
     )]
-    internal class StartDatabaseCommand : ADatabaseCommand {
+    internal class StartDatabaseCommand : ADatabaseSingleLocationCommand {
 
         [Option("-s|--service", "Service name that will be used by this database. Usually a port number or a service name declared in /etc/services.", CommandOptionType.SingleValue)]
         public string ServiceName { get; set; }
@@ -280,17 +216,10 @@ namespace Oetools.Sakoe.Command.Oe {
         [Option("-nu|--nb-users", "Number of users that should be able to connect to this database simultaneously.", CommandOptionType.SingleValue)]
         public (bool HasValue, int value) NbUsers { get; set; }
 
-        [Description("[-- <extra proserve parameters>...]")]
+        [Description("[-- <extra proserve args>...]")]
         public string[] RemainingArgs { get; set; }
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            var extra = RemainingArgs != null ? string.Join(" ", RemainingArgs) : null;
-            if (!string.IsNullOrEmpty(extra)) {
-                Log.Info($"Extra parameters: {extra.PrettyQuote()}.");
-            }
-
-            var dbOperator = new UoeDatabaseOperator(GetDlcPath()) { Log = Log };
-
             // service or next port
             if (!string.IsNullOrEmpty(ServiceName) && NextPortAvailable.HasValue) {
                 throw new CommandException($"Both {HostNameLongName} and {NextPortAvailableLongName} are defined but they are mutually exclusive options, choose only one.");
@@ -304,12 +233,11 @@ namespace Oetools.Sakoe.Command.Oe {
                 throw new CommandException("The number of users can only be strictly superior to zero.");
             }
 
-            var targetDb = GetTargetDatabasePath();
-            dbOperator.ProServe(targetDb, HostName, ServiceName, NbUsers.value > 0 ? (int?) NbUsers.value : null, extra);
+            var db = GetSingleDatabaseLocation();
+            GetOperator().Start(db, HostName, ServiceName, NbUsers.HasValue ? (int?) NbUsers.value : null, GetRemainingArgsAsProArgs(RemainingArgs));
 
             Log.Info("Multi-user connection string:");
-            Out.WriteResultOnNewLine($"{UoeDatabaseOperator.GetMultiUserConnectionString(targetDb, HostName, ServiceName)}");
-            Log.Info("Database started successfully.");
+            Out.WriteResultOnNewLine(UoeDatabaseConnection.NewMultiUserConnection(db, HostName, ServiceName).ToString());
 
             return 0;
         }
@@ -319,46 +247,45 @@ namespace Oetools.Sakoe.Command.Oe {
         "create", "cr",
         Description = "Creates a new database."
     )]
-    internal class CreateDatabaseCommand : AOeDlcCommand {
+    internal class CreateDatabaseCommand : ADatabaseSingleLocationCommand {
 
         [LegalFilePath]
-        [Argument(0, "<db path>", "Path to the database to create. The .db extension is optional. Defaults to the name of the current directory.")]
-        public string TargetDatabasePath { get; set; }
+        [Option("-f|--file",  "File name (physical name) of the database to create (" + UoeDatabaseLocation.Extension + " file). The " + UoeDatabaseLocation.Extension + " extension is optional and the path can be relative to the current directory. Defaults to the name of the current directory.", CommandOptionType.SingleValue)]
+        public string DatabasePhysicalName { get; set; }
 
-        [Option("-df|--df", "Path to the .df file containing the database schema definition.", CommandOptionType.SingleValue)]
         [FileExists]
+        [Option("-df|--df", "Path to the " + UoeDatabaseLocation.SchemaDefinitionExtension + " file containing the database schema definition. The path can be relative to the current directory.", CommandOptionType.SingleValue)]
         public string SchemaDefinitionFilePath { get; set; }
 
-        [Option("-st|--st", "Path to the .st file containing the database physical structure.", CommandOptionType.SingleValue)]
         [FileExists]
+        [Option("-st|--st", "Path to the structure file (" + UoeDatabaseLocation.StructureFileExtension + " file) containing the database physical structure. The path can be relative to the current directory.", CommandOptionType.SingleValue)]
         public string StuctureFilePath { get; set; }
 
-        [Option("-bs|--blocksize", "The blocksize to use when creating the database.", CommandOptionType.SingleValue)]
+        [Option("-bs|--block-size", "The block-size to use when creating the database. Defaults to the default block-size for the current platform (linux or windows).", CommandOptionType.SingleValue)]
         public DatabaseBlockSize BlockSize { get; } = DatabaseBlockSize.DefaultForCurrentPlatform;
 
-        [Option("-cp|--codepage", "Existing codepage in the openedge installation $DLC/prolang/(codepage).", CommandOptionType.SingleValue)]
+        [Option("-cp|--codepage", "The codepage to use. Creates the database using an empty database located in the openedge installation $DLC/prolang/(codepage).", CommandOptionType.SingleValue)]
         public string Codepage { get; } = null;
 
-        [Option("-ni|--newinstance", "Use -newinstance in the procopy command.", CommandOptionType.NoValue)]
+        [Option("-ni|--new-instance", "Specifies that a new GUID be created for the target database.", CommandOptionType.NoValue)]
         public bool NewInstance { get; } = false;
 
-        [Option("-rp|--relativepath", "Use -relativepath in the procopy command.", CommandOptionType.NoValue)]
+        [Option("-rp|--relative-path", "Use relative path in the structure file.", CommandOptionType.NoValue)]
         public bool RelativePath { get; } = false;
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            if (string.IsNullOrEmpty(TargetDatabasePath)) {
-                TargetDatabasePath = Path.GetFileName(Directory.GetCurrentDirectory().ToCleanPath());
-                Log.Info($"Using directory name for the database name: {TargetDatabasePath.PrettyQuote()}.");
+            if (string.IsNullOrEmpty(DatabasePhysicalName)) {
+                DatabasePhysicalName = UoeDatabaseLocation.GetValidPhysicalName(Path.GetFileName(Directory.GetCurrentDirectory()));
+                Log.Info($"Using directory name for the database name: {DatabasePhysicalName.PrettyQuote()}.");
             }
 
-            using (var dbAdministrator = new UoeDatabaseAdministrator(GetDlcPath())) {
-                dbAdministrator.Log = Log;
+            using (var ope = GetAdministrator()) {
+                var db = GetSingleDatabaseLocation();
 
-                dbAdministrator.CreateDatabase(TargetDatabasePath, StuctureFilePath?.MakePathAbsolute(), BlockSize, Codepage, NewInstance, RelativePath, SchemaDefinitionFilePath?.MakePathAbsolute());
+                ope.CreateWithDf(db, SchemaDefinitionFilePath?.ToAbsolutePath(), StuctureFilePath?.ToAbsolutePath(), BlockSize, Codepage, NewInstance, RelativePath);
 
                 Log.Info("Single user connection string:");
-                Out.WriteOnNewLine(UoeDatabaseOperator.GetSingleUserConnectionString(TargetDatabasePath));
-                Log.Info($"Database created successfully: {TargetDatabasePath.PrettyQuote()}.");
+                Out.WriteOnNewLine(UoeDatabaseConnection.NewSingleUserConnection(db).ToString());
             }
 
             return 0;

@@ -72,7 +72,7 @@ namespace Oetools.Sakoe.Command.Oe {
                 Log.Trace?.Write($"Using current directory to initialize the project: {SourceDirectory.PrettyQuote()}.");
             }
 
-            SourceDirectory = SourceDirectory.MakePathAbsolute().ToCleanPath();
+            SourceDirectory = SourceDirectory.ToAbsolutePath().ToCleanPath();
 
             if (string.IsNullOrEmpty(ProjectName)) {
                 ProjectName = Path.GetFileName(SourceDirectory);
@@ -213,7 +213,7 @@ Project.xsd
                     Log?.Warn($"No project file {OeBuilderConstants.OeProjectExtension} found.");
                 } else {
                     foreach (var file in files) {
-                        Out.WriteResultOnNewLine(file.FromAbsolutePathToRelativePath(PathToList));
+                        Out.WriteResultOnNewLine(file.ToRelativePath(PathToList));
                     }
                 }
                 return 0;

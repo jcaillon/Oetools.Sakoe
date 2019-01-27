@@ -20,7 +20,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Command.Oe;
 using Oetools.Sakoe.ConLog;

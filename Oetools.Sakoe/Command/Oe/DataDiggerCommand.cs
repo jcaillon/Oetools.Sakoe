@@ -73,7 +73,7 @@ Learn more here: https://datadigger.wordpress.com."
         /// </summary>
         /// <param name="readOnly"></param>
         /// <returns></returns>
-        public static string DataDiggerStartUpParameters(bool readOnly) => $"-pf DataDigger.pf -p {(readOnly ? "DataReader.p" : "DataDigger.p")} -T {Utils.CreateTempDirectory(Utils.GetRandomName()).CliQuoter()}";
+        public static string DataDiggerStartUpParameters(bool readOnly) => $"-pf DataDigger.pf -p {(readOnly ? "DataReader.p" : "DataDigger.p")} -T {Utils.CreateTempDirectory(Utils.GetRandomName()).ToCliArg()}";
     }
 
     [Command(
@@ -81,50 +81,7 @@ Learn more here: https://datadigger.wordpress.com."
         Description = "Run a new DataDigger instance.",
         ExtendedHelpText = "Please note that when running DataDigger, the DataDigger.pf file of the installation path is used."
     )]
-    internal class DataDiggerRunCommand : AOeDlcCommand {
-
-        [Option("-ro|--read-only", "Start DataDigger in read-only mode (records will not modifiable).", CommandOptionType.NoValue)]
-        public bool ReadOnly { get; set; } = false;
-
-        [Description("[-- <extra prowin parameters>...]")]
-        public string[] RemainingArgs { get; set; }
-
-        protected virtual string ConnectionString => null;
-
-        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-
-            if (!Utils.IsRuntimeWindowsPlatform) {
-                throw new CommandException("DataDigger can only run on windows platform.");
-            }
-
-            var dlcPath = GetDlcPath();
-
-            var extraParameters = RemainingArgs != null ? string.Join(" ", RemainingArgs) : null;
-            if (!string.IsNullOrEmpty(extraParameters)) {
-                Log.Info($"Extra prowin parameters: {extraParameters.PrettyQuote()}.");
-            }
-
-            if (UoeUtilities.CanProVersionUseNoSplashParameter(UoeUtilities.GetProVersionFromDlc(dlcPath))) {
-                extraParameters = $"{extraParameters ?? ""} -nosplash";
-            }
-
-            var args = $"{DataDiggerCommand.DataDiggerStartUpParameters(ReadOnly)} {ConnectionString} {extraParameters}";
-
-            Log.Debug($"Starting DataDigger with parameters: {args.PrettyQuote()}.");
-
-            var process = new Process {
-                StartInfo = new ProcessStartInfo {
-                    FileName = UoeUtilities.GetProExecutableFromDlc(dlcPath),
-                    Arguments = args,
-                    WorkingDirectory = DataDiggerCommand.DataDiggerInstallationDirectory
-                }
-            };
-
-            process.Start();
-
-            return 0;
-        }
-    }
+    internal class DataDiggerRunCommand : DatabaseDataDiggerCommand { }
 
     [Command(
         "remove", "rm",

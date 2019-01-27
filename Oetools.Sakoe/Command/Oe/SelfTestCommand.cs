@@ -151,8 +151,7 @@ nibh.") { Align = Align.Right ,Stroke = LineThickness.None },
         "input", "in",
         Description = "Subcommand that shows the usage of options and arguments",
         ExtendedHelpText = @"sakoe st input boom.txt --attachment first --attachment ""second with spaces""
-sakoe st input -b2 s1024",
-        AllowArgumentSeparator = true
+sakoe st input -b2 s1024"
     )]
     internal class InputSelfTestCommand : ABaseCommand {
 
@@ -276,8 +275,7 @@ sakoe st input -b2 s1024",
     [Command(
         "responsefile", "rf",
         Description = "Subcommand that shows the usage of a response file",
-        ExtendedHelpText = "sakoe selftest responsefile",
-        AllowArgumentSeparator = true
+        ExtendedHelpText = "sakoe selftest responsefile"
     )]
     internal class ResponseFileSelfTestCommand : ABaseCommand {
 

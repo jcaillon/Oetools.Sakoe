@@ -50,7 +50,7 @@ namespace Oetools.Sakoe.Command.Oe.Abstract {
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
 
-            var archivePath = ArchivePath.MakePathAbsolute();
+            var archivePath = ArchivePath.ToAbsolutePath();
 
             Log.Info("Listing files to process...");
 

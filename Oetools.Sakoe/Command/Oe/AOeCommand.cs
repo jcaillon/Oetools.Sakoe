@@ -24,6 +24,7 @@ using Oetools.Sakoe.Command.Exceptions;
 using Oetools.Sakoe.Utilities.Extension;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
+using Oetools.Utilities.Openedge;
 
 namespace Oetools.Sakoe.Command.Oe {
     public abstract class AOeCommand : ABaseCommand {
@@ -81,6 +82,18 @@ namespace Oetools.Sakoe.Command.Oe {
                 return path;
             }
             throw new CommandException($"No project file ({OeBuilderConstants.OeProjectExtension}) named {projectFileName} found in the current folder {Directory.GetCurrentDirectory().PrettyQuote()} nor the {OeBuilderConstants.OeProjectDirectory} directory.");
+        }
+
+        /// <summary>
+        /// Format the remaining args passed by the user to arguments usable for a pro process.
+        /// </summary>
+        /// <param name="remainingArgs"></param>
+        /// <returns></returns>
+        protected string GetRemainingArgsAsProArgs(string[] remainingArgs) {
+            if (remainingArgs != null && remainingArgs.Any()) {
+                return UoeUtilities.GetCleanCliArgs(string.Join(" ", remainingArgs));
+            }
+            return null;
         }
 
     }

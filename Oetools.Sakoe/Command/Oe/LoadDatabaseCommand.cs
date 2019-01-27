@@ -16,16 +16,16 @@ namespace Oetools.Sakoe.Command.Oe {
         "seq", "se",
         Description = "Load the database sequence values from a plain text file (.d)."
     )]
-    internal class LoadSeqDatabaseCommand : ADatabaseWithProwinCommand {
+    internal class LoadSeqDatabaseCommand : ADatabaseSingleConnectionCommand {
 
-        [Option("-d|--data-file", "File path that contains the sequence data to load.", CommandOptionType.SingleValue)]
+        [FileExists]
+        [LegalFilePath]
+        [Argument(0, "<data-file>", "File path that contains the sequence data to load (usually has the .d extension).")]
         public string LoadFilePath { get; set; }
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            var dlcPath = GetDlcPath();
-            using (var dbAdministrator = new UoeDatabaseAdministrator(dlcPath)) {
-                dbAdministrator.Log = Log;
-                dbAdministrator.LoadSequenceData(GetConnectionString(dlcPath, app), LoadFilePath);
+            using (var ope = GetAdministrator()) {
+                ope.LoadSequenceData(GetSingleDatabaseConnection(), LoadFilePath);
             }
             return 0;
         }
@@ -35,19 +35,19 @@ namespace Oetools.Sakoe.Command.Oe {
         "data", "da",
         Description = "Load the database data from plain text files (.d)."
     )]
-    internal class LoadDataDatabaseCommand : ADatabaseWithProwinCommand {
+    internal class LoadDataDatabaseCommand : ADatabaseSingleConnectionCommand {
 
-        [Option("-d|--data-directory", "Directory path that contain the data to load. Each table of the database should be stored as an individual .d file named like the table.", CommandOptionType.SingleValue)]
-        public string LoadFilePath { get; set; }
+        [DirectoryExists]
+        [LegalFilePath]
+        [Argument(0, "<data-directory>", "Directory path that contain the data to load. Each table of the database should be stored as an individual .d file named like the table.")]
+        public string LoadDirectoryPath { get; set; }
 
         [Option("-t|--table", "TA list of comma separated table names to load. Defaults to `ALL` which loads every table.", CommandOptionType.SingleValue)]
         public string TableName { get; set; } = "ALL";
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            var dlcPath = GetDlcPath();
-            using (var dbAdministrator = new UoeDatabaseAdministrator(dlcPath)) {
-                dbAdministrator.Log = Log;
-                dbAdministrator.LoadData(GetConnectionString(dlcPath, app), LoadFilePath, TableName);
+            using (var ope = GetAdministrator()) {
+                ope.LoadData(GetSingleDatabaseConnection(), LoadDirectoryPath, TableName);
             }
             return 0;
         }
@@ -57,16 +57,16 @@ namespace Oetools.Sakoe.Command.Oe {
         "schema", "df",
         Description = "Load the schema definition (.df) to a database."
     )]
-    internal class LoadDfDatabaseCommand : ADatabaseWithProwinCommand {
+    internal class LoadDfDatabaseCommand : ADatabaseSingleConnectionCommand {
 
-        [Option("-df|--df", "Path to the .df file that contains the schema definition (or partial schema) of the database.", CommandOptionType.SingleValue)]
+        [FileExists]
+        [LegalFilePath]
+        [Argument(0, "<df-file>", "Path to the " + UoeDatabaseLocation.SchemaDefinitionExtension + " file that contains the schema definition (or partial schema) of the database.")]
         public string LoadFilePath { get; set; }
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            var dlcPath = GetDlcPath();
-            using (var dbAdministrator = new UoeDatabaseAdministrator(dlcPath)) {
-                dbAdministrator.Log = Log;
-                dbAdministrator.LoadSchemaDefinition(GetConnectionString(dlcPath, app), LoadFilePath);
+            using (var ope = GetAdministrator()) {
+                ope.LoadSchemaDefinition(GetSingleDatabaseConnection(), LoadFilePath);
             }
             return 0;
         }
