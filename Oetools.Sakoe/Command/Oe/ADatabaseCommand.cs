@@ -28,7 +28,7 @@ namespace Oetools.Sakoe.Command.Oe {
 
         protected virtual IEnumerable<UoeDatabaseLocation> GetDatabaseLocations(bool addDatabasesInCurrentDirectory, bool throwWhenNoDatabaseFound) {
             var nbYield = 0;
-            foreach (var path in DatabasePaths) {
+            foreach (var path in DatabasePaths.ToNonNullEnumerable().Where(d => !string.IsNullOrEmpty(d))) {
                 nbYield++;
                 yield return new UoeDatabaseLocation(path);
             }
@@ -69,14 +69,14 @@ namespace Oetools.Sakoe.Command.Oe {
 
         protected virtual IEnumerable<UoeDatabaseConnection> GetDatabaseConnections(bool addDatabasesInCurrentDirectory, bool throwWhenNoDatabaseFound) {
             var nbYield = 0;
-            foreach (var connection in DatabaseConnections) {
+            foreach (var connection in DatabaseConnections.ToNonNullEnumerable().Where(c => !string.IsNullOrEmpty(c))) {
                 foreach (var databaseConnection in UoeDatabaseConnection.GetConnectionStrings(connection)) {
                     nbYield++;
                     yield return databaseConnection;
                 }
             }
             var ope = GetOperator();
-            foreach (var path in DatabasePaths) {
+            foreach (var path in DatabasePaths.ToNonNullEnumerable().Where(d => !string.IsNullOrEmpty(d))) {
                 nbYield++;
                 var loc = new UoeDatabaseLocation(path);
                 loc.ThrowIfNotExist();
@@ -196,7 +196,7 @@ namespace Oetools.Sakoe.Command.Oe {
 
             var argsBuilder = new StringBuilder(ToolArguments());
 
-            argsBuilder.Append(' ').Append(UoeDatabaseConnection.GetConnectionString(GetDatabaseConnections()));
+            argsBuilder.Append(' ').Append(UoeDatabaseConnection.GetConnectionString(GetDatabaseConnections(), true));
 
             if (UoeUtilities.CanProVersionUseNoSplashParameter(UoeUtilities.GetProVersionFromDlc(dlcPath))) {
                 argsBuilder.Append(" -nosplash");

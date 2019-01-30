@@ -27,6 +27,8 @@ namespace Oetools.Sakoe.Command.Oe {
 
     public abstract class AOeDlcCommand : AOeCommand {
 
+        private string _dlcDirectoryPath;
+
         [DirectoryExists]
         [Option("-dl|--dlc", "The path to the directory containing the Openedge installation. Will default to the path found in the " + UoeConstants.OeDlcAlternativeEnvVar + " or " + UoeConstants.OeDlcEnvVar + " environment variable if it exists.", CommandOptionType.SingleValue)]
         public string DlcDirectoryPath { get; }
@@ -37,15 +39,18 @@ namespace Oetools.Sakoe.Command.Oe {
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
         protected string GetDlcPath() {
-            if (!string.IsNullOrEmpty(DlcDirectoryPath)) {
-                return DlcDirectoryPath;
+            if (string.IsNullOrEmpty(_dlcDirectoryPath)) {
+                if (!string.IsNullOrEmpty(DlcDirectoryPath)) {
+                    _dlcDirectoryPath = DlcDirectoryPath;
+                } else {
+                    _dlcDirectoryPath = UoeUtilities.GetDlcPathFromEnv();
+                    if (string.IsNullOrEmpty(_dlcDirectoryPath) || !Directory.Exists(_dlcDirectoryPath)) {
+                        throw new Exception($"The path to the Openedge installation directory has not been found. Specify it with the --dlc option. Alternatively, set a {UoeConstants.OeDlcAlternativeEnvVar} (or {UoeConstants.OeDlcEnvVar}) environment variable containing the installation path.");
+                    }
+                    Log.Debug($"Using the DLC path found in the environment variable: {_dlcDirectoryPath.PrettyQuote()}.");
+                }
             }
-            var dlcPath = UoeUtilities.GetDlcPathFromEnv();
-            if (string.IsNullOrEmpty(dlcPath) || !Directory.Exists(dlcPath)) {
-                throw new Exception($"The path to the Openedge installation directory has not been found. Specify it with the --dlc option. Alternatively, set a {UoeConstants.OeDlcAlternativeEnvVar} (or {UoeConstants.OeDlcEnvVar}) environment variable containing the installation path.");
-            }
-            Log.Debug($"Using the DLC path found in the environment variable: {dlcPath.PrettyQuote()}.");
-            return dlcPath;
+            return _dlcDirectoryPath;
         }
     }
 }

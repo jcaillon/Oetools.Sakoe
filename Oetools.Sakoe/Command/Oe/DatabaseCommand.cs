@@ -132,11 +132,13 @@ namespace Oetools.Sakoe.Command.Oe {
     internal class DeleteDatabaseCommand : ADatabaseSingleLocationCommand {
 
         [Required]
-        [Option("-f|--force", "Mandatory option to force the deletion and avoid bad manipulation.", CommandOptionType.NoValue)]
-        public bool Force { get; set; } = false;
+        [Option("-y|--yes", "Mandatory option to force the deletion and avoid bad manipulation.", CommandOptionType.NoValue)]
+        public bool ForceDelete { get; set; } = false;
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            GetOperator().Delete(GetSingleDatabaseLocation());
+            if (ForceDelete) {
+                GetOperator().Delete(GetSingleDatabaseLocation());
+            }
             return 0;
         }
     }
@@ -247,7 +249,7 @@ namespace Oetools.Sakoe.Command.Oe {
         "create", "cr",
         Description = "Creates a new database."
     )]
-    internal class CreateDatabaseCommand : ADatabaseSingleLocationCommand {
+    internal class CreateDatabaseCommand : ADatabaseCommand {
 
         [LegalFilePath]
         [Option("-f|--file",  "File name (physical name) of the database to create (" + UoeDatabaseLocation.Extension + " file). The " + UoeDatabaseLocation.Extension + " extension is optional and the path can be relative to the current directory. Defaults to the name of the current directory.", CommandOptionType.SingleValue)]
@@ -264,7 +266,7 @@ namespace Oetools.Sakoe.Command.Oe {
         [Option("-bs|--block-size", "The block-size to use when creating the database. Defaults to the default block-size for the current platform (linux or windows).", CommandOptionType.SingleValue)]
         public DatabaseBlockSize BlockSize { get; } = DatabaseBlockSize.DefaultForCurrentPlatform;
 
-        [Option("-cp|--codepage", "The codepage to use. Creates the database using an empty database located in the openedge installation $DLC/prolang/(codepage).", CommandOptionType.SingleValue)]
+        [Option("-lg|--lang", "The codepage/lang to use. Creates the database using an empty database located in the openedge installation $DLC/prolang/(lang).", CommandOptionType.SingleValue)]
         public string Codepage { get; } = null;
 
         [Option("-ni|--new-instance", "Specifies that a new GUID be created for the target database.", CommandOptionType.NoValue)]
@@ -280,7 +282,7 @@ namespace Oetools.Sakoe.Command.Oe {
             }
 
             using (var ope = GetAdministrator()) {
-                var db = GetSingleDatabaseLocation();
+                var db = new UoeDatabaseLocation(DatabasePhysicalName);
 
                 ope.CreateWithDf(db, SchemaDefinitionFilePath?.ToAbsolutePath(), StuctureFilePath?.ToAbsolutePath(), BlockSize, Codepage, NewInstance, RelativePath);
 
