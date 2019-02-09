@@ -239,7 +239,7 @@ namespace Oetools.Sakoe.Command.Oe {
             GetOperator().Start(db, HostName, ServiceName, NbUsers.HasValue ? (int?) NbUsers.value : null, GetRemainingArgsAsProArgs(RemainingArgs));
 
             Log.Info("Multi-user connection string:");
-            Out.WriteResultOnNewLine(UoeDatabaseConnection.NewMultiUserConnection(db, HostName, ServiceName).ToString());
+            Out.WriteResultOnNewLine(UoeDatabaseConnection.NewMultiUserConnection(db, null, HostName, ServiceName).ToString());
 
             return 0;
         }
