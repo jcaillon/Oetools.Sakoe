@@ -18,6 +18,7 @@
 // ========================================================================
 #endregion
 
+using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
@@ -131,14 +132,31 @@ namespace Oetools.Sakoe.Command.Oe {
     )]
     internal class DeleteDatabaseCommand : ADatabaseSingleLocationCommand {
 
-        [Required]
-        [Option("-y|--yes", "Mandatory option to force the deletion and avoid bad manipulation.", CommandOptionType.NoValue)]
+        [Option("-y|--yes", "Automatically answer yes on deletion confirmation.", CommandOptionType.NoValue)]
         public bool ForceDelete { get; set; } = false;
 
+        [Option("-st|--delete-st", "Also delete the structure file (" + UoeDatabaseLocation.StructureFileExtension + ").", CommandOptionType.NoValue)]
+        public bool DeleteStructureFile { get; set; } = false;
+
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            if (ForceDelete) {
-                GetOperator().Delete(GetSingleDatabaseLocation());
+
+            var loc = GetSingleDatabaseLocation();
+
+            if (!ForceDelete) {
+                Out.WriteOnNewLine(null);
+                var args = Prompt.GetString($"Please confirm the definitive deletion of {loc.PhysicalName.PrettyQuote()} (y/n): ");
+
+                if (string.IsNullOrEmpty(args) || !args.Equals("y", StringComparison.CurrentCultureIgnoreCase)) {
+                    return 1;
+                }
             }
+
+            GetOperator().Delete(loc);
+
+            if (DeleteStructureFile) {
+                File.Delete(loc.StructureFileFullPath);
+            }
+
             return 0;
         }
     }

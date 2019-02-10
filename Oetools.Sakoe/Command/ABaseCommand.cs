@@ -79,6 +79,12 @@ namespace Oetools.Sakoe.Command {
         /// <returns></returns>
         // ReSharper disable once UnusedMember.Global
         protected int OnExecute(CommandLineApplication app, IConsole console) {
+            // use system default verbosity
+            var verbosityEnvVar = Environment.GetEnvironmentVariable("OE_VERBOSITY");
+            if ((!VerbosityThreshold.HasValue || VerbosityThreshold.Value == null) && !string.IsNullOrEmpty(verbosityEnvVar) && Enum.TryParse(verbosityEnvVar, true, out ConsoleLogThreshold threshold)) {
+                VerbosityThreshold = (true, threshold);
+            }
+
             Log = ConsoleLogger2.Singleton;
             Out = ConsoleLogger2.Singleton;
             HelpFormatter = HelpGenerator.Singleton;

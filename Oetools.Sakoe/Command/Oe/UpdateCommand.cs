@@ -146,7 +146,7 @@ namespace Oetools.Sakoe.Command.Oe {
                 httpProxy = httpProxyFromEnv;
             }
 
-            httpProxyFromEnv = Environment.GetEnvironmentVariable("HTTP_PROXY");
+            httpProxyFromEnv = Environment.GetEnvironmentVariable("http_proxy");
 
             if (string.IsNullOrEmpty(httpProxy) && !string.IsNullOrEmpty(httpProxyFromEnv)) {
                 log.Debug($"Using the proxy found in the environment variable HTTP_PROXY: {httpProxyFromEnv.PrettyQuote()}.");
