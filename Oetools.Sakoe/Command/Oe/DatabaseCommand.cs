@@ -154,6 +154,7 @@ namespace Oetools.Sakoe.Command.Oe {
             GetOperator().Delete(loc);
 
             if (DeleteStructureFile) {
+                Log?.Debug($"Deleting: {loc.StructureFileFullPath.PrettyQuote()}.");
                 File.Delete(loc.StructureFileFullPath);
             }
 

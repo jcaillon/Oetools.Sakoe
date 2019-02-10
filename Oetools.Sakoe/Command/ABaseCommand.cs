@@ -39,7 +39,7 @@ namespace Oetools.Sakoe.Command {
 
         private const string VerbosityShortName = "-vb";
 
-        [Option(VerbosityShortName + "|--verbosity <level>", "Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`.", CommandOptionType.SingleOrNoValue)]
+        [Option(VerbosityShortName + "|--verbosity <level>", "Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`.", CommandOptionType.SingleOrNoValue)]
         public (bool HasValue, ConsoleLogThreshold? Value) VerbosityThreshold { get; set; }
 
         [Option("-pm|--progress-mode <mode>", "Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done.", CommandOptionType.SingleValue)]
