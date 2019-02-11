@@ -8,6 +8,7 @@ namespace Oetools.Sakoe.Command.Oe {
     )]
     [Subcommand(typeof(LoadSeqDatabaseCommand))]
     [Subcommand(typeof(LoadDataDatabaseCommand))]
+    [Subcommand(typeof(LoadSqlDataDatabaseCommand))]
     [Subcommand(typeof(LoadDfDatabaseCommand))]
     internal class LoadDatabaseCommand : AExpectSubCommand {
     }
@@ -48,6 +49,28 @@ namespace Oetools.Sakoe.Command.Oe {
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             using (var ope = GetAdministrator()) {
                 ope.LoadData(GetSingleDatabaseConnection(), LoadDirectoryPath, TableName);
+            }
+            return 0;
+        }
+    }
+
+    [Command(
+        "sql-data", "sd",
+        Description = "Load the database data from SQL-92 format files (" + UoeDatabaseLocation.SqlExtension + ")."
+    )]
+    internal class LoadSqlDataDatabaseCommand : ADatabaseSingleConnectionCommand {
+
+        [DirectoryExists]
+        [LegalFilePath]
+        [Argument(0, "<data-directory>", "Directory path that contain the data to load. Each table of the database should be stored as an individual " + UoeDatabaseLocation.SqlExtension + " file named like the `owner.table`.")]
+        public string LoadDirectoryPath { get; set; }
+
+        [Option("-op|--options", @"Use options for the sqlload utility (see the documentation online). Defaults to loading every table.", CommandOptionType.SingleValue)]
+        public string Options { get; set; } = "-t %.%";
+
+        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
+            using (var ope = GetAdministrator()) {
+                ope.LoadSqlData(GetSingleDatabaseConnection(), LoadDirectoryPath, Options);
             }
             return 0;
         }

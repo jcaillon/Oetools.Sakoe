@@ -109,7 +109,6 @@ namespace Oetools.Sakoe.Command.Oe {
             return list.First();
         }
 
-
         protected Encoding GetOperatorEncoding() => null;
 
         protected UoeDatabaseOperator GetOperator() =>
