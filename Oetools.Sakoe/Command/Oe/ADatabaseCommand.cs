@@ -129,7 +129,7 @@ namespace Oetools.Sakoe.Command.Oe {
     internal abstract class ADatabaseSingleLocationCommand : ADatabaseCommand {
 
         [LegalFilePath]
-        [Option(OptionDatabaseFileShortName + "|--file", "Path to a database (" + UoeDatabaseLocation.Extension + " file). The " + UoeDatabaseLocation.Extension + " extension is optional and the path can be relative to the current directory. Defaults to the path of the unique " + UoeDatabaseLocation.Extension + " file found in the current directory.", CommandOptionType.SingleValue)]
+        [Option(OptionDatabaseFileShortName + "|--file <path>", "Path to a database (" + UoeDatabaseLocation.Extension + " file). The " + UoeDatabaseLocation.Extension + " extension is optional and the path can be relative to the current directory. Defaults to the path of the unique " + UoeDatabaseLocation.Extension + " file found in the current directory.", CommandOptionType.SingleValue)]
         public string DatabasePath { get; set; }
 
         protected override IEnumerable<string> DatabasePaths => DatabasePath.Yield();
@@ -141,17 +141,17 @@ namespace Oetools.Sakoe.Command.Oe {
 
     internal abstract class ADatabaseSingleLocationWithAccessArgsCommand : ADatabaseSingleLocationCommand {
 
-        [Option("-a|--access", "Database access/encryption parameters: `[[-userid username [-password passwd ]] | [ -U username -P passwd] ] [-Passphrase]`.", CommandOptionType.SingleValue)]
+        [Option("-a|--access <args>", "Database access/encryption arguments: `[[-userid username [-password passwd ]] | [ -U username -P passwd] ] [-Passphrase]`.", CommandOptionType.SingleValue)]
         public string DatabaseAccessStartupParameters { get; set; }
     }
 
     internal abstract class ADatabaseSingleConnectionCommand : ADatabaseCommand {
 
-        [Option(OptionDatabaseConnectionShortName + "|--connection", "A connection string that can be used to connect to an openedge database. The connection string will be used in a `CONNECT` statement.", CommandOptionType.SingleValue)]
+        [Option(OptionDatabaseConnectionShortName + "|--connection <args>", "A connection string that can be used to connect to an openedge database. The connection string will be used in a `CONNECT` statement.", CommandOptionType.SingleValue)]
         public string DatabaseConnection { get; set; }
 
         [LegalFilePath]
-        [Option(OptionDatabaseFileShortName + "|--file", "Path to a database (" + UoeDatabaseLocation.Extension + " file). The " + UoeDatabaseLocation.Extension + " extension is optional and the path can be relative to the current directory. Defaults to the path of the unique " + UoeDatabaseLocation.Extension + " file found in the current directory.", CommandOptionType.SingleValue)]
+        [Option(OptionDatabaseFileShortName + "|--file <path>", "Path to a database (" + UoeDatabaseLocation.Extension + " file). The " + UoeDatabaseLocation.Extension + " extension is optional and the path can be relative to the current directory. Defaults to the path of the unique " + UoeDatabaseLocation.Extension + " file found in the current directory.", CommandOptionType.SingleValue)]
         public string DatabasePath { get; set; }
 
         protected override IEnumerable<string> DatabasePaths => DatabasePath.Yield();
@@ -165,11 +165,11 @@ namespace Oetools.Sakoe.Command.Oe {
 
     internal abstract class ADatabaseMultipleConnectionCommand : ADatabaseCommand {
 
-        [Option(OptionDatabaseConnectionShortName + "|--connection", "A connection string that can be used to connect to one or more openedge database. The connection string will be used in a `CONNECT` statement.", CommandOptionType.MultipleValue)]
+        [Option(OptionDatabaseConnectionShortName + "|--connection <args>", "A connection string that can be used to connect to one or more openedge database. The connection string will be used in a `CONNECT` statement.", CommandOptionType.MultipleValue)]
         public string[] MultipleDatabaseConnection { get; set; }
 
         [LegalFilePath]
-        [Option(OptionDatabaseFileShortName + "|--file", "Path to a database (" + UoeDatabaseLocation.Extension + " file). The " + UoeDatabaseLocation.Extension + " extension is optional and the path can be relative to the current directory. Defaults to a list of path of all the " + UoeDatabaseLocation.Extension + " file found in the current directory.", CommandOptionType.MultipleValue)]
+        [Option(OptionDatabaseFileShortName + "|--file <path>", "Path to a database (" + UoeDatabaseLocation.Extension + " file). The " + UoeDatabaseLocation.Extension + " extension is optional and the path can be relative to the current directory. Defaults to a list of path of all the " + UoeDatabaseLocation.Extension + " file found in the current directory.", CommandOptionType.MultipleValue)]
         public string[] MultipleDatabasePath { get; set; }
 
         protected override IEnumerable<string> DatabasePaths => MultipleDatabasePath;
@@ -182,6 +182,9 @@ namespace Oetools.Sakoe.Command.Oe {
     }
 
     internal abstract class ADatabaseToolCommand : ADatabaseMultipleConnectionCommand {
+
+        [Option("-d|--detached", "Use this option to immediately return to the prompt instead of waiting the for the program to exit.", CommandOptionType.NoValue)]
+        public bool DetachedMode { get; set; } = false;
 
         [Description("[-- <extra pro args>...]")]
         public string[] RemainingArgs { get; set; }
@@ -207,6 +210,7 @@ namespace Oetools.Sakoe.Command.Oe {
 
             var executable = UoeUtilities.GetProExecutableFromDlc(dlcPath);
 
+            args = args.ToCleanCliArgs();
             Log?.Debug($"Executing command:\n{executable.ToCliArg()} {args}");
 
             var process = new Process {
@@ -218,6 +222,13 @@ namespace Oetools.Sakoe.Command.Oe {
             };
 
             process.Start();
+
+            if (!DetachedMode) {
+                var detach = SpinUntilConditionOrDetachedOrExited(() => process.HasExited, "exit the program");
+                if (!detach && !process.HasExited) {
+                    process.Kill();
+                }
+            }
 
             return 0;
         }

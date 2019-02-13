@@ -18,6 +18,7 @@
 // ========================================================================
 #endregion
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Threading;
@@ -39,16 +40,16 @@ namespace Oetools.Sakoe.Command {
 
         private const string VerbosityShortName = "-vb";
 
-        [Option(VerbosityShortName + "|--verbosity <level>", "Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`.", CommandOptionType.SingleOrNoValue)]
+        [Option(VerbosityShortName + "|--verbosity <level>", "Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`.", CommandOptionType.SingleOrNoValue, Inherited = true)]
         public (bool HasValue, ConsoleLogThreshold? Value) VerbosityThreshold { get; set; }
 
-        [Option("-do|--debug-output <file>", "Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`.", CommandOptionType.SingleOrNoValue)]
+        [Option("-lo|--log-file <path>", "Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`.", CommandOptionType.SingleOrNoValue, Inherited = true)]
         public (bool HasValue, string Value) LogOutputFilePath { get; set; }
 
-        [Option("-wl|--with-logo", "Always show the logo on start.", CommandOptionType.NoValue)]
+        [Option("-wl|--with-logo", "Always show the logo on start.", CommandOptionType.NoValue, Inherited = true)]
         public bool IsLogoOn { get; set; }
 
-        [Option("-pm|--progress-mode <mode>", "Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done.", CommandOptionType.SingleValue)]
+        [Option("-pb|--progress-bar <mode>", "Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done.", CommandOptionType.SingleValue, Inherited = true)]
         public ConsoleProgressBarDisplayMode? ProgressBarDisplayMode { get; set; }
 
         protected ConsoleLogThreshold Verbosity => VerbosityThreshold.HasValue ? VerbosityThreshold.Value ?? ConsoleLogThreshold.Debug : ConsoleLogThreshold.Info;
@@ -56,6 +57,8 @@ namespace Oetools.Sakoe.Command {
         protected ILogger Log { get; private set; }
 
         protected IConsoleOutput Out { get; private set; }
+
+        protected IConsoleImplementation Con { get; private set; }
 
         protected IHelpFormatter HelpFormatter { get; private set; }
 
@@ -85,6 +88,7 @@ namespace Oetools.Sakoe.Command {
                 VerbosityThreshold = (true, threshold);
             }
 
+            Con = console as IConsoleImplementation;
             Log = ConsoleLogger2.Singleton;
             Out = ConsoleLogger2.Singleton;
             HelpFormatter = HelpGenerator.Singleton;
@@ -198,10 +202,12 @@ namespace Oetools.Sakoe.Command {
         protected virtual void ConsoleOnCancelKeyPress(object sender, ConsoleCancelEventArgs e) {
             if (Monitor.TryEnter(_lock, 500)) {
                 try {
+                    Log.Warn($"CTRL+C pressed (press {3 - _numberOfCancelKeyPress} times more for instantaneous exit)");
+                    if (_numberOfCancelKeyPress == 0) {
+                        Log.Warn("Cancelling execution, please be patient...");
+                    }
                     _numberOfCancelKeyPress++;
-                    Log.Warn($"CTRL+C pressed (press {4 - _numberOfCancelKeyPress} times more for instantaneous exit)");
-                    Log.Warn("Cancelling execution, please be patient...");
-                    ConsoleImplementation.Singleton.ResetColor();
+                    Con.ResetColor();
                     _cancelSource.Cancel();
                     if (_numberOfCancelKeyPress < 4) {
                         e.Cancel = true;
@@ -210,6 +216,30 @@ namespace Oetools.Sakoe.Command {
                     Monitor.Exit(_lock);
                 }
             }
+        }
+
+        /// <summary>
+        /// Stops the program execution until a condition is fulfilled or CTRL+C is pressed or CTRL+D is pressed.
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="messageActionOnCtrlC"></param>
+        /// <returns>Returns true if CTRL+D has been pressed.</returns>
+        protected bool SpinUntilConditionOrDetachedOrExited(Func<bool> condition, string messageActionOnCtrlC) {
+            Out.WriteResultOnNewLine($"Press CTRL+C to {messageActionOnCtrlC}.");
+            Out.WriteResultOnNewLine("Press CTRL+D to detach and go back to prompt.");
+            do {
+                SpinWait.SpinUntil(() => condition() || Con.KeyAvailable || _cancelSource.IsCancellationRequested);
+                if (condition() || _cancelSource.IsCancellationRequested) {
+                    break;
+                }
+                var pressedKey = Con.ReadKey();
+                if ((pressedKey.Modifiers & ConsoleModifiers.Control) != 0 && pressedKey.Key == ConsoleKey.D) {
+                    Log.Info("CTRL+D pressed, detaching.");
+                    return true;
+                }
+            } while (!_cancelSource.IsCancellationRequested);
+
+            return false;
         }
     }
 

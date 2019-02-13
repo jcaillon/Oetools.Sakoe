@@ -90,6 +90,12 @@ namespace Oetools.Sakoe.ConLog {
         }
 
         /// <inheritdoc />
+        public ConsoleKeyInfo ReadKey(bool intercept = true) => Console.ReadKey(intercept);
+
+        /// <inheritdoc />
+        public bool KeyAvailable => Console.KeyAvailable;
+
+        /// <inheritdoc />
         public void ResetColor() {
             Console.ResetColor();
         }

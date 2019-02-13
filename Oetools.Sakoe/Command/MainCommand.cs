@@ -70,7 +70,6 @@ namespace Oetools.Sakoe.Command {
         }
 
         public static int ExecuteMainCommand(string[] args) {
-            // TODO: global configuration in an .xml next to sakoe.exe that store default verbosity, log path, http proxy and so on...
             var console = ConsoleImplementation2.Singleton;
             try {
                 console.CursorVisible = false;

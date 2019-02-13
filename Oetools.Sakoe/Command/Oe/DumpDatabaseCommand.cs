@@ -62,14 +62,14 @@ namespace Oetools.Sakoe.Command.Oe {
     }
 
     [Command(
-        "sql", "sq",
+        "sql-schema", "ss",
         Description = "Dump the SQL-92 schema of a database."
     )]
     internal class DumpSqlDatabaseCommand : ADatabaseSingleConnectionCommand {
 
         [Required]
         [LegalFilePath]
-        [Argument(0, "<dump-file>", "Path to the output " + UoeDatabaseLocation.SqlExtension + " file that will contain the sql-92 definition of the database (extension is optional).")]
+        [Argument(0, "<dump-file>", "Path to the output " + UoeDatabaseLocation.SqlSchemaDefinitionExtension + " file that will contain the sql-92 definition of the database (extension is optional).")]
         public string DumpFilePath { get; set; }
 
         [Option("-op|--options", @"Use options for the sqlschema utility (see the documentation online). Defaults to dumping everything.", CommandOptionType.SingleValue)]
@@ -77,7 +77,7 @@ namespace Oetools.Sakoe.Command.Oe {
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             using (var ope = GetAdministrator()) {
-                ope.DumpSqlSchema(GetSingleDatabaseConnection(), DumpFilePath.AddFileExtention(UoeDatabaseLocation.SqlExtension), Options);
+                ope.DumpSqlSchema(GetSingleDatabaseConnection(), DumpFilePath.AddFileExtention(UoeDatabaseLocation.SqlSchemaDefinitionExtension), Options);
             }
             return 0;
         }
@@ -91,7 +91,7 @@ namespace Oetools.Sakoe.Command.Oe {
 
         [Required]
         [LegalFilePath]
-        [Argument(0, "<dump-directory>", "Directory path that will contain the data dumped. Each table of the database will be dumped as an individual " + UoeDatabaseLocation.SqlExtension + " file named like the table.")]
+        [Argument(0, "<dump-directory>", "Directory path that will contain the data dumped. Each table of the database will be dumped as an individual " + UoeDatabaseLocation.SqlDataExtension + " file named like the table.")]
         public string DumpDirectoryPath { get; set; }
 
         [Option("-op|--options", @"Use options for the sqldump utility (see the documentation online). Defaults to dumping every table.", CommandOptionType.SingleValue)]

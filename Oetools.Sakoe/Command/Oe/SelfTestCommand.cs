@@ -344,11 +344,11 @@ sakoe st input -b2 s1024"
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
 
-            Out.WriteOnNewLine($"WindowWidth = {ConsoleImplementation.Singleton.WindowWidth}");
-            Out.WriteOnNewLine($"CursorTop = {ConsoleImplementation.Singleton.CursorTop}");
-            Out.WriteOnNewLine($"CursorVisible = {ConsoleImplementation.Singleton.CursorVisible}");
-            Out.WriteOnNewLine($"IsOutputRedirected = {ConsoleImplementation.Singleton.IsOutputRedirected}");
-            Out.WriteOnNewLine($"IsErrorRedirected = {ConsoleImplementation.Singleton.IsErrorRedirected}");
+            Out.WriteOnNewLine($"WindowWidth = {Con.WindowWidth}");
+            Out.WriteOnNewLine($"CursorTop = {Con.CursorTop}");
+            Out.WriteOnNewLine($"CursorVisible = {Con.CursorVisible}");
+            Out.WriteOnNewLine($"IsOutputRedirected = {Con.IsOutputRedirected}");
+            Out.WriteOnNewLine($"IsErrorRedirected = {Con.IsErrorRedirected}");
 
             typeof(ConsoleColor).ForEach<ConsoleColor>((s, l) => {
                 Out.WriteOnNewLine($"==== {s} ====", (ConsoleColor) l);

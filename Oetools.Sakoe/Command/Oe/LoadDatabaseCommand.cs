@@ -56,13 +56,13 @@ namespace Oetools.Sakoe.Command.Oe {
 
     [Command(
         "sql-data", "sd",
-        Description = "Load the database data from SQL-92 format files (" + UoeDatabaseLocation.SqlExtension + ")."
+        Description = "Load the database data from SQL-92 format files (" + UoeDatabaseLocation.SqlDataExtension + ")."
     )]
     internal class LoadSqlDataDatabaseCommand : ADatabaseSingleConnectionCommand {
 
         [DirectoryExists]
         [LegalFilePath]
-        [Argument(0, "<data-directory>", "Directory path that contain the data to load. Each table of the database should be stored as an individual " + UoeDatabaseLocation.SqlExtension + " file named like the `owner.table`.")]
+        [Argument(0, "<data-directory>", "Directory path that contain the data to load. Each table of the database should be stored as an individual " + UoeDatabaseLocation.SqlDataExtension + " file named like the `owner.table` (e.g. PUB.table1).")]
         public string LoadDirectoryPath { get; set; }
 
         [Option("-op|--options", @"Use options for the sqlload utility (see the documentation online). Defaults to loading every table.", CommandOptionType.SingleValue)]

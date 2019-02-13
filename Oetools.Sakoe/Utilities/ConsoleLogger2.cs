@@ -2,17 +2,17 @@
 // ========================================================================
 // Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
 // This file (ConsoleLogger2.cs) is part of Oetools.Sakoe.
-// 
+//
 // Oetools.Sakoe is a free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // Oetools.Sakoe is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
@@ -27,7 +27,7 @@ using ITraceLogger = Oetools.Builder.Utilities.ITraceLogger;
 using Utils = Oetools.Utilities.Lib.Utils;
 
 namespace Oetools.Sakoe.Utilities {
-    
+
     public class ConsoleLogger2 : ConsoleLogger, ILogger, ITraceLogger {
 
         private static ConsoleLogger2 _instance;
@@ -35,19 +35,19 @@ namespace Oetools.Sakoe.Utilities {
         /// <summary>
         /// A singleton instance of <see cref="ConsoleLogger2" />.
         /// </summary>
-        public new static ConsoleLogger2 Singleton => _instance ?? (_instance = new ConsoleLogger2(ConsoleImplementation.Singleton));
+        public new static ConsoleLogger2 Singleton => _instance ?? (_instance = new ConsoleLogger2(ConsoleImplementation2.Singleton));
 
         /// <summary>
         /// Initializes a new instance of <see cref="ConsoleLogger2"/>.
         /// </summary>
         private ConsoleLogger2(IConsoleImplementation console) : base(console) { }
-        
+
         private StringBuilder _logContent;
         private string _logOutputFilePath;
 
         /// <inheritdoc />
         public new ITraceLogger Trace => LogTheshold <= ConsoleLogThreshold.Debug ? this : null;
-        
+
         /// <inheritdoc />
         public new ILogger If(bool condition) => condition ? this : null;
 
@@ -123,6 +123,6 @@ namespace Oetools.Sakoe.Utilities {
                 }
             }
         }
-        
+
     }
 }

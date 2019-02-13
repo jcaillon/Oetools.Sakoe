@@ -108,7 +108,8 @@ namespace Oetools.Sakoe.Utilities {
 
             GenerateUsage(fullCommandLine, arguments, options, commands, commandType.GetProperty("RemainingArgs"));
             GenerateArguments(arguments, firstColumnWidth);
-            GenerateOptions(options, optionShortNameColumnWidth, optionLongNameColumnWidth);
+            GenerateOptions(options.Where(o => !o.Inherited).ToList(), optionShortNameColumnWidth, optionLongNameColumnWidth, false);
+            GenerateOptions(options.Where(o => o.Inherited).ToList(), optionShortNameColumnWidth, optionLongNameColumnWidth, true);
             GenerateCommands(application, fullCommandLine, commands, firstColumnWidth);
 
             var additionalHelpTextAttribute = (CommandAdditionalHelpTextAttribute) Attribute.GetCustomAttribute(commandType, typeof(CommandAdditionalHelpTextAttribute), true);
@@ -184,11 +185,11 @@ namespace Oetools.Sakoe.Utilities {
         /// <summary>
         /// Generate the lines that show information about options
         /// </summary>
-        protected virtual void GenerateOptions(IReadOnlyList<CommandOption> visibleOptions, int optionShortNameColumnWidth, int optionLongNameColumnWidth) {
+        protected virtual void GenerateOptions(IReadOnlyList<CommandOption> visibleOptions, int optionShortNameColumnWidth, int optionLongNameColumnWidth, bool inheritedOptions) {
             var firstColumnWidth = optionShortNameColumnWidth + optionLongNameColumnWidth;
             if (visibleOptions.Any()) {
                 WriteOnNewLine(null);
-                WriteSectionTitle("OPTIONS");
+                WriteSectionTitle(inheritedOptions ? "INHERITED OPTIONS" : "OPTIONS");
 
                 foreach (var opt in visibleOptions) {
                     var shortName = string.IsNullOrEmpty(opt.SymbolName) ? string.IsNullOrEmpty(opt.ShortName) ? "" : $"-{opt.ShortName}, " : $"-{opt.SymbolName}, ";

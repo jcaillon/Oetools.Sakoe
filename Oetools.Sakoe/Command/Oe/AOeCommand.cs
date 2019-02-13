@@ -17,6 +17,8 @@
 // along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
+using System;
 using System.IO;
 using System.Linq;
 using Oetools.Builder.Utilities;
@@ -91,7 +93,7 @@ namespace Oetools.Sakoe.Command.Oe {
         /// <returns></returns>
         protected string GetRemainingArgsAsProArgs(string[] remainingArgs) {
             if (remainingArgs != null && remainingArgs.Any()) {
-                return UoeUtilities.GetCleanCliArgs(string.Join(" ", remainingArgs));
+                return remainingArgs.Quoter().ToCleanQuoterArgs();
             }
             return null;
         }

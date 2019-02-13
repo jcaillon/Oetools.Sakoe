@@ -30,7 +30,7 @@ namespace Oetools.Sakoe.Command.Oe {
         private string _dlcDirectoryPath;
 
         [DirectoryExists]
-        [Option("-dl|--dlc", "The path to the directory containing the Openedge installation. Will default to the path found in the " + UoeConstants.OeDlcAlternativeEnvVar + " or " + UoeConstants.OeDlcEnvVar + " environment variable if it exists.", CommandOptionType.SingleValue)]
+        [Option("-dl|--dlc", "The path to the directory containing the Openedge installation. Will default to the path found in the `" + UoeConstants.OeDlcAlternativeEnvVar + "` or `" + UoeConstants.OeDlcEnvVar + "` environment variable if it exists.", CommandOptionType.SingleValue, Inherited = true)]
         public string DlcDirectoryPath { get; }
 
         /// <summary>
