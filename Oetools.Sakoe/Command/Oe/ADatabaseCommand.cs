@@ -8,6 +8,7 @@ using System.Text;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Command.Exceptions;
 using Oetools.Sakoe.Utilities.Extension;
+using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge;
 using Oetools.Utilities.Openedge.Database;
@@ -206,17 +207,17 @@ namespace Oetools.Sakoe.Command.Oe {
 
             argsBuilder.Append(' ').Append(GetRemainingArgsAsProArgs(RemainingArgs));
 
-            var args = argsBuilder.Trim().ToString();
+            ProcessArgs args = argsBuilder.Trim().ToString();
 
             var executable = UoeUtilities.GetProExecutableFromDlc(dlcPath);
 
-            args = args.ToCleanCliArgs();
-            Log?.Debug($"Executing command:\n{executable.ToCliArg()} {args}");
+            var argsString = args.ToCliArgs();
+            Log?.Debug($"Executing command:\n{executable.ToCliArg()} {argsString}");
 
             var process = new Process {
                 StartInfo = new ProcessStartInfo {
                     FileName = executable,
-                    Arguments = args,
+                    Arguments = argsString,
                     WorkingDirectory = ExecutionWorkingDirectory ?? Directory.GetCurrentDirectory()
                 }
             };

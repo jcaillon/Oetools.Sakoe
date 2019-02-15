@@ -93,7 +93,7 @@ namespace Oetools.Sakoe.Command.Oe {
         /// <returns></returns>
         protected string GetRemainingArgsAsProArgs(string[] remainingArgs) {
             if (remainingArgs != null && remainingArgs.Any()) {
-                return remainingArgs.Quoter().ToCleanQuoterArgs();
+                return remainingArgs.ToQuotedArgs().FromQuotedToQuotedFlattenedArgs();
             }
             return null;
         }

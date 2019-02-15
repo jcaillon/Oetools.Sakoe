@@ -61,6 +61,7 @@ Each command is well documented on its own, don't be afraid to use the " + MainC
             formatter.WriteOnNewLine(@"How to use this command line interface tool:
   - You can escape white spaces in argument/option values by using double quotes (i.e. ""my value"").
   - If you need to use a double quote within a double quote, you can do so by double quoting the double quotes (i.e. ""my """"special"""" value"").
+  - If an extra layer is needed, just double the doubling (i.e. -opt ""-mysubopt """"my special """"""""value"""""""""""""").
   - In the 'USAGE' help section, arguments between brackets (i.e. []) are optionals.");
 
             formatter.WriteOnNewLine(null);

@@ -73,7 +73,7 @@ Learn more here: https://datadigger.wordpress.com."
         /// </summary>
         /// <param name="readOnly"></param>
         /// <returns></returns>
-        public static string DataDiggerStartUpParameters(bool readOnly) => $"-pf DataDigger.pf -p {(readOnly ? "DataReader.p" : "DataDigger.p")} -T {Utils.CreateTempDirectory(Utils.GetRandomName()).Quoter()}";
+        public static string DataDiggerStartUpParameters(bool readOnly) => $"-pf DataDigger.pf -p {(readOnly ? "DataReader.p" : "DataDigger.p")} -T {Utils.CreateTempDirectory(Utils.GetRandomName()).ToQuotedArg()}";
     }
 
     [Command(
