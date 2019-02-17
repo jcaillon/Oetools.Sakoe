@@ -32,6 +32,7 @@ using Oetools.Sakoe.Command.Exceptions;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge;
+using Oetools.Utilities.Openedge.Execution;
 
 namespace Oetools.Sakoe.Command.Oe {
 
@@ -73,7 +74,7 @@ Learn more here: https://datadigger.wordpress.com."
         /// </summary>
         /// <param name="readOnly"></param>
         /// <returns></returns>
-        public static string DataDiggerStartUpParameters(bool readOnly) => $"-pf DataDigger.pf -p {(readOnly ? "DataReader.p" : "DataDigger.p")} -T {Utils.CreateTempDirectory(Utils.GetRandomName()).ToQuotedArg()}";
+        public static UoeProcessArgs DataDiggerStartUpParameters(bool readOnly) => $"-pf DataDigger.pf -p {(readOnly ? "DataReader.p" : "DataDigger.p")} -T {Utils.CreateTempDirectory(Utils.GetRandomName())}";
     }
 
     [Command(

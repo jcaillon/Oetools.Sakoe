@@ -55,7 +55,7 @@ namespace Oetools.Sakoe.Command.Oe {
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
 
-            var msg = UoeUtilities.GetOpenedgeProMessage(GetDlcPath(), MessageNumber);
+            var msg = UoeProMessage.GetProMessage(GetDlcPath(), MessageNumber);
 
             Out.WriteResultOnNewLine($"{(string.IsNullOrEmpty(msg.Category) ? "" : $"({msg.Category}) ")}{msg.Text}");
             Out.WriteResultOnNewLine(null);
