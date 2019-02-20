@@ -74,7 +74,7 @@ Learn more here: https://datadigger.wordpress.com."
         /// </summary>
         /// <param name="readOnly"></param>
         /// <returns></returns>
-        public static UoeProcessArgs DataDiggerStartUpParameters(bool readOnly) => $"-pf DataDigger.pf -p {(readOnly ? "DataReader.p" : "DataDigger.p")} -T {Utils.CreateTempDirectory(Utils.GetRandomName())}";
+        public static UoeProcessArgs DataDiggerStartUpParameters(bool readOnly) => new UoeProcessArgs().Append("-pf").Append("DataDigger.pf").Append("-p").Append(readOnly ? "DataReader.p" : "DataDigger.p").Append("-T").Append(Utils.CreateTempDirectory(Utils.GetRandomName())) as UoeProcessArgs;
     }
 
     [Command(
@@ -121,7 +121,7 @@ Learn more here: https://datadigger.wordpress.com."
         [Option("-b|--get-pre-release", "Accept to install pre-release (i.e. 'beta') versions of the tool.", CommandOptionType.NoValue)]
         public bool GetPreRelease { get; set; } = false;
 
-        [Option("-p|--proxy", "The http proxy to use for this update. Useful if you are behind a corporate firewall.\nThe expected format is: 'http(s)://[user:password@]host[:port]'.\nIt is also possible to use the environment variables OE_HTTP_PROXY or HTTP_PROXY to set this value.", CommandOptionType.SingleValue)]
+        [Option("-p|--proxy", "The http proxy to use for this update. Useful if you are behind a corporate firewall.\nThe expected format is: 'http(s)://[user:password@]host[:port]'.\nIt is also possible to use the environment variables OE_HTTP_PROXY or http_proxy to set this value.", CommandOptionType.SingleValue)]
         public string HttpProxy { get; set; }
 
         [Option("-f|--force", "Force the installation even if the tool is already installed.", CommandOptionType.NoValue)]
@@ -161,6 +161,8 @@ Learn more here: https://datadigger.wordpress.com."
             Utils.CreateDirectoryIfNeeded(destinationDir);
 
             using (var zip = ZipFile.Open(tempFilePath, ZipArchiveMode.Read)) {
+                var count = zip.Entries.Count;
+                var i = 0;
                 foreach (var zipEntry in zip.Entries) {
                     if (zipEntry.Length == 0 && string.IsNullOrEmpty(zipEntry.Name)) {
                         continue; // folder
@@ -173,8 +175,9 @@ Learn more here: https://datadigger.wordpress.com."
                     correctedPath = correctedPath.Substring(correctedPath.IndexOf("/", StringComparison.Ordinal) + 1);
                     var extractionPath = Path.Combine(destinationDir, correctedPath);
                     Utils.CreateDirectoryIfNeeded(Path.GetDirectoryName(extractionPath));
-                    Log.Debug($"Extracting file to: {extractionPath.PrettyQuote()}.");
+                    Log.ReportProgress(count, i, $"Extracting file to: {extractionPath.PrettyQuote()}.");
                     zipEntry.ExtractToFile(extractionPath, true);
+                    i++;
                 }
             }
 

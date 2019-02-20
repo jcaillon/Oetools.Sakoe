@@ -153,9 +153,9 @@ namespace Oetools.Sakoe.Command.Oe {
                 httpProxy = httpProxyFromEnv;
             }
 
-            if (!string.IsNullOrEmpty(httpProxy) && httpProxy.ParseHttpAddress(out var userName, out var password, out var host, out var port)) {
+            if (!string.IsNullOrEmpty(httpProxy) && httpProxy.ParseWebProxy(out var host, out var port, out var user, out var password)) {
                 log.Debug($"Using http proxy: {httpProxy.PrettyQuote()}.");
-                updater.UseProxy($"{host}{(port > 0 ? $":{port}" : "")}", userName, password);
+                updater.UseProxy($"{host}:{port}", user, password);
             }
         }
     }

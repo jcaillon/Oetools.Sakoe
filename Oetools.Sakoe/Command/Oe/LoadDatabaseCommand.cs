@@ -1,4 +1,5 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
+using Oetools.Utilities.Lib;
 using Oetools.Utilities.Openedge.Database;
 
 namespace Oetools.Sakoe.Command.Oe {
@@ -70,7 +71,7 @@ namespace Oetools.Sakoe.Command.Oe {
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             using (var ope = GetAdministrator()) {
-                ope.LoadSqlData(GetSingleDatabaseConnection(), LoadDirectoryPath, Options);
+                ope.LoadSqlData(GetSingleDatabaseConnection(), LoadDirectoryPath, new ProcessArgs().AppendFromQuotedArgs(Options));
             }
             return 0;
         }

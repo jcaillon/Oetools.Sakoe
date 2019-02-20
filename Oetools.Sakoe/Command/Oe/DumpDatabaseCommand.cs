@@ -77,7 +77,7 @@ namespace Oetools.Sakoe.Command.Oe {
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             using (var ope = GetAdministrator()) {
-                ope.DumpSqlSchema(GetSingleDatabaseConnection(), DumpFilePath.AddFileExtention(UoeDatabaseLocation.SqlSchemaDefinitionExtension), Options);
+                ope.DumpSqlSchema(GetSingleDatabaseConnection(), DumpFilePath.AddFileExtention(UoeDatabaseLocation.SqlSchemaDefinitionExtension), new ProcessArgs().AppendFromQuotedArgs(Options));
             }
             return 0;
         }
@@ -99,7 +99,7 @@ namespace Oetools.Sakoe.Command.Oe {
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             using (var ope = GetAdministrator()) {
-                ope.DumpSqlData(GetSingleDatabaseConnection(), DumpDirectoryPath, Options);
+                ope.DumpSqlData(GetSingleDatabaseConnection(), DumpDirectoryPath, new ProcessArgs().AppendFromQuotedArgs(Options));
             }
             return 0;
         }

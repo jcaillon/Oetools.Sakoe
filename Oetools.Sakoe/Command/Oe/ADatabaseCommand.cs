@@ -12,6 +12,7 @@ using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge;
 using Oetools.Utilities.Openedge.Database;
+using Oetools.Utilities.Openedge.Execution;
 
 namespace Oetools.Sakoe.Command.Oe {
 
@@ -116,14 +117,14 @@ namespace Oetools.Sakoe.Command.Oe {
             new UoeDatabaseOperator(GetDlcPath(), GetOperatorEncoding()) {
                 Log = Log,
                 CancelToken = CancelToken,
-                InternationalizationStartupParameters = InternationalizationStartupParameters
+                InternationalizationStartupParameters = new UoeProcessArgs().AppendFromQuotedArgs(InternationalizationStartupParameters)
             };
 
         protected UoeDatabaseAdministrator GetAdministrator() =>
             new UoeDatabaseAdministrator(GetDlcPath(), GetOperatorEncoding()) {
                 Log = Log,
                 CancelToken = CancelToken,
-                InternationalizationStartupParameters = InternationalizationStartupParameters
+                InternationalizationStartupParameters = new UoeProcessArgs().AppendFromQuotedArgs(InternationalizationStartupParameters)
             };
     }
 
@@ -190,29 +191,24 @@ namespace Oetools.Sakoe.Command.Oe {
         [Description("[-- <extra pro args>...]")]
         public string[] RemainingArgs { get; set; }
 
-        protected abstract string ToolArguments();
+        protected abstract ProcessArgs ToolArguments();
 
         protected virtual string ExecutionWorkingDirectory => null;
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             var dlcPath = GetDlcPath();
 
-            var argsBuilder = new StringBuilder(ToolArguments());
-
-            argsBuilder.Append(' ').Append(UoeDatabaseConnection.GetConnectionString(GetDatabaseConnections(), true));
-
+            var args = new UoeProcessArgs();
+            args.Append(ToolArguments(), GetDatabaseConnections());
             if (UoeUtilities.CanProVersionUseNoSplashParameter(UoeUtilities.GetProVersionFromDlc(dlcPath))) {
-                argsBuilder.Append(" -nosplash");
+                args.Append("-nosplash");
             }
-
-            argsBuilder.Append(' ').Append(GetRemainingArgsAsProArgs(RemainingArgs));
-
-            ProcessArgs args = argsBuilder.Trim().ToString();
+            args.Append(RemainingArgs);
 
             var executable = UoeUtilities.GetProExecutableFromDlc(dlcPath);
 
             var argsString = args.ToCliArgs();
-            Log?.Debug($"Executing command:\n{executable.ToCliArg()} {argsString}");
+            Log?.Debug($"Executing command:\n{ProcessArgs.ToCliArg(executable)} {argsString}");
 
             var process = new Process {
                 StartInfo = new ProcessStartInfo {

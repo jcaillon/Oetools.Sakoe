@@ -28,6 +28,7 @@ using Oetools.Sakoe.Utilities.Extension;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge.Database;
+using Oetools.Utilities.Openedge.Execution;
 
 namespace Oetools.Sakoe.Command.Oe {
 
@@ -63,7 +64,7 @@ namespace Oetools.Sakoe.Command.Oe {
         [Option("-ro|--read-only", "Start DataDigger in read-only mode (records will not modifiable).", CommandOptionType.NoValue)]
         public bool ReadOnly { get; set; } = false;
 
-        protected override string ToolArguments() => $"{DataDiggerCommand.DataDiggerStartUpParameters(ReadOnly)}";
+        protected override ProcessArgs ToolArguments() => DataDiggerCommand.DataDiggerStartUpParameters(ReadOnly);
 
         protected override string ExecutionWorkingDirectory => DataDiggerCommand.DataDiggerInstallationDirectory;
 
@@ -84,7 +85,7 @@ namespace Oetools.Sakoe.Command.Oe {
     )]
     internal class DatabaseDictionaryCommand : ADatabaseToolCommand {
 
-        protected override string ToolArguments() => "-p _dict.p";
+        protected override ProcessArgs ToolArguments() => new ProcessArgs().Append("-p", "_dict.p");
 
     }
 
@@ -94,7 +95,7 @@ namespace Oetools.Sakoe.Command.Oe {
     )]
     internal class DatabaseAdminCommand : ADatabaseToolCommand {
 
-        protected override string ToolArguments() => "-p _admin.p";
+        protected override ProcessArgs ToolArguments() =>  new ProcessArgs().Append("-p", "_admin.p");
     }
 
     [Command(
@@ -120,7 +121,7 @@ namespace Oetools.Sakoe.Command.Oe {
     internal class RepairDatabaseCommand : ADatabaseSingleLocationWithAccessArgsCommand {
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            GetOperator().RepairDatabaseControlInfo(GetSingleDatabaseLocation(), DatabaseAccessStartupParameters);
+            GetOperator().RepairDatabaseControlInfo(GetSingleDatabaseLocation(), new UoeProcessArgs().AppendFromQuotedArgs(DatabaseAccessStartupParameters));
             return 0;
         }
     }
@@ -172,7 +173,7 @@ namespace Oetools.Sakoe.Command.Oe {
         public string[] RemainingArgs { get; set; }
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            GetOperator().Shutdown(GetSingleDatabaseLocation(), GetRemainingArgsAsProArgs(RemainingArgs));
+            GetOperator().Shutdown(GetSingleDatabaseLocation(), new ProcessArgs().Append(RemainingArgs));
             return 0;
         }
     }
@@ -255,7 +256,7 @@ namespace Oetools.Sakoe.Command.Oe {
             }
 
             var db = GetSingleDatabaseLocation();
-            GetOperator().Start(db, HostName, ServiceName, NbUsers.HasValue ? (int?) NbUsers.value : null, GetRemainingArgsAsProArgs(RemainingArgs));
+            GetOperator().Start(db, HostName, ServiceName, NbUsers.HasValue ? (int?) NbUsers.value : null, new UoeProcessArgs().Append(RemainingArgs) as UoeProcessArgs);
 
             Log.Info("Multi-user connection string:");
             Out.WriteResultOnNewLine(UoeDatabaseConnection.NewMultiUserConnection(db, null, HostName, ServiceName).ToString());

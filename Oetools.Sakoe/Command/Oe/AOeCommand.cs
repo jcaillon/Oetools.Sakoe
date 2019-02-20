@@ -85,18 +85,5 @@ namespace Oetools.Sakoe.Command.Oe {
             }
             throw new CommandException($"No project file ({OeBuilderConstants.OeProjectExtension}) named {projectFileName} found in the current folder {Directory.GetCurrentDirectory().PrettyQuote()} nor the {OeBuilderConstants.OeProjectDirectory} directory.");
         }
-
-        /// <summary>
-        /// Format the remaining args passed by the user to arguments usable for a pro process.
-        /// </summary>
-        /// <param name="remainingArgs"></param>
-        /// <returns></returns>
-        protected string GetRemainingArgsAsProArgs(string[] remainingArgs) {
-            if (remainingArgs != null && remainingArgs.Any()) {
-                return remainingArgs.ToQuotedArgs().FromQuotedToQuotedFlattenedArgs();
-            }
-            return null;
-        }
-
     }
 }

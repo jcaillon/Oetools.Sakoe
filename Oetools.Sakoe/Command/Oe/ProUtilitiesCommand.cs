@@ -22,6 +22,7 @@ using System.IO;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge;
+using Oetools.Utilities.Openedge.Execution;
 
 namespace Oetools.Sakoe.Command.Oe {
 
@@ -52,7 +53,7 @@ namespace Oetools.Sakoe.Command.Oe {
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
 
-            Out.WriteResultOnNewLine(UoeUtilities.GetConnectionStringFromPfFile(File));
+            Out.WriteResultOnNewLine(new UoeProcessArgs().AppendFromPfFilePath(File).ToQuotedArgs());
 
             return 0;
         }
