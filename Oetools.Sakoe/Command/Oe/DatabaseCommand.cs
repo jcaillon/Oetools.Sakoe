@@ -235,7 +235,7 @@ namespace Oetools.Sakoe.Command.Oe {
         [Option("-np|" + NextPortAvailableLongName, "Port number, the next available port after this number will be used to start the database.", CommandOptionType.SingleValue)]
         public (bool HasValue, int value) NextPortAvailable { get; set; }
 
-        [Option("-nu|--nb-users", "Number of users that should be able to connect to this database simultaneously.", CommandOptionType.SingleValue)]
+        [Option("-n|--nb-users", "Number of users that should be able to connect to this database simultaneously.", CommandOptionType.SingleValue)]
         public (bool HasValue, int value) NbUsers { get; set; }
 
         [Description("[-- <extra proserve args>...]")]
@@ -256,10 +256,10 @@ namespace Oetools.Sakoe.Command.Oe {
             }
 
             var db = GetSingleDatabaseLocation();
-            GetOperator().Start(db, HostName, ServiceName, NbUsers.HasValue ? (int?) NbUsers.value : null, new UoeProcessArgs().Append(RemainingArgs) as UoeProcessArgs);
+            var connection = GetOperator().Start(db, HostName, ServiceName, NbUsers.HasValue ? (int?) NbUsers.value : null, new UoeProcessArgs().Append(RemainingArgs) as UoeProcessArgs);
 
             Log.Info("Multi-user connection string:");
-            Out.WriteResultOnNewLine(UoeDatabaseConnection.NewMultiUserConnection(db, null, HostName, ServiceName).ToString());
+            Out.WriteResultOnNewLine(connection.ToString());
 
             return 0;
         }
