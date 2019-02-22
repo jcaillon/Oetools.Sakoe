@@ -39,6 +39,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Subcommand(typeof(CreateDatabaseCommand))]
     [Subcommand(typeof(StartDatabaseCommand))]
     [Subcommand(typeof(StopDatabaseCommand))]
+    [Subcommand(typeof(KillDatabaseCommand))]
     [Subcommand(typeof(KillAllDatabaseCommand))]
     [Subcommand(typeof(DeleteDatabaseCommand))]
     [Subcommand(typeof(RepairDatabaseCommand))]
@@ -173,7 +174,19 @@ namespace Oetools.Sakoe.Command.Oe {
         public string[] RemainingArgs { get; set; }
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            GetOperator().Shutdown(GetSingleDatabaseLocation(), new ProcessArgs().Append(RemainingArgs));
+            GetOperator().Stop(GetSingleDatabaseLocation(), new ProcessArgs().Append(RemainingArgs));
+            return 0;
+        }
+    }
+
+    [Command(
+        "kill", "ki",
+        Description = "Kill the broker/server processes running for a particular a database."
+    )]
+    internal class KillDatabaseCommand : ADatabaseSingleLocationCommand {
+
+        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
+            GetOperator().Kill(GetSingleDatabaseLocation());
             return 0;
         }
     }
@@ -207,8 +220,8 @@ namespace Oetools.Sakoe.Command.Oe {
     }
 
     [Command(
-        "kill", "ki",
-        Description = "Kill all the broker processes running on this machine.",
+        "kill-all", "ka",
+        Description = "Kill all the broker/server processes running on this machine.",
         ExtendedHelpText = "A broker process is generally named: `_mprosrv`."
     )]
     internal class KillAllDatabaseCommand : ABaseCommand {
@@ -235,9 +248,6 @@ namespace Oetools.Sakoe.Command.Oe {
         [Option("-np|" + NextPortAvailableLongName, "Port number, the next available port after this number will be used to start the database.", CommandOptionType.SingleValue)]
         public (bool HasValue, int value) NextPortAvailable { get; set; }
 
-        [Option("-n|--nb-users", "Number of users that should be able to connect to this database simultaneously.", CommandOptionType.SingleValue)]
-        public (bool HasValue, int value) NbUsers { get; set; }
-
         [Description("[-- <extra proserve args>...]")]
         public string[] RemainingArgs { get; set; }
 
@@ -251,12 +261,8 @@ namespace Oetools.Sakoe.Command.Oe {
                 ServiceName = UoeDatabaseOperator.GetNextAvailablePort(NextPortAvailable.value).ToString();
             }
 
-            if (NbUsers.HasValue && NbUsers.value <= 0) {
-                throw new CommandException("The number of users can only be strictly superior to zero.");
-            }
-
             var db = GetSingleDatabaseLocation();
-            var connection = GetOperator().Start(db, HostName, ServiceName, NbUsers.HasValue ? (int?) NbUsers.value : null, new UoeProcessArgs().Append(RemainingArgs) as UoeProcessArgs);
+            var connection = GetOperator().Start(db, HostName, ServiceName, new UoeProcessArgs().Append(RemainingArgs) as UoeProcessArgs);
 
             Log.Info("Multi-user connection string:");
             Out.WriteResultOnNewLine(connection.ToString());
