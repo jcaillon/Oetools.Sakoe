@@ -74,7 +74,7 @@ Learn more here: https://datadigger.wordpress.com."
         /// </summary>
         /// <param name="readOnly"></param>
         /// <returns></returns>
-        public static UoeProcessArgs DataDiggerStartUpParameters(bool readOnly) => new UoeProcessArgs().Append("-pf").Append("DataDigger.pf").Append("-p").Append(readOnly ? "DataReader.p" : "DataDigger.p").Append("-T").Append(Utils.CreateTempDirectory(Utils.GetRandomName())) as UoeProcessArgs;
+        public static UoeProcessArgs DataDiggerStartUpParameters(bool readOnly) => new UoeProcessArgs().Append("-pf").Append("DataDigger.pf").Append("-p").Append(readOnly ? "DataReader.p" : "DataDigger.p").Append("-T").Append(Utils.CreateTempDirectory()) as UoeProcessArgs;
     }
 
     [Command(
