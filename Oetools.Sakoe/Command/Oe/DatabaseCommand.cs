@@ -21,6 +21,7 @@
 using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.IO;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Command.Exceptions;
@@ -50,6 +51,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Subcommand(typeof(DatabaseAdminCommand))]
     [Subcommand(typeof(DatabaseDictionaryCommand))]
     [Subcommand(typeof(DatabaseDataDiggerCommand))]
+    [Subcommand(typeof(AdvisorDatabaseCommand))]
     // TODO: project database manipulation!
 //    [Subcommand(typeof(ProjectDatabaseCommand))]
     internal class DatabaseCommand : AExpectSubCommand {
@@ -187,6 +189,46 @@ namespace Oetools.Sakoe.Command.Oe {
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             GetOperator().Kill(GetSingleDatabaseLocation());
+            return 0;
+        }
+    }
+
+    [Command(
+        "advisor", "ar",
+        Description = "Generates an html report which provides pointers to common database configuration issues.",
+        ExtendedHelpText = @"This command uses the Database Advisor which can be found here: http://practicaldba.com/dlmain.html.
+
+The OpenEdge Database Advisor is intended to provide a quick checkup for common database configuration issues. Obviously proper tuning for an application requires much more than any tool can provide, but the advisor should highlight some of the most common low hanging fruit.
+
+For best results you will need a recent database analysis file (proutil -C dbanalys) and you should run this against your production database. A large portion of the suggestions will be based on VST information that will differ greatly between your production and test environments."
+    )]
+    internal class AdvisorDatabaseCommand : ADatabaseSingleConnectionCommand {
+
+        [Required]
+        [LegalFilePath]
+        [Argument(0, "<report-file>", "Path to the output html report file that will contain pointers to common database configuration issues. The extension is optional but it will be changed to .html if it is incorrectly provided.")]
+        public string ReportFilePath { get; set; }
+
+        [LegalFilePath]
+        [Option("-a|--analysis-file", "The file path to a database analysis output. If empty, the analysis will be carried on automatically if the database is local.", CommandOptionType.SingleValue)]
+        public string AnalysisFilePath { get; set; }
+
+        [Option("-u|--unattended", "Do not open the html report with the default browser after its creation.", CommandOptionType.NoValue)]
+        public bool Unattended { get; set; } = false;
+
+        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
+            using (var ope = GetAdministrator()) {
+                ReportFilePath = ReportFilePath.ToAbsolutePath();
+                ReportFilePath = !string.IsNullOrEmpty(ReportFilePath) ? Path.ChangeExtension(ReportFilePath, ".html") : null;
+                ope.GenerateAdvisorReport(GetSingleDatabaseConnection(), ReportFilePath, AnalysisFilePath);
+                if (!Unattended && !string.IsNullOrEmpty(ReportFilePath)) {
+                    try {
+                        Process.Start(ReportFilePath);
+                    } catch (Exception) {
+                        //ignored
+                    }
+                }
+            }
             return 0;
         }
     }
