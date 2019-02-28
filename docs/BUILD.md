@@ -22,6 +22,28 @@ With the following options :
 build.bat
 ```
 
+## dotnet builds
+
+Deplying dotnet core apps: https://docs.microsoft.com/en-us/dotnet/core/deploying/.
+
+```bash
+dotnet restore Oetools.Sakoe/Oetools.Sakoe.csproj
+dotnet publish Oetools.Sakoe/Oetools.Sakoe.csproj -f netcoreapp2.2 -c release -r linux-x64 --self-contained --verbosity minimal /p:UseAppHost=true /p:TrimUnusedDependencies=true
+```
+
+.NET Core on Linux relies on the ICU libraries for globalization support.
+
+On centos and rehl, there are some pre-requisites to running even a self-contained application: 
+https://github.com/dotnet/core/blob/master/Documentation/build-and-install-rhel6-prerequisites.md#making-the-libraries-available-for-a-net-core-application.
+
+We can also publish for invariant mode. In this mode, the libraries are not included with your deployment, and all cultures behave like the invariant culture: 
+https://github.com/dotnet/corefx/blob/master/Documentation/architecture/globalization-invariant-mode.md.
+
+A good example project: https://github.com/datalust/piggy.
+
+https://ianqvist.blogspot.com/2018/01/reducing-size-of-self-contained-net.html
+
+
 ## Additionnal remarks
 
 *Why are the libraries like Oetools.Builder targetting explicitly net461 AND netstandard2.0?*

@@ -15,7 +15,7 @@
     <ProjAuthor>jcaillon</ProjAuthor>
     <ProjApplicationIcon>app.ico</ProjApplicationIcon>
     <!-- https://docs.microsoft.com/en-us/dotnet/standard/frameworks -->
-    <ProjDefaultTargetFrameworks>net461;netcoreapp2.0</ProjDefaultTargetFrameworks>
+    <ProjDefaultTargetFrameworks>net461;netcoreapp2.2</ProjDefaultTargetFrameworks>
     <!-- ==== Package ==== -->
     <!-- 64x64 image with transparent background to use as the icon -->
     <ProjPackageIconPath>docs/images/logo.png</ProjPackageIconPath>
@@ -40,6 +40,11 @@
   <!-- PROJECT SPECIFIC -->
   <!-- ============================================================= -->
 
+  <PropertyGroup>
+  	<!-- add xtra nuget sources -->
+    <RestoreSources>$(RestoreSources);https://www.myget.org/F/natemcmaster/api/v3/index.json;https://dotnet.myget.org/F/dotnet-core/api/v3/index.json</RestoreSources>
+  </PropertyGroup>
+
   <ItemGroup Label="ProjectReferences">
     <ProjectReference Include="..\Oetools.Builder\Oetools.Builder\Oetools.Builder.csproj" />
     <ProjectReference Include="..\Oetools.Builder\Oetools.Utilities\Oetools.Utilities\Oetools.Utilities.csproj" />
@@ -47,15 +52,27 @@
   </ItemGroup>
 
   <ItemGroup Label="PackageReferences">
-    <NugetPackageSource Include="https://www.myget.org/F/natemcmaster/api/v3/index.json" />
-    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.3.2" />
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.3.3-build.14" />
     <!-- <PackageReference Include="Noyacode.GithubUpdater" Version="1.1.*" /> -->
-    <!-- <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.5" /> -->
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="System.IO.Compression" />
   </ItemGroup>
+
+  <Choose>
+    <When Condition=" $(IsNetStandard) ">
+  	  <ItemGroup Label="PackageReferences">
+  	    <!-- <PackageReference Include="ILLink.Tasks" Version="0.1.5-preview-1841731" /> -->
+  	    <PackageReference Include="Microsoft.Packaging.Tools.Trimming" Version="1.1.0-preview1-26619-01" />
+  	  </ItemGroup>
+  	  <ItemGroup>
+  	    <!-- adds invariant runtime option in app.runtimeconfig.json -->
+  	    <!-- https://github.com/dotnet/corefx/blob/master/Documentation/architecture/globalization-invariant-mode.md -->
+  	    <RuntimeHostConfigurationOption Include="System.Globalization.Invariant" Value="true" />
+  	  </ItemGroup>
+  	</When>
+  </Choose>
 
   <!-- Extra targets -->
   <Import Project="Target.*.target" />

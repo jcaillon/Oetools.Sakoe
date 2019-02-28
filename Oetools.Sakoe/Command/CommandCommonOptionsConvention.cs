@@ -29,6 +29,7 @@ namespace Oetools.Sakoe.Command {
                 return;
             }
 
+            context.Application.UsePagerForHelpText = false;
             context.Application.ClusterOptions = false;
             context.Application.OptionsComparison = StringComparison.CurrentCultureIgnoreCase;
             context.Application.ResponseFileHandling = ResponseFileHandling.ParseArgsAsLineSeparated;
