@@ -45,14 +45,14 @@ install:
 #---------------------------------#
 
 build_script:
-  - cmd: pushd GithubUpdater && build_simple_updater.bat && popd && pushd Oetools.Builder && update_xsd.bat && popd && build.bat
+  - ps: .\build.ps1 -ShouldExit 1
 
 #---------------------------------#
 #       tests configuration       #
 #---------------------------------#
 
-test_script:
-  - cmd: runtests.bat
+#test_script:
+#  - cmd: runtests.bat
 
 #---------------------------------#
 #      artifacts configuration    #
@@ -62,6 +62,9 @@ artifacts:
   # pushing a single file with environment variable in path and "Deployment name" specified
   - path: '**\*.zip'
     name: zip
+
+  - path: '**\*.tar.gz'
+    name: targz
 
   # pushing entire folder as a zip archive
   - path: '**\*.binlog'
@@ -97,7 +100,7 @@ deploy:
     # encrypt at https://ci.appveyor.com/tools/encrypt
     auth_token:
       secure: zDL5COwBGVuS+6EFFXUnIuvhmOi63DNyHAIb+0rO5JOe0rA1wHAe9Y8R+9HARS4D
-    artifact: zip
+    artifact: zip,targz
     draft: true
     prerelease: true
     on:

@@ -28,7 +28,7 @@ Deplying dotnet core apps: https://docs.microsoft.com/en-us/dotnet/core/deployin
 
 ```bash
 dotnet restore Oetools.Sakoe/Oetools.Sakoe.csproj
-dotnet publish Oetools.Sakoe/Oetools.Sakoe.csproj -f netcoreapp2.2 -c release -r linux-x64 --self-contained --verbosity minimal /p:UseAppHost=true /p:TrimUnusedDependencies=true
+dotnet publish Oetools.Sakoe/Oetools.Sakoe.csproj -f netcoreapp2.2 -c release -r linux-x64 --self-contained --verbosity minimal /p:UseAppHost=true /p:TrimUnusedDependencies=true /p:ShowLinkerSizeComparison=true
 ```
 
 .NET Core on Linux relies on the ICU libraries for globalization support.
@@ -43,6 +43,17 @@ A good example project: https://github.com/datalust/piggy.
 
 https://ianqvist.blogspot.com/2018/01/reducing-size-of-self-contained-net.html
 
+```bash
+tar -zxvf sakoe.tar.gz
+cd sakoe
+chmod +x sakoe
+./sakoe
+```
+
+```bash
+export PATH=`pwd`:$PATH
+sakoe
+```
 
 ## Additionnal remarks
 

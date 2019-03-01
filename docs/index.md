@@ -20,7 +20,8 @@ Each command is well documented on its own, don't be afraid to use the `--help` 
 
 How to use this command line interface tool:
   - You can escape white spaces in argument/option values by using double quotes (i.e. "my value").
-  - If you need to use a double quote within a double quote, you can do so by double the double quote (i.e. "my ""special"" value").
+  - If you need to use a double quote within a double quote, you can do so by double quoting the double quotes (i.e. "my ""special"" value").
+  - If an extra layer is needed, just double the doubling (i.e. -opt "-mysubopt ""my special """"value""""""").
   - In the 'USAGE' help section, arguments between brackets (i.e. []) are optionals.
 
 ### Response file parsing
@@ -36,7 +37,7 @@ In response files, you do not have to double quote arguments containing spaces, 
 
 The convention followed by this tool is the following.
   - 0 : used when a command completed successfully, without errors nor warnings.
-  - 1-8 : used when a command completed but with warnings, the level can be used to pinpoint different kind of warnings.
+  - 1-8 : used when a command completed but with warnings, the level can be used to pinpoint different kinds of warnings.
   - 9 : used when a command does not complete and ends up in error.
 
 ### Website
@@ -53,24 +54,37 @@ You are invited to STAR the project on github to increase its visibility!
 - [About the build command](#about-the-build-command)
 - [build](#sakoe-build)
 - [database](#sakoe-database)
+  - [admin](#sakoe-database-admin)
+  - [advisor](#sakoe-database-advisor)
   - [connect](#sakoe-database-connect)
   - [copy](#sakoe-database-copy)
   - [create](#sakoe-database-create)
+  - [datadigger](#sakoe-database-datadigger)
   - [delete](#sakoe-database-delete)
+  - [dictionary](#sakoe-database-dictionary)
   - [dump](#sakoe-database-dump)
     - [data](#sakoe-database-dump-data)
     - [incremental](#sakoe-database-dump-incremental)
     - [incremental-df](#sakoe-database-dump-incremental-df)
     - [schema](#sakoe-database-dump-schema)
     - [seq](#sakoe-database-dump-seq)
+    - [sql-data](#sakoe-database-dump-sql-data)
+    - [sql-schema](#sakoe-database-dump-sql-schema)
   - [kill](#sakoe-database-kill)
+  - [kill-all](#sakoe-database-kill-all)
   - [load](#sakoe-database-load)
     - [data](#sakoe-database-load-data)
     - [schema](#sakoe-database-load-schema)
     - [seq](#sakoe-database-load-seq)
+    - [sql-data](#sakoe-database-load-sql-data)
   - [repair](#sakoe-database-repair)
   - [start](#sakoe-database-start)
   - [stop](#sakoe-database-stop)
+- [external-tools](#sakoe-external-tools)
+  - [datadigger](#sakoe-external-tools-datadigger)
+    - [install](#sakoe-external-tools-datadigger-install)
+    - [remove](#sakoe-external-tools-datadigger-remove)
+    - [run](#sakoe-external-tools-datadigger-run)
 - [manual](#sakoe-manual)
 - [prohelp](#sakoe-prohelp)
   - [chm](#sakoe-prohelp-chm)
@@ -81,6 +95,7 @@ You are invited to STAR the project on github to increase its visibility!
   - [gitignore](#sakoe-project-gitignore)
   - [init](#sakoe-project-init)
   - [list](#sakoe-project-list)
+  - [update](#sakoe-project-update)
 - [update](#sakoe-update)
 - [utilities](#sakoe-utilities)
   - [connectstr](#sakoe-utilities-connectstr)
@@ -95,24 +110,37 @@ You are invited to STAR the project on github to increase its visibility!
 | --- | --- |
 | [sakoe build](#sakoe-build) | Build automation for Openedge projects. This command is the bread and butter of this tool. |
 | [sakoe database](#sakoe-database) | Database manipulation tools. |
+| [sakoe database admin](#sakoe-database-admin) | Open the database administration tool. |
+| [sakoe database advisor](#sakoe-database-advisor) | Generates an html report which provides pointers to common database configuration issues. |
 | [sakoe database connect](#sakoe-database-connect) | Get the connection string to use to connect to a database. |
 | [sakoe database copy](#sakoe-database-copy) | Copy a database. |
 | [sakoe database create](#sakoe-database-create) | Creates a new database. |
+| [sakoe database datadigger](#sakoe-database-datadigger) | Open a new DataDigger instance. |
 | [sakoe database delete](#sakoe-database-delete) | Delete a database. |
+| [sakoe database dictionary](#sakoe-database-dictionary) | Open the database dictionary tool. |
 | [sakoe database dump](#sakoe-database-dump) | Dump data or schema definition from a database. |
 | [sakoe database dump data](#sakoe-database-dump-data) | Dump the database data in plain text files (.d). |
 | [sakoe database dump incremental](#sakoe-database-dump-incremental) | Dump an incremental schema definition (.df) allowing to update a database schema definition. |
 | [sakoe database dump incremental-df](#sakoe-database-dump-incremental-df) | Dump an incremental schema definition (.df) by comparing .df files. |
 | [sakoe database dump schema](#sakoe-database-dump-schema) | Dump the schema definition (.df) of a database. |
 | [sakoe database dump seq](#sakoe-database-dump-seq) | Dump the database sequence values in a plain text file (.d). |
-| [sakoe database kill](#sakoe-database-kill) | Kill all the broker processes running on this machine. |
+| [sakoe database dump sql-data](#sakoe-database-dump-sql-data) | Dump data in SQL-92 format from a database. |
+| [sakoe database dump sql-schema](#sakoe-database-dump-sql-schema) | Dump the SQL-92 schema of a database. |
+| [sakoe database kill](#sakoe-database-kill) | Kill the broker/server processes running for a particular a database. |
+| [sakoe database kill-all](#sakoe-database-kill-all) | Kill all the broker/server processes running on this machine. |
 | [sakoe database load](#sakoe-database-load) | Load data or schema definition to a database. |
 | [sakoe database load data](#sakoe-database-load-data) | Load the database data from plain text files (.d). |
 | [sakoe database load schema](#sakoe-database-load-schema) | Load the schema definition (.df) to a database. |
 | [sakoe database load seq](#sakoe-database-load-seq) | Load the database sequence values from a plain text file (.d). |
+| [sakoe database load sql-data](#sakoe-database-load-sql-data) | Load the database data from SQL-92 format files (.dsql). |
 | [sakoe database repair](#sakoe-database-repair) | Repair the structure of a database. |
 | [sakoe database start](#sakoe-database-start) | Start a database in order to use it in multi-users mode. |
 | [sakoe database stop](#sakoe-database-stop) | Stop a database that was started for multi-users. |
+| [sakoe external-tools](#sakoe-external-tools) | Manage external tools usable in sakoe. |
+| [sakoe external-tools datadigger](#sakoe-external-tools-datadigger) | The DataDigger is a database explorer tool, fully written in Progress, that enables you to handle your data in a very natural way. |
+| [sakoe external-tools datadigger install](#sakoe-external-tools-datadigger-install) | Install DataDigger in the default installation path. Use the environment variable `OE_DATADIGGER_INSTALL_PATH` to specify a different location. |
+| [sakoe external-tools datadigger remove](#sakoe-external-tools-datadigger-remove) | Remove DataDigger from the installation path. |
+| [sakoe external-tools datadigger run](#sakoe-external-tools-datadigger-run) | Run a new DataDigger instance. |
 | [sakoe manual](#sakoe-manual) | The manual of this tool. Learn about its usage and about key concepts of sakoe. |
 | [sakoe prohelp](#sakoe-prohelp) | Access the Openedge help. |
 | [sakoe prohelp chm](#sakoe-prohelp-chm) | Opens a .chm file (windows help file) present in $DLC/prohelp. |
@@ -123,6 +151,7 @@ You are invited to STAR the project on github to increase its visibility!
 | [sakoe project gitignore](#sakoe-project-gitignore) | Initialize a .gitignore file adapted for sakoe projects (or append to, if it exists). |
 | [sakoe project init](#sakoe-project-init) | Initialize a new Openedge project file (.oeproj.xml). |
 | [sakoe project list](#sakoe-project-list) | List all the project files or list the build configurations in a project file. |
+| [sakoe project update](#sakoe-project-update) | Update the `Project.xsd` file of the project with the latest version embedded in this tool. |
 | [sakoe update](#sakoe-update) | Update this tool with the latest release found on github. |
 | [sakoe utilities](#sakoe-utilities) | Miscellaneous utility commands. |
 | [sakoe utilities connectstr](#sakoe-utilities-connectstr) | Returns a single line connection string from a .pf file. |
@@ -171,7 +200,7 @@ Below is a simplified representation of a project file:
       - Child build configuration x...
     - Child build configuration x...
   - Build configuration x...
-
+            
 There are no upper limit for build configuration nesting.
 The idea is that nested build configuration inherit properties from their parent, recursively (more details on the build configuration help).
 
@@ -197,7 +226,7 @@ Below is a simplified representation of a build configuration:
   - List of children build configuration
   - Child build configuration 1
   - Child build configuration x...
-
+            
 Inheritance of build configurations (think of russian dolls):
   - Each build configuration can define "children" build configurations.
   - Each child inherits its parent properties following these rules:
@@ -206,7 +235,7 @@ Inheritance of build configurations (think of russian dolls):
             
 Practical example:
   Given the project below:
- 
+            
   Project
   - Build configuration 1
      - Properties
@@ -303,10 +332,11 @@ Build automation for Openedge projects. This command is the bread and butter of 
 | -p | --property | (Can be used multiple times) A pair of key/value to dynamically set a property for this build. The value set this way will prevail over the value defined in a project file. Each pair should specify the name of the property to set and the value that should be used. Use the option --property-help to see the full list of properties available as well as their documentation. |
 | -v | --variable | (Can be used multiple times) A pair of key/value to dynamically set a variable for this build. A variable set this way will prevail over a variable with the same name defined in a project file. Each pair should specify the name of the variable to set and the value that should be used. |
 | -ph | --property-help | Shows the list of each build property usable with its full documentation. |
-| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. |
-| -pm | --progress-mode | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
-| -do | --debug-output | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
 | -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
 | -h | --help | Show this help text. |
 
 ### Build properties
@@ -328,6 +358,7 @@ Build automation for Openedge projects. This command is the bread and butter of 
 * -p "CompileWithXref=False"
 * -p "CurrentBranchName="
 * -p "CurrentBranchOriginCommit="
+* -p "DatabaseInternationalizationStartupParameters="
 * -p "DlcDirectoryPath=$DLC (openedge installation directory)"
 * -p "EnabledIncrementalBuild=True"
 * -p "ExtraDatabaseConnectionString="
@@ -339,7 +370,7 @@ Build automation for Openedge projects. This command is the bread and butter of 
 * -p "IniFilePath="
 * -p "MinimumNumberOfFilesPerProcess=10"
 * -p "NumberProcessPerCore=1"
-* -p "OpenedgeCodePage="
+* -p "OpenedgeIoEncoding="
 * -p "OpenedgeTemporaryDirectoryPath=$TEMP/.oe_tmp/xxx (temporary folder)"
 * -p "OutputDirectoryPath={{SOURCE_DIRECTORY}}\bin"
 * -p "ProcedurePathToExecuteAfterAnyProgressExecution="
@@ -435,16 +466,88 @@ Database manipulation tools.
 
 | Short name | Long name | Description |
 | --- | --- | --- |
+| ad | admin | Open the database administration tool. |
+| ar | advisor | Generates an html report which provides pointers to common database configuration issues. |
 | co | connect | Get the connection string to use to connect to a database. |
 | cp | copy | Copy a database. |
 | cr | create | Creates a new database. |
+| dd | datadigger | Open a new DataDigger instance. |
 | de | delete | Delete a database. |
+| di | dictionary | Open the database dictionary tool. |
 | du | dump | Dump data or schema definition from a database. |
-| ki | kill | Kill all the broker processes running on this machine. |
+| ki | kill | Kill the broker/server processes running for a particular a database. |
+| ka | kill-all | Kill all the broker/server processes running on this machine. |
 | lo | load | Load data or schema definition to a database. |
 | re | repair | Repair the structure of a database. |
-| proserve | start | Start a database in order to use it in multi-users mode. |
-| proshut | stop | Stop a database that was started for multi-users. |
+| st | start | Start a database in order to use it in multi-users mode. |
+| sp | stop | Stop a database that was started for multi-users. |
+
+**[\[Go back to the table of content\].](#table-of-content)**
+## SAKOE DATABASE ADMIN
+
+### Synopsis
+
+Open the database administration tool.
+
+### Usage
+
+`sakoe database admin [options] [-- <extra pro args>...]`
+
+### Options
+
+| Short name | Long name | Description |
+| --- | --- | --- |
+| -d | --detached | Use this option to immediately return to the prompt instead of waiting the for the program to exit. |
+| -c | --connection | (Can be used multiple times) A connection string that can be used to connect to one or more openedge database. The connection string will be used in a `CONNECT` statement. |
+| -f | --file | (Can be used multiple times) Path to a database (.db file). The .db extension is optional and the path can be relative to the current directory. Defaults to a list of path of all the .db file found in the current directory. |
+| -cp | --cp-params | Database server internationalization startup parameters such as `-cpinternal` codepage and `-cpstream` codepage. This option will be used for openedge commands that support them (_dbutil, _mprosrv, _mprshut, _proutil). |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
+| -h | --help | Show this help text. |
+
+**[\[Go back to the table of content\].](#table-of-content)**
+## SAKOE DATABASE ADVISOR
+
+### Synopsis
+
+Generates an html report which provides pointers to common database configuration issues.
+
+### Usage
+
+`sakoe database advisor <report-file> [options]`
+
+### Arguments
+
+| Argument | Description |
+| --- | --- |
+| \<report-file\> | Path to the output html report file that will contain pointers to common database configuration issues. The extension is optional but it will be changed to .html if it is incorrectly provided. |
+
+### Options
+
+| Short name | Long name | Description |
+| --- | --- | --- |
+| -a | --analysis-file | The file path to a database analysis output. If empty, the analysis will be carried on automatically if the database is local. |
+| -u | --unattended | Do not open the html report with the default browser after its creation. |
+| -c | --connection | A connection string that can be used to connect to an openedge database. The connection string will be used in a `CONNECT` statement. |
+| -f | --file | Path to a database (.db file). The .db extension is optional and the path can be relative to the current directory. Defaults to the path of the unique .db file found in the current directory. |
+| -cp | --cp-params | Database server internationalization startup parameters such as `-cpinternal` codepage and `-cpstream` codepage. This option will be used for openedge commands that support them (_dbutil, _mprosrv, _mprshut, _proutil). |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
+| -h | --help | Show this help text. |
+
+### Description
+
+This command uses the Database Advisor which can be found here: http://practicaldba.com/dlmain.html.
+
+The OpenEdge Database Advisor is intended to provide a quick checkup for common database configuration issues. Obviously proper tuning for an application requires much more than any tool can provide, but the advisor should highlight some of the most common low hanging fruit.
+
+For best results you will need a recent database analysis file (proutil -C dbanalys) and you should run this against your production database. A large portion of the suggestions will be based on VST information that will differ greatly between your production and test environments.
 
 **[\[Go back to the table of content\].](#table-of-content)**
 ## SAKOE DATABASE CONNECT
@@ -455,24 +558,20 @@ Get the connection string to use to connect to a database.
 
 ### Usage
 
-`sakoe database connect [<db path>] [options]`
-
-### Arguments
-
-| Argument | Description |
-| --- | --- |
-| \<db path\> | Path to the database. The .db extension is optional. Defaults to the first .db file found in the current directory. |
+`sakoe database connect [options]`
 
 ### Options
 
 | Short name | Long name | Description |
 | --- | --- | --- |
 | -l | --logical-name | The logical name to use for the database in the connection string. |
-| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the DLC environment variable if it exists. |
-| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. |
-| -pm | --progress-mode | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
-| -do | --debug-output | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -f | --file | Path to a database (.db file). The .db extension is optional and the path can be relative to the current directory. Defaults to the path of the unique .db file found in the current directory. |
+| -cp | --cp-params | Database server internationalization startup parameters such as `-cpinternal` codepage and `-cpstream` codepage. This option will be used for openedge commands that support them (_dbutil, _mprosrv, _mprshut, _proutil). |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
 | -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
 | -h | --help | Show this help text. |
 
 **[\[Go back to the table of content\].](#table-of-content)**
@@ -490,20 +589,21 @@ Copy a database.
 
 | Argument | Description |
 | --- | --- |
-| \<source db path\> | The path to the 'source' database. The .db extension is optional. |
-| \<target db path\> | The path to the 'target' database. The .db extension is optional. |
+| \<source db path\> | Path to the source database (.db file). The .db extension is optional and the path can be relative to the current directory. |
+| \<target db path\> | Path to the target database (.db file). The .db extension is optional and the path can be relative to the current directory. |
 
 ### Options
 
 | Short name | Long name | Description |
 | --- | --- | --- |
-| -ni | --newinstance | Use -newinstance in the procopy command. |
-| -rp | --relativepath | Use -relativepath in the procopy command. |
-| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the DLC environment variable if it exists. |
-| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. |
-| -pm | --progress-mode | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
-| -do | --debug-output | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -ni | --new-instance | Specifies that a new GUID be created for the target database. |
+| -rp | --relative-path | Use relative path in the structure file. |
+| -cp | --cp-params | Database server internationalization startup parameters such as `-cpinternal` codepage and `-cpstream` codepage. This option will be used for openedge commands that support them (_dbutil, _mprosrv, _mprshut, _proutil). |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
 | -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
 | -h | --help | Show this help text. |
 
 **[\[Go back to the table of content\].](#table-of-content)**
@@ -515,30 +615,57 @@ Creates a new database.
 
 ### Usage
 
-`sakoe database create <db path> [options]`
-
-### Arguments
-
-| Argument | Description |
-| --- | --- |
-| \<db path\> | Path to the database to create. The .db extension is optional. Defaults to the name of the current directory. |
+`sakoe database create [options]`
 
 ### Options
 
 | Short name | Long name | Description |
 | --- | --- | --- |
-| -df | --df | Path to the .df file containing the database schema definition. |
-| -st | --st | Path to the .st file containing the database physical structure. |
-| -bs | --blocksize | The blocksize to use when creating the database. |
-| -cp | --codepage | Existing codepage in the openedge installation $DLC/prolang/(codepage). |
-| -ni | --newinstance | Use -newinstance in the procopy command. |
-| -rp | --relativepath | Use -relativepath in the procopy command. |
-| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the DLC environment variable if it exists. |
-| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. |
-| -pm | --progress-mode | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
-| -do | --debug-output | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -f | --file | File name (physical name) of the database to create (.db file). The .db extension is optional and the path can be relative to the current directory. Defaults to the name of the current directory. |
+| -df | --df | Path to the .df file containing the database schema definition. The path can be relative to the current directory. |
+| -st | --st | Path to the structure file (.st file) containing the database physical structure. The path can be relative to the current directory. |
+| -bs | --block-size | The block-size to use when creating the database. Defaults to the default block-size for the current platform (linux or windows). |
+| -lg | --lang | The codepage/lang to use. Creates the database using an empty database located in the openedge installation $DLC/prolang/(lang). |
+| -ni | --new-instance | Specifies that a new GUID be created for the target database. |
+| -rp | --relative-path | Use relative path in the structure file. |
+| -cp | --cp-params | Database server internationalization startup parameters such as `-cpinternal` codepage and `-cpstream` codepage. This option will be used for openedge commands that support them (_dbutil, _mprosrv, _mprshut, _proutil). |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
 | -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
 | -h | --help | Show this help text. |
+
+**[\[Go back to the table of content\].](#table-of-content)**
+## SAKOE DATABASE DATADIGGER
+
+### Synopsis
+
+Open a new DataDigger instance.
+
+### Usage
+
+`sakoe database datadigger [options] [-- <extra pro args>...]`
+
+### Options
+
+| Short name | Long name | Description |
+| --- | --- | --- |
+| -ro | --read-only | Start DataDigger in read-only mode (records will not modifiable). |
+| -d | --detached | Use this option to immediately return to the prompt instead of waiting the for the program to exit. |
+| -c | --connection | (Can be used multiple times) A connection string that can be used to connect to one or more openedge database. The connection string will be used in a `CONNECT` statement. |
+| -f | --file | (Can be used multiple times) Path to a database (.db file). The .db extension is optional and the path can be relative to the current directory. Defaults to a list of path of all the .db file found in the current directory. |
+| -cp | --cp-params | Database server internationalization startup parameters such as `-cpinternal` codepage and `-cpstream` codepage. This option will be used for openedge commands that support them (_dbutil, _mprosrv, _mprshut, _proutil). |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
+| -h | --help | Show this help text. |
+
+### Description
+
+Please note that when running DataDigger, the DataDigger.pf file of the installation path is used.
 
 **[\[Go back to the table of content\].](#table-of-content)**
 ## SAKOE DATABASE DELETE
@@ -549,28 +676,52 @@ Delete a database.
 
 ### Usage
 
-`sakoe database delete [<db path>] [options]`
-
-### Arguments
-
-| Argument | Description |
-| --- | --- |
-| \<db path\> | Path to the database. The .db extension is optional. Defaults to the first .db file found in the current directory. |
+`sakoe database delete [options]`
 
 ### Options
 
 | Short name | Long name | Description |
 | --- | --- | --- |
-| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the DLC environment variable if it exists. |
-| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. |
-| -pm | --progress-mode | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
-| -do | --debug-output | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -y | --yes | Automatically answer yes on deletion confirmation. |
+| -st | --delete-st | Also delete the structure file (.st). |
+| -f | --file | Path to a database (.db file). The .db extension is optional and the path can be relative to the current directory. Defaults to the path of the unique .db file found in the current directory. |
+| -cp | --cp-params | Database server internationalization startup parameters such as `-cpinternal` codepage and `-cpstream` codepage. This option will be used for openedge commands that support them (_dbutil, _mprosrv, _mprshut, _proutil). |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
 | -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
 | -h | --help | Show this help text. |
 
 ### Description
 
 All the files composing the database are deleted without confirmation.
+
+**[\[Go back to the table of content\].](#table-of-content)**
+## SAKOE DATABASE DICTIONARY
+
+### Synopsis
+
+Open the database dictionary tool.
+
+### Usage
+
+`sakoe database dictionary [options] [-- <extra pro args>...]`
+
+### Options
+
+| Short name | Long name | Description |
+| --- | --- | --- |
+| -d | --detached | Use this option to immediately return to the prompt instead of waiting the for the program to exit. |
+| -c | --connection | (Can be used multiple times) A connection string that can be used to connect to one or more openedge database. The connection string will be used in a `CONNECT` statement. |
+| -f | --file | (Can be used multiple times) Path to a database (.db file). The .db extension is optional and the path can be relative to the current directory. Defaults to a list of path of all the .db file found in the current directory. |
+| -cp | --cp-params | Database server internationalization startup parameters such as `-cpinternal` codepage and `-cpstream` codepage. This option will be used for openedge commands that support them (_dbutil, _mprosrv, _mprshut, _proutil). |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
+| -h | --help | Show this help text. |
 
 **[\[Go back to the table of content\].](#table-of-content)**
 ## SAKOE DATABASE DUMP
@@ -598,6 +749,8 @@ Dump data or schema definition from a database.
 | id | incremental-df | Dump an incremental schema definition (.df) by comparing .df files. |
 | df | schema | Dump the schema definition (.df) of a database. |
 | se | seq | Dump the database sequence values in a plain text file (.d). |
+| sd | sql-data | Dump data in SQL-92 format from a database. |
+| ss | sql-schema | Dump the SQL-92 schema of a database. |
 
 **[\[Go back to the table of content\].](#table-of-content)**
 ## SAKOE DATABASE DUMP DATA
@@ -608,25 +761,27 @@ Dump the database data in plain text files (.d).
 
 ### Usage
 
-`sakoe database dump data [<db path>] [options]`
+`sakoe database dump data <dump-directory> [options]`
 
 ### Arguments
 
 | Argument | Description |
 | --- | --- |
-| \<db path\> | Path to the database. The .db extension is optional. Defaults to the first .db file found in the current directory. |
+| \<dump-directory\> | Directory path that will contain the data dumped. Each table of the database will be dumped as an individual .d file named like the table. |
 
 ### Options
 
 | Short name | Long name | Description |
 | --- | --- | --- |
-| -d | --dump-directory | Directory path that will contain the data dumped. Each table of the database will be dumped as an individual .d file named like the table. |
-| -t | --table | A list of comma separated table names to dump. Defaults to `ALL` which dumps every table. |
-| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the DLC environment variable if it exists. |
-| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. |
-| -pm | --progress-mode | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
-| -do | --debug-output | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -t | --table | A list of comma separated table names to dump. Defaults to `ALL` which dumps every table (extension is optional). |
+| -c | --connection | A connection string that can be used to connect to an openedge database. The connection string will be used in a `CONNECT` statement. |
+| -f | --file | Path to a database (.db file). The .db extension is optional and the path can be relative to the current directory. Defaults to the path of the unique .db file found in the current directory. |
+| -cp | --cp-params | Database server internationalization startup parameters such as `-cpinternal` codepage and `-cpstream` codepage. This option will be used for openedge commands that support them (_dbutil, _mprosrv, _mprshut, _proutil). |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
 | -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
 | -h | --help | Show this help text. |
 
 **[\[Go back to the table of content\].](#table-of-content)**
@@ -638,26 +793,27 @@ Dump an incremental schema definition (.df) allowing to update a database schema
 
 ### Usage
 
-`sakoe database dump incremental <old db path> <new db path> [options]`
+`sakoe database dump incremental <old-db-path> <new-db-path> <dump-file> [options]`
 
 ### Arguments
 
 | Argument | Description |
 | --- | --- |
-| \<old db path\> | The path to the 'old' database. The .db extension is optional. |
-| \<new db path\> | The path to the 'new' database. The .db extension is optional. |
+| \<old-db-path\> | The path to the 'old' database. The .db extension is optional. |
+| \<new-db-path\> | The path to the 'new' database. The .db extension is optional. |
+| \<dump-file\> | Path to the output incremental .df file (extension is optional). |
 
 ### Options
 
 | Short name | Long name | Description |
 | --- | --- | --- |
-| -df | --df | Path to the output incremental .df file. |
 | -rf | --rename-file | Path to the 'rename file'. It is a plain text file used to identify database tables and fields that have changed names. This allows to avoid having a DROP then ADD table when you changed only the name of said table.  The format of the file is simple (comma separated lines, don't forget to add a final empty line for IMPORT): - T,old-table-name,new-table-name - F,table-name,old-field-name,new-field-name - S,old-sequence-name,new-sequence-name  Missing entries or entries with an empty new name are considered to have been deleted.  |
-| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the DLC environment variable if it exists. |
-| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. |
-| -pm | --progress-mode | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
-| -do | --debug-output | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -cp | --cp-params | Database server internationalization startup parameters such as `-cpinternal` codepage and `-cpstream` codepage. This option will be used for openedge commands that support them (_dbutil, _mprosrv, _mprshut, _proutil). |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
 | -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
 | -h | --help | Show this help text. |
 
 ### Description
@@ -673,7 +829,7 @@ Dump an incremental schema definition (.df) by comparing .df files.
 
 ### Usage
 
-`sakoe database dump incremental-df <old df path> <new df path> [options]`
+`sakoe database dump incremental-df <old df path> <new df path> <dump-file> [options]`
 
 ### Arguments
 
@@ -681,18 +837,19 @@ Dump an incremental schema definition (.df) by comparing .df files.
 | --- | --- |
 | \<old df path\> | The path to the 'old' database. |
 | \<new df path\> | The path to the 'new' database. |
+| \<dump-file\> | Path to the output incremental .df file (extension is optional). |
 
 ### Options
 
 | Short name | Long name | Description |
 | --- | --- | --- |
-| -df | --df | Path to the output incremental .df file. |
 | -rf | --rename-file | Path to the 'rename file'. It is a plain text file used to identify database tables and fields that have changed names. This allows to avoid having a DROP then ADD table when you changed only the name of said table.  The format of the file is simple (comma separated lines, don't forget to add a final empty line for IMPORT): - T,old-table-name,new-table-name - F,table-name,old-field-name,new-field-name - S,old-sequence-name,new-sequence-name  Missing entries or entries with an empty new name are considered to have been deleted.  |
-| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the DLC environment variable if it exists. |
-| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. |
-| -pm | --progress-mode | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
-| -do | --debug-output | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -cp | --cp-params | Database server internationalization startup parameters such as `-cpinternal` codepage and `-cpstream` codepage. This option will be used for openedge commands that support them (_dbutil, _mprosrv, _mprshut, _proutil). |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
 | -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
 | -h | --help | Show this help text. |
 
 **[\[Go back to the table of content\].](#table-of-content)**
@@ -704,25 +861,27 @@ Dump the schema definition (.df) of a database.
 
 ### Usage
 
-`sakoe database dump schema [<db path>] [options]`
+`sakoe database dump schema <dump-file> [options]`
 
 ### Arguments
 
 | Argument | Description |
 | --- | --- |
-| \<db path\> | Path to the database. The .db extension is optional. Defaults to the first .db file found in the current directory. |
+| \<dump-file\> | Path to the output .df file that will contain the schema definition of the database (extension is optional). |
 
 ### Options
 
 | Short name | Long name | Description |
 | --- | --- | --- |
-| -df | --df | Path to the output .df file that will contain the schema definition of the database. |
 | -t | --table | A list of comma separated table names for which we need a schema definition dump. Defaults to `ALL` which dumps every table and sequence. |
-| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the DLC environment variable if it exists. |
-| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. |
-| -pm | --progress-mode | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
-| -do | --debug-output | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -c | --connection | A connection string that can be used to connect to an openedge database. The connection string will be used in a `CONNECT` statement. |
+| -f | --file | Path to a database (.db file). The .db extension is optional and the path can be relative to the current directory. Defaults to the path of the unique .db file found in the current directory. |
+| -cp | --cp-params | Database server internationalization startup parameters such as `-cpinternal` codepage and `-cpstream` codepage. This option will be used for openedge commands that support them (_dbutil, _mprosrv, _mprshut, _proutil). |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
 | -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
 | -h | --help | Show this help text. |
 
 **[\[Go back to the table of content\].](#table-of-content)**
@@ -734,24 +893,90 @@ Dump the database sequence values in a plain text file (.d).
 
 ### Usage
 
-`sakoe database dump seq [<db path>] [options]`
+`sakoe database dump seq <dump-file> [options]`
 
 ### Arguments
 
 | Argument | Description |
 | --- | --- |
-| \<db path\> | Path to the database. The .db extension is optional. Defaults to the first .db file found in the current directory. |
+| \<dump-file\> | File path that will contain the data dumped (usually has the .d extension). |
 
 ### Options
 
 | Short name | Long name | Description |
 | --- | --- | --- |
-| -d | --dump-file | File path that will contain the data dumped. |
-| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the DLC environment variable if it exists. |
-| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. |
-| -pm | --progress-mode | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
-| -do | --debug-output | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -c | --connection | A connection string that can be used to connect to an openedge database. The connection string will be used in a `CONNECT` statement. |
+| -f | --file | Path to a database (.db file). The .db extension is optional and the path can be relative to the current directory. Defaults to the path of the unique .db file found in the current directory. |
+| -cp | --cp-params | Database server internationalization startup parameters such as `-cpinternal` codepage and `-cpstream` codepage. This option will be used for openedge commands that support them (_dbutil, _mprosrv, _mprshut, _proutil). |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
 | -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
+| -h | --help | Show this help text. |
+
+**[\[Go back to the table of content\].](#table-of-content)**
+## SAKOE DATABASE DUMP SQL-DATA
+
+### Synopsis
+
+Dump data in SQL-92 format from a database.
+
+### Usage
+
+`sakoe database dump sql-data <dump-directory> [options]`
+
+### Arguments
+
+| Argument | Description |
+| --- | --- |
+| \<dump-directory\> | Directory path that will contain the data dumped. Each table of the database will be dumped as an individual .dsql file named like the table. |
+
+### Options
+
+| Short name | Long name | Description |
+| --- | --- | --- |
+| -op | --options | Use options for the sqldump utility (see the documentation online). Defaults to dumping every table. |
+| -c | --connection | A connection string that can be used to connect to an openedge database. The connection string will be used in a `CONNECT` statement. |
+| -f | --file | Path to a database (.db file). The .db extension is optional and the path can be relative to the current directory. Defaults to the path of the unique .db file found in the current directory. |
+| -cp | --cp-params | Database server internationalization startup parameters such as `-cpinternal` codepage and `-cpstream` codepage. This option will be used for openedge commands that support them (_dbutil, _mprosrv, _mprshut, _proutil). |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
+| -h | --help | Show this help text. |
+
+**[\[Go back to the table of content\].](#table-of-content)**
+## SAKOE DATABASE DUMP SQL-SCHEMA
+
+### Synopsis
+
+Dump the SQL-92 schema of a database.
+
+### Usage
+
+`sakoe database dump sql-schema <dump-file> [options]`
+
+### Arguments
+
+| Argument | Description |
+| --- | --- |
+| \<dump-file\> | Path to the output .dfsql file that will contain the sql-92 definition of the database (extension is optional). |
+
+### Options
+
+| Short name | Long name | Description |
+| --- | --- | --- |
+| -op | --options | Use options for the sqlschema utility (see the documentation online). Defaults to dumping everything. |
+| -c | --connection | A connection string that can be used to connect to an openedge database. The connection string will be used in a `CONNECT` statement. |
+| -f | --file | Path to a database (.db file). The .db extension is optional and the path can be relative to the current directory. Defaults to the path of the unique .db file found in the current directory. |
+| -cp | --cp-params | Database server internationalization startup parameters such as `-cpinternal` codepage and `-cpstream` codepage. This option will be used for openedge commands that support them (_dbutil, _mprosrv, _mprshut, _proutil). |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
 | -h | --help | Show this help text. |
 
 **[\[Go back to the table of content\].](#table-of-content)**
@@ -759,7 +984,7 @@ Dump the database sequence values in a plain text file (.d).
 
 ### Synopsis
 
-Kill all the broker processes running on this machine.
+Kill the broker/server processes running for a particular a database.
 
 ### Usage
 
@@ -769,10 +994,34 @@ Kill all the broker processes running on this machine.
 
 | Short name | Long name | Description |
 | --- | --- | --- |
-| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. |
-| -pm | --progress-mode | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
-| -do | --debug-output | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -f | --file | Path to a database (.db file). The .db extension is optional and the path can be relative to the current directory. Defaults to the path of the unique .db file found in the current directory. |
+| -cp | --cp-params | Database server internationalization startup parameters such as `-cpinternal` codepage and `-cpstream` codepage. This option will be used for openedge commands that support them (_dbutil, _mprosrv, _mprshut, _proutil). |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
 | -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
+| -h | --help | Show this help text. |
+
+**[\[Go back to the table of content\].](#table-of-content)**
+## SAKOE DATABASE KILL-ALL
+
+### Synopsis
+
+Kill all the broker/server processes running on this machine.
+
+### Usage
+
+`sakoe database kill-all [options]`
+
+### Options
+
+| Short name | Long name | Description |
+| --- | --- | --- |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
 | -h | --help | Show this help text. |
 
 ### Description
@@ -803,6 +1052,7 @@ Load data or schema definition to a database.
 | da | data | Load the database data from plain text files (.d). |
 | df | schema | Load the schema definition (.df) to a database. |
 | se | seq | Load the database sequence values from a plain text file (.d). |
+| sd | sql-data | Load the database data from SQL-92 format files (.dsql). |
 
 **[\[Go back to the table of content\].](#table-of-content)**
 ## SAKOE DATABASE LOAD DATA
@@ -813,25 +1063,27 @@ Load the database data from plain text files (.d).
 
 ### Usage
 
-`sakoe database load data [<db path>] [options]`
+`sakoe database load data <data-directory> [options]`
 
 ### Arguments
 
 | Argument | Description |
 | --- | --- |
-| \<db path\> | Path to the database. The .db extension is optional. Defaults to the first .db file found in the current directory. |
+| \<data-directory\> | Directory path that contain the data to load. Each table of the database should be stored as an individual .d file named like the table. |
 
 ### Options
 
 | Short name | Long name | Description |
 | --- | --- | --- |
-| -d | --data-directory | Directory path that contain the data to load. Each table of the database should be stored as an individual .d file named like the table. |
 | -t | --table | TA list of comma separated table names to load. Defaults to `ALL` which loads every table. |
-| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the DLC environment variable if it exists. |
-| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. |
-| -pm | --progress-mode | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
-| -do | --debug-output | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -c | --connection | A connection string that can be used to connect to an openedge database. The connection string will be used in a `CONNECT` statement. |
+| -f | --file | Path to a database (.db file). The .db extension is optional and the path can be relative to the current directory. Defaults to the path of the unique .db file found in the current directory. |
+| -cp | --cp-params | Database server internationalization startup parameters such as `-cpinternal` codepage and `-cpstream` codepage. This option will be used for openedge commands that support them (_dbutil, _mprosrv, _mprshut, _proutil). |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
 | -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
 | -h | --help | Show this help text. |
 
 **[\[Go back to the table of content\].](#table-of-content)**
@@ -843,24 +1095,26 @@ Load the schema definition (.df) to a database.
 
 ### Usage
 
-`sakoe database load schema [<db path>] [options]`
+`sakoe database load schema <df-file> [options]`
 
 ### Arguments
 
 | Argument | Description |
 | --- | --- |
-| \<db path\> | Path to the database. The .db extension is optional. Defaults to the first .db file found in the current directory. |
+| \<df-file\> | Path to the .df file that contains the schema definition (or partial schema) of the database. |
 
 ### Options
 
 | Short name | Long name | Description |
 | --- | --- | --- |
-| -df | --df | Path to the .df file that contains the schema definition (or partial schema) of the database. |
-| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the DLC environment variable if it exists. |
-| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. |
-| -pm | --progress-mode | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
-| -do | --debug-output | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -c | --connection | A connection string that can be used to connect to an openedge database. The connection string will be used in a `CONNECT` statement. |
+| -f | --file | Path to a database (.db file). The .db extension is optional and the path can be relative to the current directory. Defaults to the path of the unique .db file found in the current directory. |
+| -cp | --cp-params | Database server internationalization startup parameters such as `-cpinternal` codepage and `-cpstream` codepage. This option will be used for openedge commands that support them (_dbutil, _mprosrv, _mprshut, _proutil). |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
 | -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
 | -h | --help | Show this help text. |
 
 **[\[Go back to the table of content\].](#table-of-content)**
@@ -872,24 +1126,58 @@ Load the database sequence values from a plain text file (.d).
 
 ### Usage
 
-`sakoe database load seq [<db path>] [options]`
+`sakoe database load seq <data-file> [options]`
 
 ### Arguments
 
 | Argument | Description |
 | --- | --- |
-| \<db path\> | Path to the database. The .db extension is optional. Defaults to the first .db file found in the current directory. |
+| \<data-file\> | File path that contains the sequence data to load (usually has the .d extension). |
 
 ### Options
 
 | Short name | Long name | Description |
 | --- | --- | --- |
-| -d | --data-file | File path that contains the sequence data to load. |
-| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the DLC environment variable if it exists. |
-| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. |
-| -pm | --progress-mode | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
-| -do | --debug-output | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -c | --connection | A connection string that can be used to connect to an openedge database. The connection string will be used in a `CONNECT` statement. |
+| -f | --file | Path to a database (.db file). The .db extension is optional and the path can be relative to the current directory. Defaults to the path of the unique .db file found in the current directory. |
+| -cp | --cp-params | Database server internationalization startup parameters such as `-cpinternal` codepage and `-cpstream` codepage. This option will be used for openedge commands that support them (_dbutil, _mprosrv, _mprshut, _proutil). |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
 | -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
+| -h | --help | Show this help text. |
+
+**[\[Go back to the table of content\].](#table-of-content)**
+## SAKOE DATABASE LOAD SQL-DATA
+
+### Synopsis
+
+Load the database data from SQL-92 format files (.dsql).
+
+### Usage
+
+`sakoe database load sql-data <data-directory> [options]`
+
+### Arguments
+
+| Argument | Description |
+| --- | --- |
+| \<data-directory\> | Directory path that contain the data to load. Each table of the database should be stored as an individual .dsql file named like the `owner.table` (e.g. PUB.table1). |
+
+### Options
+
+| Short name | Long name | Description |
+| --- | --- | --- |
+| -op | --options | Use options for the sqlload utility (see the documentation online). Defaults to loading every table. |
+| -c | --connection | A connection string that can be used to connect to an openedge database. The connection string will be used in a `CONNECT` statement. |
+| -f | --file | Path to a database (.db file). The .db extension is optional and the path can be relative to the current directory. Defaults to the path of the unique .db file found in the current directory. |
+| -cp | --cp-params | Database server internationalization startup parameters such as `-cpinternal` codepage and `-cpstream` codepage. This option will be used for openedge commands that support them (_dbutil, _mprosrv, _mprshut, _proutil). |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
 | -h | --help | Show this help text. |
 
 **[\[Go back to the table of content\].](#table-of-content)**
@@ -901,23 +1189,20 @@ Repair the structure of a database.
 
 ### Usage
 
-`sakoe database repair [<db path>] [options]`
-
-### Arguments
-
-| Argument | Description |
-| --- | --- |
-| \<db path\> | Path to the database. The .db extension is optional. Defaults to the first .db file found in the current directory. |
+`sakoe database repair [options]`
 
 ### Options
 
 | Short name | Long name | Description |
 | --- | --- | --- |
-| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the DLC environment variable if it exists. |
-| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. |
-| -pm | --progress-mode | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
-| -do | --debug-output | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -a | --access | Database access/encryption arguments: `[[-userid username [-password passwd ]] | [ -U username -P passwd] ] [-Passphrase]`. |
+| -f | --file | Path to a database (.db file). The .db extension is optional and the path can be relative to the current directory. Defaults to the path of the unique .db file found in the current directory. |
+| -cp | --cp-params | Database server internationalization startup parameters such as `-cpinternal` codepage and `-cpstream` codepage. This option will be used for openedge commands that support them (_dbutil, _mprosrv, _mprshut, _proutil). |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
 | -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
 | -h | --help | Show this help text. |
 
 ### Description
@@ -933,13 +1218,7 @@ Start a database in order to use it in multi-users mode.
 
 ### Usage
 
-`sakoe database start [<db path>] [options] [[--] <extra proserve parameters>...]`
-
-### Arguments
-
-| Argument | Description |
-| --- | --- |
-| \<db path\> | Path to the database. The .db extension is optional. Defaults to the first .db file found in the current directory. |
+`sakoe database start [options] [-- <extra proserve args>...]`
 
 ### Options
 
@@ -948,12 +1227,13 @@ Start a database in order to use it in multi-users mode.
 | -s | --service | Service name that will be used by this database. Usually a port number or a service name declared in /etc/services. |
 | -h | --hostname | The hostname on which to start the database. Defaults to the current machine. |
 | -np | --next-port | Port number, the next available port after this number will be used to start the database. |
-| -nu | --nb-users | Number of users that should be able to connect to this database simultaneously. |
-| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the DLC environment variable if it exists. |
-| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. |
-| -pm | --progress-mode | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
-| -do | --debug-output | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -f | --file | Path to a database (.db file). The .db extension is optional and the path can be relative to the current directory. Defaults to the path of the unique .db file found in the current directory. |
+| -cp | --cp-params | Database server internationalization startup parameters such as `-cpinternal` codepage and `-cpstream` codepage. This option will be used for openedge commands that support them (_dbutil, _mprosrv, _mprshut, _proutil). |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
 | -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
 | -h | --help | Show this help text. |
 
 **[\[Go back to the table of content\].](#table-of-content)**
@@ -965,24 +1245,153 @@ Stop a database that was started for multi-users.
 
 ### Usage
 
-`sakoe database stop [<db path>] [options] [[--] <extra proshut parameters>...]`
-
-### Arguments
-
-| Argument | Description |
-| --- | --- |
-| \<db path\> | Path to the database. The .db extension is optional. Defaults to the first .db file found in the current directory. |
+`sakoe database stop [options] [-- <extra proshut args>...]`
 
 ### Options
 
 | Short name | Long name | Description |
 | --- | --- | --- |
-| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the DLC environment variable if it exists. |
-| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. |
-| -pm | --progress-mode | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
-| -do | --debug-output | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -f | --file | Path to a database (.db file). The .db extension is optional and the path can be relative to the current directory. Defaults to the path of the unique .db file found in the current directory. |
+| -cp | --cp-params | Database server internationalization startup parameters such as `-cpinternal` codepage and `-cpstream` codepage. This option will be used for openedge commands that support them (_dbutil, _mprosrv, _mprshut, _proutil). |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
 | -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
 | -h | --help | Show this help text. |
+
+**[\[Go back to the table of content\].](#table-of-content)**
+## SAKOE EXTERNAL-TOOLS
+
+### Synopsis
+
+Manage external tools usable in sakoe.
+
+### Usage
+
+`sakoe external-tools [options] [command]`
+
+### Options
+
+| Short name | Long name | Description |
+| --- | --- | --- |
+| -h | --help | Show this help text. |
+
+### Commands
+
+| Short name | Long name | Description |
+| --- | --- | --- |
+| dd | datadigger | The DataDigger is a database explorer tool, fully written in Progress, that enables you to handle your data in a very natural way. |
+
+**[\[Go back to the table of content\].](#table-of-content)**
+## SAKOE EXTERNAL-TOOLS DATADIGGER
+
+### Synopsis
+
+The DataDigger is a database explorer tool, fully written in Progress, that enables you to handle your data in a very natural way.
+
+### Usage
+
+`sakoe external-tools datadigger [options] [command]`
+
+### Options
+
+| Short name | Long name | Description |
+| --- | --- | --- |
+| -h | --help | Show this help text. |
+
+### Commands
+
+| Short name | Long name | Description |
+| --- | --- | --- |
+| in | install | Install DataDigger in the default installation path. Use the environment variable `OE_DATADIGGER_INSTALL_PATH` to specify a different location. |
+| rm | remove | Remove DataDigger from the installation path. |
+| ru | run | Run a new DataDigger instance. |
+
+### Description
+
+If DataDigger is already installed on your computer, you can use the environment variable `OE_DATADIGGER_INSTALL_PATH` to specify the installation location so sakoe knows where to find the tool. Otherwise, simply let sakoe install it in the default location.
+
+DataDigger is maintained by Patrick Tingen: https://github.com/patrickTingen/DataDigger.
+
+Learn more here: https://datadigger.wordpress.com.
+
+**[\[Go back to the table of content\].](#table-of-content)**
+## SAKOE EXTERNAL-TOOLS DATADIGGER INSTALL
+
+### Synopsis
+
+Install DataDigger in the default installation path. Use the environment variable `OE_DATADIGGER_INSTALL_PATH` to specify a different location.
+
+### Usage
+
+`sakoe external-tools datadigger install [options]`
+
+### Options
+
+| Short name | Long name | Description |
+| --- | --- | --- |
+| -b | --get-pre-release | Accept to install pre-release (i.e. 'beta') versions of the tool. |
+| -p | --proxy | The http proxy to use for this update. Useful if you are behind a corporate firewall. The expected format is: 'http(s)://[user:password@]host[:port]'. It is also possible to use the environment variables OE_HTTP_PROXY or http_proxy to set this value. |
+| -f | --force | Force the installation even if the tool is already installed. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
+| -h | --help | Show this help text. |
+
+**[\[Go back to the table of content\].](#table-of-content)**
+## SAKOE EXTERNAL-TOOLS DATADIGGER REMOVE
+
+### Synopsis
+
+Remove DataDigger from the installation path.
+
+### Usage
+
+`sakoe external-tools datadigger remove [options]`
+
+### Options
+
+| Short name | Long name | Description |
+| --- | --- | --- |
+| -f | --force | Mandatory option to force the removal and avoid bad manipulation. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
+| -h | --help | Show this help text. |
+
+**[\[Go back to the table of content\].](#table-of-content)**
+## SAKOE EXTERNAL-TOOLS DATADIGGER RUN
+
+### Synopsis
+
+Run a new DataDigger instance.
+
+### Usage
+
+`sakoe external-tools datadigger run [options] [-- <extra pro args>...]`
+
+### Options
+
+| Short name | Long name | Description |
+| --- | --- | --- |
+| -ro | --read-only | Start DataDigger in read-only mode (records will not modifiable). |
+| -d | --detached | Use this option to immediately return to the prompt instead of waiting the for the program to exit. |
+| -c | --connection | (Can be used multiple times) A connection string that can be used to connect to one or more openedge database. The connection string will be used in a `CONNECT` statement. |
+| -f | --file | (Can be used multiple times) Path to a database (.db file). The .db extension is optional and the path can be relative to the current directory. Defaults to a list of path of all the .db file found in the current directory. |
+| -cp | --cp-params | Database server internationalization startup parameters such as `-cpinternal` codepage and `-cpstream` codepage. This option will be used for openedge commands that support them (_dbutil, _mprosrv, _mprshut, _proutil). |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
+| -h | --help | Show this help text. |
+
+### Description
+
+Please note that when running DataDigger, the DataDigger.pf file of the installation path is used.
 
 **[\[Go back to the table of content\].](#table-of-content)**
 ## SAKOE MANUAL
@@ -1015,7 +1424,8 @@ Each command is well documented on its own, don't be afraid to use the `--help` 
 
 How to use this command line interface tool:
   - You can escape white spaces in argument/option values by using double quotes (i.e. "my value").
-  - If you need to use a double quote within a double quote, you can do so by double the double quote (i.e. "my ""special"" value").
+  - If you need to use a double quote within a double quote, you can do so by double quoting the double quotes (i.e. "my ""special"" value").
+  - If an extra layer is needed, just double the doubling (i.e. -opt "-mysubopt ""my special """"value""""""").
   - In the 'USAGE' help section, arguments between brackets (i.e. []) are optionals.
 
 ### Response file parsing
@@ -1031,7 +1441,7 @@ In response files, you do not have to double quote arguments containing spaces, 
 
 The convention followed by this tool is the following.
   - 0 : used when a command completed successfully, without errors nor warnings.
-  - 1-8 : used when a command completed but with warnings, the level can be used to pinpoint different kind of warnings.
+  - 1-8 : used when a command completed but with warnings, the level can be used to pinpoint different kinds of warnings.
   - 9 : used when a command does not complete and ends up in error.
 
 ### Website
@@ -1091,11 +1501,11 @@ Opens a .chm file (windows help file) present in $DLC/prohelp.
 
 | Short name | Long name | Description |
 | --- | --- | --- |
-| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the DLC environment variable if it exists. |
-| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. |
-| -pm | --progress-mode | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
-| -do | --debug-output | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
 | -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
 | -h | --help | Show this help text. |
 
 **[\[Go back to the table of content\].](#table-of-content)**
@@ -1119,11 +1529,11 @@ Look for help on the given Openedge keyword in the language windows help file.
 
 | Short name | Long name | Description |
 | --- | --- | --- |
-| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the DLC environment variable if it exists. |
-| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. |
-| -pm | --progress-mode | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
-| -do | --debug-output | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
 | -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
 | -h | --help | Show this help text. |
 
 **[\[Go back to the table of content\].](#table-of-content)**
@@ -1141,11 +1551,11 @@ List all the .chm files (windows help files) available in $DLC/prohelp.
 
 | Short name | Long name | Description |
 | --- | --- | --- |
-| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the DLC environment variable if it exists. |
-| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. |
-| -pm | --progress-mode | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
-| -do | --debug-output | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
 | -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
 | -h | --help | Show this help text. |
 
 **[\[Go back to the table of content\].](#table-of-content)**
@@ -1169,11 +1579,11 @@ Displays the extended error message using an error number.
 
 | Short name | Long name | Description |
 | --- | --- | --- |
-| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the DLC environment variable if it exists. |
-| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. |
-| -pm | --progress-mode | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
-| -do | --debug-output | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
 | -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
 | -h | --help | Show this help text. |
 
 ### Description
@@ -1204,6 +1614,7 @@ Commands related to an Openedge project (.oe directory).
 | gi | gitignore | Initialize a .gitignore file adapted for sakoe projects (or append to, if it exists). |
 | in | init | Initialize a new Openedge project file (.oeproj.xml). |
 | li | list | List all the project files or list the build configurations in a project file. |
+| up | update | Update the `Project.xsd` file of the project with the latest version embedded in this tool. |
 
 **[\[Go back to the table of content\].](#table-of-content)**
 ## SAKOE PROJECT GITIGNORE
@@ -1226,10 +1637,10 @@ Initialize a .gitignore file adapted for sakoe projects (or append to, if it exi
 
 | Short name | Long name | Description |
 | --- | --- | --- |
-| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. |
-| -pm | --progress-mode | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
-| -do | --debug-output | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
 | -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
 | -h | --help | Show this help text. |
 
 **[\[Go back to the table of content\].](#table-of-content)**
@@ -1256,10 +1667,10 @@ Initialize a new Openedge project file (.oeproj.xml).
 | -p | --project-name | The name of the project to create. Defaults to the current directory name. |
 | -l | --local | Create the new project file for local use only. A local project should contain build configurations specific to your machine and thus should not be shared or versioned in your source control system. |
 | -f | --force | Force the creation of the project file by replacing an older project file, if it exists. By default, the command will fail if the project file already exists. |
-| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. |
-| -pm | --progress-mode | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
-| -do | --debug-output | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
 | -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
 | -h | --help | Show this help text. |
 
 **[\[Go back to the table of content\].](#table-of-content)**
@@ -1283,10 +1694,37 @@ List all the project files or list the build configurations in a project file.
 
 | Short name | Long name | Description |
 | --- | --- | --- |
-| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. |
-| -pm | --progress-mode | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
-| -do | --debug-output | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
 | -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
+| -h | --help | Show this help text. |
+
+**[\[Go back to the table of content\].](#table-of-content)**
+## SAKOE PROJECT UPDATE
+
+### Synopsis
+
+Update the `Project.xsd` file of the project with the latest version embedded in this tool.
+
+### Usage
+
+`sakoe project update <directory> [options]`
+
+### Arguments
+
+| Argument | Description |
+| --- | --- |
+| \<directory\> | The directory in which the project is located. Defaults to the current directory. |
+
+### Options
+
+| Short name | Long name | Description |
+| --- | --- | --- |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
 | -h | --help | Show this help text. |
 
 **[\[Go back to the table of content\].](#table-of-content)**
@@ -1305,13 +1743,12 @@ Update this tool with the latest release found on github.
 | Short name | Long name | Description |
 | --- | --- | --- |
 | -b | --get-pre-release | Accept to update from new pre-release (i.e. 'beta') versions of the tool. This option will be used by default if the current version of the tool is a pre-release version. Otherwise, only stable releases will be used for updates.  |
-| -p | --proxy | The http proxy to use for this update. Useful if you are behind a corporate firewall. The expected format is: 'http(s)://[user:password@]host[:port]'. It is also possible to use the environment variable HTTP_PROXY to set this value. |
+| -p | --proxy | The http proxy to use for this update. Useful if you are behind a corporate firewall. The expected format is: 'http(s)://[user:password@]host[:port]'. It is also possible to use the environment variables OE_HTTP_PROXY or http_proxy to set this value. |
 | -c | --check-only | Check for new releases but exit the command before actually updating the tool. |
-| -u | --override-github-url | Use an alternative url for the github api. This option is here to allow updates from a different location (a private server for instance) but should not be used in most cases. |
-| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. |
-| -pm | --progress-mode | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
-| -do | --debug-output | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
 | -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
 | -h | --help | Show this help text. |
 
 **[\[Go back to the table of content\].](#table-of-content)**
@@ -1361,10 +1798,10 @@ Returns a single line connection string from a .pf file.
 
 | Short name | Long name | Description |
 | --- | --- | --- |
-| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. |
-| -pm | --progress-mode | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
-| -do | --debug-output | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
 | -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
 | -h | --help | Show this help text. |
 
 ### Description
@@ -1388,11 +1825,11 @@ Returns the pro executable full path.
 | Short name | Long name | Description |
 | --- | --- | --- |
 | -c | --char-mode | Specify to return the path of the character mode executable. |
-| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the DLC environment variable if it exists. |
-| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. |
-| -pm | --progress-mode | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
-| -do | --debug-output | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
 | -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
 | -h | --help | Show this help text. |
 
 **[\[Go back to the table of content\].](#table-of-content)**
@@ -1417,11 +1854,11 @@ Returns PROPATH value found in a .ini file.
 | Short name | Long name | Description |
 | --- | --- | --- |
 | -d | --base-directory | The base directory to use to convert to absolute path. Default to current directory. |
-| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the DLC environment variable if it exists. |
-| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. |
-| -pm | --progress-mode | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
-| -do | --debug-output | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
 | -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
 | -h | --help | Show this help text. |
 
 ### Description
@@ -1446,11 +1883,11 @@ Returns the version found for the Openedge installation.
 
 | Short name | Long name | Description |
 | --- | --- | --- |
-| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the DLC environment variable if it exists. |
-| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. |
-| -pm | --progress-mode | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
-| -do | --debug-output | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -dl | --dlc | The path to the directory containing the Openedge installation. Will default to the path found in the `OE_DLC` or `DLC` environment variable if it exists. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
 | -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
 | -h | --help | Show this help text. |
 
 **[\[Go back to the table of content\].](#table-of-content)**
@@ -1469,10 +1906,10 @@ Show the version information of this tool.
 | Short name | Long name | Description |
 | --- | --- | --- |
 | -b | --bare-version | Output the raw assembly version of the tool, without logo and pre-release tag. |
-| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. |
-| -pm | --progress-mode | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
-| -do | --debug-output | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
+| -vb | --verbosity | Sets the verbosity of this command line tool. To get the 'raw output' of a command (without displaying the log), you can set the verbosity to `none`. Specifying this option without a level value sets the verbosity to `debug`. Not specifying the option defaults to `info`. Optionally, set the verbosity level for all commands using the environment variable `OE_VERBOSITY`. |
+| -lo | --log-file | Output all the log message in a file, independently of the current verbosity. This allow to have a normal verbosity in the console while still logging everything to a file. Specifying this option without a value will output to the default file `sakoe.log`. |
 | -wl | --with-logo | Always show the logo on start. |
+| -pb | --progress-bar | Sets the display mode of progress bars. Specify `off` to hide progress bars and `stay` to make them persistent. Defaults to `on`, which show progress bars but hide them when done. |
 | -h | --help | Show this help text. |
 
 **[\[Go back to the table of content\].](#table-of-content)**

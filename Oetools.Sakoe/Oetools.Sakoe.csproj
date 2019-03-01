@@ -43,6 +43,8 @@
   <PropertyGroup>
   	<!-- add xtra nuget sources -->
     <RestoreSources>$(RestoreSources);https://www.myget.org/F/natemcmaster/api/v3/index.json;https://dotnet.myget.org/F/dotnet-core/api/v3/index.json</RestoreSources>
+    <!-- https://docs.microsoft.com/en-us/dotnet/core/rid-catalog -->
+    <RuntimeIdentifiers>win-x64;win-x86;linux-x64</RuntimeIdentifiers>
   </PropertyGroup>
 
   <ItemGroup Label="ProjectReferences">
@@ -64,6 +66,7 @@
     <When Condition=" $(IsNetStandard) ">
   	  <ItemGroup Label="PackageReferences">
   	    <!-- <PackageReference Include="ILLink.Tasks" Version="0.1.5-preview-1841731" /> -->
+        <!-- https://github.com/ericstj/Microsoft.Packaging.Tools.Trimming -->
   	    <PackageReference Include="Microsoft.Packaging.Tools.Trimming" Version="1.1.0-preview1-26619-01" />
   	  </ItemGroup>
   	  <ItemGroup>

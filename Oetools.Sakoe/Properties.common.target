@@ -37,6 +37,26 @@
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
   </PropertyGroup>
 
+  <PropertyGroup Label="Compilation info">
+    <!-- https://docs.microsoft.com/en-us/dotnet/standard/frameworks -->
+    <TargetFrameworks>$(ProjDefaultTargetFrameworks)</TargetFrameworks>
+    <!-- The operating system you are building for: "Any CPU", "x86", and "x64" -->
+    <Platform>Any Cpu</Platform>
+    <Configuration>Release</Configuration>
+    <SolutionDir Condition=" $(SolutionDir) == ''">..\</SolutionDir>
+    <Optimize Condition=" '$(Configuration)' == 'Release' ">true</Optimize>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <OutputPath Condition=" '$(Platform)' != 'Any Cpu' ">bin\$(Configuration)\$(Platform)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
+    <BuildProjectReferences>true</BuildProjectReferences>
+    <IsNetStandard Condition=" $(TargetFramework.Contains('netstandard')) OR $(TargetFramework.Contains('netcoreapp')) ">true</IsNetStandard>
+    <IsNetStandard Condition=" '$(IsNetStandard)'=='' ">false</IsNetStandard>
+    <IsNetFramework Condition=" $(IsNetStandard) ">false</IsNetFramework>
+    <IsNetFramework Condition=" !$(IsNetStandard) ">true</IsNetFramework>
+    <IsOutputLibrary>false</IsOutputLibrary>
+    <IsOutputLibrary Condition=" '$(ProjOutputType)'=='Library' ">true</IsOutputLibrary>
+  </PropertyGroup>
+
   <PropertyGroup Label="Package info">
     <IsPackable Condition=" '$(ProjOutputType)'=='Library' ">true</IsPackable>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
@@ -64,25 +84,6 @@ See more details about this release on github: https://github.com/$(ProjReposito
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <IncludeSource>true</IncludeSource>
     <IncludeSymbols>true</IncludeSymbols>
-  </PropertyGroup>
-
-  <PropertyGroup Label="Compilation info">
-    <!-- https://docs.microsoft.com/en-us/dotnet/standard/frameworks -->
-    <TargetFrameworks>$(ProjDefaultTargetFrameworks)</TargetFrameworks>
-    <!-- The operating system you are building for: "Any CPU", "x86", and "x64" -->
-    <Platform>Any Cpu</Platform>
-    <Configuration>Release</Configuration>
-    <SolutionDir Condition=" $(SolutionDir) == ''">..\</SolutionDir>
-    <Optimize Condition=" '$(Configuration)' == 'Release' ">true</Optimize>
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
-    <BuildProjectReferences>true</BuildProjectReferences>
-    <IsNetStandard Condition=" $(TargetFramework.Contains('netstandard')) OR $(TargetFramework.Contains('netcoreapp')) ">true</IsNetStandard>
-    <IsNetStandard Condition=" '$(IsNetStandard)'=='' ">false</IsNetStandard>
-    <IsNetFramework Condition=" $(IsNetStandard) ">false</IsNetFramework>
-    <IsNetFramework Condition=" !$(IsNetStandard) ">true</IsNetFramework>
-    <IsOutputLibrary>false</IsOutputLibrary>
-    <IsOutputLibrary Condition=" '$(ProjOutputType)'=='Library' ">true</IsOutputLibrary>
   </PropertyGroup>
 
   <PropertyGroup Label="SourceLink info">
