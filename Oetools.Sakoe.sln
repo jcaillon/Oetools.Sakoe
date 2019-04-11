@@ -9,9 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Oetools.Utilities", "Oetool
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{88BF140B-288F-4CD9-A6F0-0BBAD9FCC77A}"
 	ProjectSection(SolutionItems) = preProject
-		build.bat = build.bat
 		README.md = README.md
-		runtests.bat = runtests.bat
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Oetools.Sakoe", "Oetools.Sakoe\Oetools.Sakoe.csproj", "{FFB81763-530F-4355-A234-BCE711A49102}"

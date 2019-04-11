@@ -108,6 +108,7 @@ See more details about this release on github: https://github.com/$(ProjReposito
 
   <PropertyGroup Label="Extra stuff">
     <DefineConstants Condition=" $(IsNetFramework) ">$(DefineConstants);WINDOWSONLYBUILD</DefineConstants>
+    <DefineConstants Condition=" '$(UseAppHost)'=='true' ">$(DefineConstants);SELFCONTAINEDWITHEXE</DefineConstants>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <!-- throw an exception on overflow instead of failing quietly -->
     <CheckForOverflowUnderflow Condition=" '$(Configuration)'=='Release' ">true</CheckForOverflowUnderflow>

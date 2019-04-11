@@ -421,6 +421,7 @@ sakoe st input -b2 s1024"
 
             for (var i = 0; i <= 100; i++) {
                 CancelToken?.ThrowIfCancellationRequested();
+                Log.Debug($"iteration {i}");
                 Log.ReportProgress(100, i, $"Executing task {i}");
                 Thread.Sleep(100);
             }

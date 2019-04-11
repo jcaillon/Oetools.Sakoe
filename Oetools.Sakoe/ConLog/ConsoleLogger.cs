@@ -195,11 +195,11 @@ namespace Oetools.Sakoe.ConLog {
         /// <param name="e"></param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         protected virtual void Log(ConsoleLogThreshold level, string message, Exception e = null) {
-            StopProgressBar();
-
             if (level < LogTheshold) {
                 return;
             }
+            StopProgressBar();
+
             var elapsed = _stopwatch.Elapsed;
             var logPrefix = $"{level.ToString().ToUpper().PadRight(5, ' ')} [{elapsed.Minutes:D2}:{elapsed.Seconds:D2}.{elapsed.Milliseconds:D3}] ";
 

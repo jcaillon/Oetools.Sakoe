@@ -154,7 +154,7 @@ namespace Oetools.Sakoe.Utilities {
                 }
             }
 
-            #if !WINDOWSONLYBUILD
+            #if !WINDOWSONLYBUILD && !SELFCONTAINEDWITHEXE
             if (!File.Exists(CreateStarterCommand.StartScriptFilePath)) {
                 WriteOnNewLine(null);
                 WriteTip($"Tip: use the command {typeof(CreateStarterCommand).GetFullCommandLine().PrettyQuote()} to simplify your invocation of sakoe.");

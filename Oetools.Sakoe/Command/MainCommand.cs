@@ -128,7 +128,7 @@ namespace Oetools.Sakoe.Command {
             console.Write(@"  /;/", ConsoleColor.White);
             console.Write(@"       \ \\      ", ConsoleColor.Gray);
             console.Write("Version ", ConsoleColor.Gray);
-            console.Write(RunningAssembly.Info.ProductShortVersion, ConsoleColor.White);
+            console.Write($"{RunningAssembly.Info.ProductShortVersion}-{(Environment.Is64BitProcess ? "x64" : "x86")}", ConsoleColor.White);
             console.Write(".", ConsoleColor.Gray);
             console.WriteOnNewLine(@"   \ \", ConsoleColor.Gray);
             console.Write(@"/", ConsoleColor.White);

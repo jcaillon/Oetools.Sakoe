@@ -40,7 +40,7 @@ namespace Oetools.Sakoe.Command.Oe {
     internal class UpdateCommand : ABaseCommand {
 
         private const string RepoOwner = "jcaillon";
-        private const string RepoName = "Oetools.Sakoe";
+        private const string RepoName = "battle-code"; // Oetools.Sakoe
         public const string GitHubToken = "MmViMDJlNWVlYWZlMTIzNGIxN2VmOTkxMGQ1NzljMTRkM2E1ZDEyMw==";
 
         [Option("-b|--get-pre-release", "Accept to update from new pre-release (i.e. 'beta') versions of the tool.\nThis option will be used by default if the current version of the tool is a pre-release version. Otherwise, only stable releases will be used for updates. ", CommandOptionType.NoValue)]
@@ -97,16 +97,20 @@ namespace Oetools.Sakoe.Command.Oe {
 
             var latestAsset = latestRelease.Assets.FirstOrDefault(asset => {
                 if (Utils.IsNetFrameworkBuild) {
-                    return !asset.Name.Contains("core");
+                    return asset.Name.Contains("win") && asset.Name.Contains(Environment.Is64BitProcess ? "x64" : "x86");
                 }
-                return asset.Name.Contains("core");
+                #if !SELFCONTAINEDWITHEXE
+                    return asset.Name.Contains("no-runtime");
+                #else
+                    return asset.Name.Contains("core");
+                #endif
             });
 
             if (latestAsset == null) {
                 throw new CommandException("Could not find a matching asset in the latest github release.");
             }
 
-            Log.Debug($"Downloading the latest release asset: {latestAsset.BrowserDownloadUrl}.");
+            Log.Debug($"Downloading the latest release asset {latestAsset.Name} from {latestAsset.BrowserDownloadUrl}.");
             var tempFilePath = updater.DownloadToTempFile(latestAsset.BrowserDownloadUrl, progress => {
                 Log.ReportProgress(100, (int) Math.Round((decimal) progress.NumberOfBytesDoneTotal / progress.NumberOfBytesTotal * 100), "Downloading update.");
             });
@@ -122,8 +126,10 @@ namespace Oetools.Sakoe.Command.Oe {
             if (string.IsNullOrEmpty(toolDirectory)) {
                 throw new CommandException("Could not find the directory in which this tool is installed.");
             }
-            foreach (var file in Utils.EnumerateAllFiles(tempExtractionDir)) {
-                fileUpdater.AddFileToMove(file, Path.Combine(toolDirectory, file.Replace(tempExtractionDir, "").TrimStartDirectorySeparator()));
+            foreach (var file in Utils.EnumerateAllFiles(Path.Combine(tempExtractionDir, "sakoe"))) {
+                if (file != null) {
+                    fileUpdater.AddFileToMove(file, Path.Combine(toolDirectory, Path.GetFileName(file)));
+                }
             }
 
             File.Delete(tempFilePath);
