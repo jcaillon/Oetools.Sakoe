@@ -52,7 +52,7 @@ namespace Oetools.Sakoe.Command.Oe {
     internal class ProjectInitCommand : ABaseCommand {
 
         [DirectoryExists]
-        [Argument(0, "<directory>", "The directory in which to initialize the project. Defaults to the current directory.")]
+        [Option("-d|--directory <path>", "The directory in which to initialize the project. Defaults to the current directory.", CommandOptionType.SingleValue)]
         public string SourceDirectory { get; set; }
 
         [LegalFilePath]
@@ -132,7 +132,7 @@ For git repositories, use the command " + typeof(ProjectGitignoreCommand).GetFul
     internal class ProjectGitignoreCommand : ABaseCommand {
 
         [DirectoryExists]
-        [Argument(0, "<directory>", "The repository base directory (source directory). Defaults to the current directory.")]
+        [Option("-d|--directory <path>", "The repository base directory (source directory). Defaults to the current directory.", CommandOptionType.SingleValue)]
         public string SourceDirectory { get; set; }
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
@@ -198,7 +198,7 @@ Project.xsd
     internal class ProjectListCommand : AOeCommand {
 
         [LegalFilePath]
-        [Argument(0, "<file or directory>", "The project file in which to list the build configurations or the project base directory (source directory) in which to list the project files. Defaults to the current directory.")]
+        [Option("-p|--path <path>", "The project file in which to list the build configurations or the project base directory (source directory) in which to list the project files. Defaults to the current directory.", CommandOptionType.SingleValue)]
         public string PathToList { get; set; }
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
@@ -240,7 +240,7 @@ Project.xsd
     internal class ProjectUpdateCommand : AOeCommand {
 
         [DirectoryExists]
-        [Argument(0, "<directory>", "The directory in which the project is located. Defaults to the current directory.")]
+        [Option("-d|--directory <path>", "The directory in which the project is located. Defaults to the current directory.", CommandOptionType.SingleValue)]
         public string ProjectDirectory { get; set; }
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {

@@ -22,6 +22,7 @@ using System.IO;
 using System.Linq;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Command.Oe;
+using Oetools.Sakoe.Command.Oe.Database;
 using Oetools.Sakoe.ConLog;
 using Oetools.Sakoe.Utilities;
 using Oetools.Sakoe.Utilities.Extension;

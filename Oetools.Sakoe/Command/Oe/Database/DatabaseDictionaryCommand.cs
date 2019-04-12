@@ -1,8 +1,7 @@
-﻿#region header
-
+#region header
 // ========================================================================
-// Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
-// This file (UpdateCommand.cs) is part of Oetools.Sakoe.
+// Copyright (c) 2019 - Julien Caillon (julien.caillon@gmail.com)
+// This file (DataDiggerCommand.cs) is part of Oetools.Sakoe.
 //
 // Oetools.Sakoe is a free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,26 +16,28 @@
 // You should have received a copy of the GNU General Public License
 // along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
-
 #endregion
 
-using System.IO;
 using McMaster.Extensions.CommandLineUtils;
-using Oetools.Sakoe.Command.Oe.Database;
 using Oetools.Utilities.Lib;
 
-namespace Oetools.Sakoe.Command.Oe {
+namespace Oetools.Sakoe.Command.Oe.Database {
 
     [Command(
-        "external-tools", "et",
-        Description = "Manage external tools usable in sakoe."
+        "dictionary", "di", "dic",
+        Description = "The openedge database dictionary tool."
     )]
-    [Subcommand(typeof(DataDiggerCommand))]
-    internal class ExternalTools : AExpectSubCommand {
-        /// <summary>
-        /// Directory in which external tools are installed.
-        /// </summary>
-        public static string ExternalToolInstallationDirectory => Path.Combine(Utils.GetHomeDirectory(), ".sakoe");
+    [Subcommand(typeof(DatabaseDictionaryRunCommand))]
+    internal class DatabaseDictionaryCommand : AExpectSubCommand {
     }
 
+    [Command(
+        "run", "ru",
+        Description = "Run an instance of the dictionary tool."
+    )]
+    internal class DatabaseDictionaryRunCommand : ADatabaseToolCommand {
+
+        protected override ProcessArgs ToolArguments() => new ProcessArgs().Append("-p", "_dict.p");
+
+    }
 }

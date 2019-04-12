@@ -137,11 +137,11 @@ namespace Oetools.Sakoe.Utilities {
             WriteSectionTitle("USAGE");
             WriteOnNewLine(thisCommandLine);
 
-            foreach (var argument in visibleArguments) {
-                Write($" {argument.Name}");
-            }
             if (visibleOptions.Any()) {
                 Write(" [options]");
+            }
+            foreach (var argument in visibleArguments) {
+                Write($" {argument.Name}");
             }
             if (visibleCommands.Any()) {
                 Write(" [command]");

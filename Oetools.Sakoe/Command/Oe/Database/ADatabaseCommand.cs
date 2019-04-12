@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -14,7 +13,7 @@ using Oetools.Utilities.Openedge;
 using Oetools.Utilities.Openedge.Database;
 using Oetools.Utilities.Openedge.Execution;
 
-namespace Oetools.Sakoe.Command.Oe {
+namespace Oetools.Sakoe.Command.Oe.Database {
 
     internal abstract class ADatabaseCommand : AOeDlcCommand {
 
@@ -51,7 +50,7 @@ namespace Oetools.Sakoe.Command.Oe {
                 if (!throwWhenNoDatabaseFound) {
                     yield break;
                 }
-                throw new CommandException($"No database file {UoeDatabaseLocation.Extension.PrettyQuote()} found in the current folder: {Directory.GetCurrentDirectory().PrettyQuote()}. Initialize a new database using the command: {typeof(CreateDatabaseCommand).GetFullCommandLine().PrettyQuote()}.");
+                throw new CommandException($"No database file {UoeDatabaseLocation.Extension.PrettyQuote()} found in the current folder: {Directory.GetCurrentDirectory().PrettyQuote()}. Initialize a new database using the command: {typeof(DatabaseCreateCommand).GetFullCommandLine().PrettyQuote()}.");
             }
             foreach (var path in list) {
                 var databaseLocation = new UoeDatabaseLocation(path);

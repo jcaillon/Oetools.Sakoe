@@ -97,7 +97,8 @@ namespace Oetools.Sakoe.Command.Oe {
         [Argument(0, "<chm file name>", "The file name of the .chm file to display.")]
         public string ChmFileName { get; }
 
-        [Argument(1, "<topic>", "Open the .chm on the given topic.")]
+
+        [Option("-t|--topic <topic>", @"Open the .chm on the given topic.", CommandOptionType.SingleValue)]
         public string Topic { get; }
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
@@ -124,6 +125,7 @@ namespace Oetools.Sakoe.Command.Oe {
     )]
     internal class KeywordProHelpCommand : ChmDisplayProHelpCommand {
 
+        [Required]
         [Argument(0, "<keyword>", "The keyword you would like to find in the help.")]
         public string Keyword { get; }
 

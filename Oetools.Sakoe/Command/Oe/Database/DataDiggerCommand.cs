@@ -19,9 +19,7 @@
 #endregion
 
 using System;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -29,12 +27,12 @@ using System.Text;
 using GithubUpdater.GitHub;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Command.Exceptions;
+using Oetools.Sakoe.Utilities.Extension;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
-using Oetools.Utilities.Openedge;
 using Oetools.Utilities.Openedge.Execution;
 
-namespace Oetools.Sakoe.Command.Oe {
+namespace Oetools.Sakoe.Command.Oe.Database {
 
     [Command(
         "datadigger", "dd",
@@ -82,7 +80,25 @@ Learn more here: https://datadigger.wordpress.com."
         Description = "Run a new DataDigger instance.",
         ExtendedHelpText = "Please note that when running DataDigger, the DataDigger.pf file of the installation path is used."
     )]
-    internal class DataDiggerRunCommand : DatabaseDataDiggerCommand { }
+    internal class DataDiggerRunCommand : ADatabaseToolCommand {
+
+        [Option("-ro|--read-only", "Start DataDigger in read-only mode (records will not modifiable).", CommandOptionType.NoValue)]
+        public bool ReadOnly { get; set; } = false;
+
+        protected override ProcessArgs ToolArguments() => DataDiggerCommand.DataDiggerStartUpParameters(ReadOnly);
+
+        protected override string ExecutionWorkingDirectory => DataDiggerCommand.DataDiggerInstallationDirectory;
+
+        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
+            if (!Utils.IsRuntimeWindowsPlatform) {
+                throw new CommandException("DataDigger can only run on windows platform.");
+            }
+            if (!DataDiggerCommand.IsDataDiggerInstalled) {
+                throw new CommandException($"DataDigger is not installed yet, use the command {typeof(DataDiggerInstallCommand).GetFullCommandLine().PrettyQuote()}.");
+            }
+            return base.ExecuteCommand(app, console);
+        }
+    }
 
     [Command(
         "remove", "rm",
@@ -121,7 +137,7 @@ Learn more here: https://datadigger.wordpress.com."
         [Option("-b|--get-pre-release", "Accept to install pre-release (i.e. 'beta') versions of the tool.", CommandOptionType.NoValue)]
         public bool GetPreRelease { get; set; } = false;
 
-        [Option("-p|--proxy", "The http proxy to use for this update. Useful if you are behind a corporate firewall.\nThe expected format is: 'http(s)://[user:password@]host[:port]'.\nIt is also possible to use the environment variables OE_HTTP_PROXY or http_proxy to set this value.", CommandOptionType.SingleValue)]
+        [Option("-p|--proxy <url>", "The http proxy to use for this update. Useful if you are behind a corporate firewall.\nThe expected format is: 'http(s)://[user:password@]host[:port]'.\nIt is also possible to use the environment variables OE_HTTP_PROXY or http_proxy to set this value.", CommandOptionType.SingleValue)]
         public string HttpProxy { get; set; }
 
         [Option("-f|--force", "Force the installation even if the tool is already installed.", CommandOptionType.NoValue)]

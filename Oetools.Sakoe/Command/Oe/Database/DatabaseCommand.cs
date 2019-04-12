@@ -21,93 +21,55 @@
 using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.IO;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Command.Exceptions;
-using Oetools.Sakoe.Utilities.Extension;
+using Oetools.Sakoe.ConLog;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge.Database;
 using Oetools.Utilities.Openedge.Execution;
 
-namespace Oetools.Sakoe.Command.Oe {
+namespace Oetools.Sakoe.Command.Oe.Database {
 
     [Command(
         "database", "db",
         Description = "Database manipulation tools."
     )]
-    [Subcommand(typeof(CreateDatabaseCommand))]
-    [Subcommand(typeof(StartDatabaseCommand))]
-    [Subcommand(typeof(StopDatabaseCommand))]
-    [Subcommand(typeof(KillDatabaseCommand))]
-    [Subcommand(typeof(KillAllDatabaseCommand))]
-    [Subcommand(typeof(DeleteDatabaseCommand))]
-    [Subcommand(typeof(RepairDatabaseCommand))]
-    [Subcommand(typeof(ConnectDatabaseCommand))]
-    [Subcommand(typeof(CopyDatabaseCommand))]
-    [Subcommand(typeof(DumpDatabaseCommand))]
-    [Subcommand(typeof(LoadDatabaseCommand))]
+    [Subcommand(typeof(DatabaseStructureCommand))]
+    [Subcommand(typeof(DatabaseAnalysisCommand))]
+    [Subcommand(typeof(DatabaseLogCommand))]
+    [Subcommand(typeof(DatabaseBiCommand))]
+    [Subcommand(typeof(DatabaseIndexCommand))]
     [Subcommand(typeof(DatabaseAdminCommand))]
     [Subcommand(typeof(DatabaseDictionaryCommand))]
-    [Subcommand(typeof(DatabaseDataDiggerCommand))]
-    [Subcommand(typeof(AdvisorDatabaseCommand))]
-    // TODO: project database manipulation!
-//    [Subcommand(typeof(ProjectDatabaseCommand))]
+    [Subcommand(typeof(DataDiggerCommand))]
+    [Subcommand(typeof(DatabaseProjectCommand))]
+    [Subcommand(typeof(DatabaseDataCommand))]
+    [Subcommand(typeof(DatabaseSchemaCommand))]
+
+    [Subcommand(typeof(DatabaseCreateCommand))]
+    [Subcommand(typeof(DatabaseStartCommand))]
+    [Subcommand(typeof(DatabaseStopCommand))]
+    [Subcommand(typeof(DatabaseKillCommand))]
+    [Subcommand(typeof(DatabaseKillAllCommand))]
+    [Subcommand(typeof(DatabaseDeleteCommand))]
+    [Subcommand(typeof(DatabaseRepairCommand))]
+    [Subcommand(typeof(DatabaseConnectCommand))]
+    [Subcommand(typeof(DatabaseCopyCommand))]
+    [Subcommand(typeof(DatabaseGetBusyCommand))]
+    [Subcommand(typeof(DatabaseBackUpCommand))]
+    [Subcommand(typeof(DatabaseRestoreCommand))]
     internal class DatabaseCommand : AExpectSubCommand {
-    }
-
-    [Command(
-        "datadigger", "dd",
-        Description = "Open a new DataDigger instance.",
-        ExtendedHelpText = "Please note that when running DataDigger, the DataDigger.pf file of the installation path is used."
-    )]
-    internal class DatabaseDataDiggerCommand : ADatabaseToolCommand {
-
-        [Option("-ro|--read-only", "Start DataDigger in read-only mode (records will not modifiable).", CommandOptionType.NoValue)]
-        public bool ReadOnly { get; set; } = false;
-
-        protected override ProcessArgs ToolArguments() => DataDiggerCommand.DataDiggerStartUpParameters(ReadOnly);
-
-        protected override string ExecutionWorkingDirectory => DataDiggerCommand.DataDiggerInstallationDirectory;
-
-        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            if (!Utils.IsRuntimeWindowsPlatform) {
-                throw new CommandException("DataDigger can only run on windows platform.");
-            }
-            if (!DataDiggerCommand.IsDataDiggerInstalled) {
-                throw new CommandException($"DataDigger is not installed yet, use the command {typeof(DataDiggerInstallCommand).GetFullCommandLine().PrettyQuote()}.");
-            }
-            return base.ExecuteCommand(app, console);
-        }
-    }
-
-    [Command(
-        "dictionary", "di", "dic",
-        Description = "Open the database dictionary tool."
-    )]
-    internal class DatabaseDictionaryCommand : ADatabaseToolCommand {
-
-        protected override ProcessArgs ToolArguments() => new ProcessArgs().Append("-p", "_dict.p");
-
-    }
-
-    [Command(
-        "admin", "ad",
-        Description = "Open the database administration tool."
-    )]
-    internal class DatabaseAdminCommand : ADatabaseToolCommand {
-
-        protected override ProcessArgs ToolArguments() =>  new ProcessArgs().Append("-p", "_admin.p");
     }
 
     [Command(
         "connect", "co",
         Description = "Get the connection string to use to connect to a database."
     )]
-    internal class ConnectDatabaseCommand : ADatabaseSingleLocationCommand {
+    internal class DatabaseConnectCommand : ADatabaseSingleLocationCommand {
 
-        [Option("-l|--logical-name", "The logical name to use for the database in the connection string.", CommandOptionType.SingleValue)]
+        [Option("-l|--logical-name <name>", "The logical name to use for the database in the connection string.", CommandOptionType.SingleValue)]
         public string LogicalName { get; set; }
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
@@ -118,10 +80,10 @@ namespace Oetools.Sakoe.Command.Oe {
 
     [Command(
         "repair", "re",
-        Description = "Repair the structure of a database.",
+        Description = "Repair/update the database control information file (" + UoeDatabaseLocation.Extension + ").",
         ExtendedHelpText = "Update the database control information, usually done after an extent has been moved or renamed."
     )]
-    internal class RepairDatabaseCommand : ADatabaseSingleLocationWithAccessArgsCommand {
+    internal class DatabaseRepairCommand : ADatabaseSingleLocationWithAccessArgsCommand {
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             GetOperator().RepairDatabaseControlInfo(GetSingleDatabaseLocation(), new UoeProcessArgs().AppendFromQuotedArgs(DatabaseAccessStartupParameters));
@@ -132,9 +94,9 @@ namespace Oetools.Sakoe.Command.Oe {
     [Command(
         "delete", "de",
         Description = "Delete a database.",
-        ExtendedHelpText = "All the files composing the database are deleted without confirmation."
+        ExtendedHelpText = "All the files composing the database are deleted."
     )]
-    internal class DeleteDatabaseCommand : ADatabaseSingleLocationCommand {
+    internal class DatabaseDeleteCommand : ADatabaseSingleLocationCommand {
 
         [Option("-y|--yes", "Automatically answer yes on deletion confirmation.", CommandOptionType.NoValue)]
         public bool ForceDelete { get; set; } = false;
@@ -167,10 +129,10 @@ namespace Oetools.Sakoe.Command.Oe {
     }
 
     [Command(
-        "stop", "sp",
+        "stop", "so",
         Description = "Stop a database that was started for multi-users."
     )]
-    internal class StopDatabaseCommand : ADatabaseSingleLocationCommand {
+    internal class DatabaseStopCommand : ADatabaseSingleLocationCommand {
 
         [Description("[-- <extra proshut args>...]")]
         public string[] RemainingArgs { get; set; }
@@ -185,7 +147,7 @@ namespace Oetools.Sakoe.Command.Oe {
         "kill", "ki",
         Description = "Kill the broker/server processes running for a particular a database."
     )]
-    internal class KillDatabaseCommand : ADatabaseSingleLocationCommand {
+    internal class DatabaseKillCommand : ADatabaseSingleLocationCommand {
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             GetOperator().Kill(GetSingleDatabaseLocation());
@@ -194,50 +156,10 @@ namespace Oetools.Sakoe.Command.Oe {
     }
 
     [Command(
-        "advisor", "ar",
-        Description = "Generates an html report which provides pointers to common database configuration issues.",
-        ExtendedHelpText = @"This command uses the Database Advisor which can be found here: http://practicaldba.com/dlmain.html.
-
-The OpenEdge Database Advisor is intended to provide a quick checkup for common database configuration issues. Obviously proper tuning for an application requires much more than any tool can provide, but the advisor should highlight some of the most common low hanging fruit.
-
-For best results you will need a recent database analysis file (proutil -C dbanalys) and you should run this against your production database. A large portion of the suggestions will be based on VST information that will differ greatly between your production and test environments."
-    )]
-    internal class AdvisorDatabaseCommand : ADatabaseSingleConnectionCommand {
-
-        [Required]
-        [LegalFilePath]
-        [Argument(0, "<report-file>", "Path to the output html report file that will contain pointers to common database configuration issues. The extension is optional but it will be changed to .html if it is incorrectly provided.")]
-        public string ReportFilePath { get; set; }
-
-        [LegalFilePath]
-        [Option("-a|--analysis-file", "The file path to a database analysis output. If empty, the analysis will be carried on automatically if the database is local.", CommandOptionType.SingleValue)]
-        public string AnalysisFilePath { get; set; }
-
-        [Option("-u|--unattended", "Do not open the html report with the default browser after its creation.", CommandOptionType.NoValue)]
-        public bool Unattended { get; set; } = false;
-
-        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            using (var ope = GetAdministrator()) {
-                ReportFilePath = ReportFilePath.ToAbsolutePath();
-                ReportFilePath = !string.IsNullOrEmpty(ReportFilePath) ? Path.ChangeExtension(ReportFilePath, ".html") : null;
-                ope.GenerateAdvisorReport(GetSingleDatabaseConnection(), ReportFilePath, AnalysisFilePath);
-                if (!Unattended && !string.IsNullOrEmpty(ReportFilePath)) {
-                    try {
-                        Process.Start(ReportFilePath);
-                    } catch (Exception) {
-                        //ignored
-                    }
-                }
-            }
-            return 0;
-        }
-    }
-
-    [Command(
         "copy", "cp",
         Description = "Copy a database."
     )]
-    internal class CopyDatabaseCommand : ADatabaseCommand {
+    internal class DatabaseCopyCommand : ADatabaseCommand {
 
         [Required]
         [LegalFilePath]
@@ -266,7 +188,7 @@ For best results you will need a recent database analysis file (proutil -C dbana
         Description = "Kill all the broker/server processes running on this machine.",
         ExtendedHelpText = "A broker process is generally named: `_mprosrv`."
     )]
-    internal class KillAllDatabaseCommand : ABaseCommand {
+    internal class DatabaseKillAllCommand : ABaseCommand {
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             UoeDatabaseOperator.KillAllMproSrv();
             return 0;
@@ -274,20 +196,20 @@ For best results you will need a recent database analysis file (proutil -C dbana
     }
 
     [Command(
-        "start", "st",
+        "start", "sa",
         Description = "Start a database in order to use it in multi-users mode."
     )]
-    internal class StartDatabaseCommand : ADatabaseSingleLocationCommand {
+    internal class DatabaseStartCommand : ADatabaseSingleLocationCommand {
 
-        [Option("-s|--service", "Service name that will be used by this database. Usually a port number or a service name declared in /etc/services.", CommandOptionType.SingleValue)]
+        [Option("-s|--service <port>", "Service name that will be used by this database. Usually a port number or a service name declared in /etc/services.", CommandOptionType.SingleValue)]
         public string ServiceName { get; set; }
 
         private const string HostNameLongName = "--hostname";
-        [Option("-h|" + HostNameLongName, "The hostname on which to start the database. Defaults to the current machine.", CommandOptionType.SingleValue)]
+        [Option("-h|" + HostNameLongName + " <host>", "The hostname on which to start the database. Defaults to the current machine.", CommandOptionType.SingleValue)]
         public string HostName { get; set; }
 
         private const string NextPortAvailableLongName = "--next-port";
-        [Option("-np|" + NextPortAvailableLongName, "Port number, the next available port after this number will be used to start the database.", CommandOptionType.SingleValue)]
+        [Option("-np|" + NextPortAvailableLongName + " <port>", "Port number, the next available port after this number will be used to start the database.", CommandOptionType.SingleValue)]
         public (bool HasValue, int value) NextPortAvailable { get; set; }
 
         [Description("[-- <extra proserve args>...]")]
@@ -317,24 +239,24 @@ For best results you will need a recent database analysis file (proutil -C dbana
         "create", "cr",
         Description = "Creates a new database."
     )]
-    internal class CreateDatabaseCommand : ADatabaseCommand {
+    internal class DatabaseCreateCommand : ADatabaseCommand {
 
         [LegalFilePath]
-        [Option("-f|--file",  "File name (physical name) of the database to create (" + UoeDatabaseLocation.Extension + " file). The " + UoeDatabaseLocation.Extension + " extension is optional and the path can be relative to the current directory. Defaults to the name of the current directory.", CommandOptionType.SingleValue)]
+        [Option("-f|--file <file>",  "File name (physical name) of the database to create (" + UoeDatabaseLocation.Extension + " file). The " + UoeDatabaseLocation.Extension + " extension is optional and the path can be relative to the current directory. Defaults to the name of the current directory.", CommandOptionType.SingleValue)]
         public string DatabasePhysicalName { get; set; }
 
         [FileExists]
-        [Option("-df|--df", "Path to the " + UoeDatabaseLocation.SchemaDefinitionExtension + " file containing the database schema definition. The path can be relative to the current directory.", CommandOptionType.SingleValue)]
+        [Option("-df|--df <file>", "Path to the " + UoeDatabaseLocation.SchemaDefinitionExtension + " file containing the database schema definition. The path can be relative to the current directory.", CommandOptionType.SingleValue)]
         public string SchemaDefinitionFilePath { get; set; }
 
         [FileExists]
-        [Option("-st|--st", "Path to the structure file (" + UoeDatabaseLocation.StructureFileExtension + " file) containing the database physical structure. The path can be relative to the current directory.", CommandOptionType.SingleValue)]
+        [Option("-st|--st <file>", "Path to the structure file (" + UoeDatabaseLocation.StructureFileExtension + " file) containing the database physical structure. The path can be relative to the current directory.", CommandOptionType.SingleValue)]
         public string StuctureFilePath { get; set; }
 
-        [Option("-bs|--block-size", "The block-size to use when creating the database. Defaults to the default block-size for the current platform (linux or windows).", CommandOptionType.SingleValue)]
+        [Option("-bs|--block-size <size>", "The block-size to use when creating the database. Defaults to the default block-size for the current platform (linux or windows).", CommandOptionType.SingleValue)]
         public DatabaseBlockSize BlockSize { get; } = DatabaseBlockSize.DefaultForCurrentPlatform;
 
-        [Option("-lg|--lang", "The codepage/lang to use. Creates the database using an empty database located in the openedge installation $DLC/prolang/(lang).", CommandOptionType.SingleValue)]
+        [Option("-lg|--lang <lang>", "The codepage/lang to use. Creates the database using an empty database located in the openedge installation $DLC/prolang/(lang).", CommandOptionType.SingleValue)]
         public string Codepage { get; } = null;
 
         [Option("-ni|--new-instance", "Specifies that a new GUID be created for the target database.", CommandOptionType.NoValue)]
@@ -358,6 +280,68 @@ For best results you will need a recent database analysis file (proutil -C dbana
                 Out.WriteOnNewLine(UoeDatabaseConnection.NewSingleUserConnection(db).ToString());
             }
 
+            return 0;
+        }
+    }
+
+    [Command(
+        "busy", "bu",
+        Description = "Fetch the busy mode of a database, indicating if the database is used in single/multi user mode (or not busy at all)."
+    )]
+    internal class DatabaseGetBusyCommand : ADatabaseSingleLocationWithAccessArgsCommand {
+
+        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
+            var busyMode = GetOperator().GetBusyMode(GetSingleDatabaseLocation(), new UoeProcessArgs().AppendFromQuotedArgs(DatabaseAccessStartupParameters));
+
+            Log.Info("Database busy mode:");
+            Out.WriteOnNewLine(busyMode.ToString());
+
+            return 0;
+        }
+    }
+
+    [Command(
+        "backup", "ba",
+        Description = "Backup a database into a single file for a future restore."
+    )]
+    internal class DatabaseBackUpCommand : ADatabaseSingleLocationCommand {
+
+        [Required]
+        [LegalFilePath]
+        [Argument(0, "<backup-file>", "File path that will contain the database backup.")]
+        public string DumpFilePath { get; set; }
+
+        [Option("-ns|--no-scan", "Prevents the tool from performing an initial scan of the database to display the number of blocks that will be backed up and the amount of media the backup requires.", CommandOptionType.NoValue)]
+        public bool NoScan { get; } = false;
+
+        [Option("-nc|--no-compress", "Prevents the tool from compressing the backup file.", CommandOptionType.NoValue)]
+        public bool NoCompressed { get; } = false;
+
+        [Option("-op|--options <args>", @"Use options for the probkup utility (see the documentation online).", CommandOptionType.SingleValue)]
+        public string Options { get; set; }
+
+        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
+            GetOperator().Backup(GetSingleDatabaseLocation(), DumpFilePath, Verbosity == ConsoleLogThreshold.Debug, !NoScan, !NoCompressed, new UoeProcessArgs().AppendFromQuotedArgs(Options));
+            return 0;
+        }
+    }
+
+    [Command(
+        "restore", "rs",
+        Description = "Restore a database from a backup file."
+    )]
+    internal class DatabaseRestoreCommand : ADatabaseSingleLocationCommand {
+
+        [Required]
+        [FileExists]
+        [Argument(0, "<backup-file>", "File path that contains the database backup.")]
+        public string BackupFilePath { get; set; }
+
+        [Option("-op|--options <args>", @"Use options for the prorest utility (see the documentation online).", CommandOptionType.SingleValue)]
+        public string Options { get; set; }
+
+        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
+            GetOperator().Restore(GetSingleDatabaseLocation(), BackupFilePath, new UoeProcessArgs().AppendFromQuotedArgs(Options));
             return 0;
         }
     }

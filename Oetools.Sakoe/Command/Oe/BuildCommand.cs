@@ -53,7 +53,7 @@ namespace Oetools.Sakoe.Command.Oe {
         private const string ExtraConfigOption = "extra-config";
 
         [LegalFilePath]
-        [Argument(0, "[<project>]", "Path or name of the project file. The " + OeBuilderConstants.OeProjectExtension + " extension is optional. Defaults to the first " + OeBuilderConstants.OeProjectExtension + " file found.\nThe search is done in the current directory and in the " + OeBuilderConstants.OeProjectDirectory + " directory when it exists.")]
+        [Option("-p|--path <path>", "Path or name of the project file. The " + OeBuilderConstants.OeProjectExtension + " extension is optional. Defaults to the first " + OeBuilderConstants.OeProjectExtension + " file found.\nThe search is done in the current directory and in the " + OeBuilderConstants.OeProjectDirectory + " directory when it exists.", CommandOptionType.SingleValue)]
         public string ProjectFile { get; set; }
 
         [Option("-c|" + ConfigurationNameLongName + " <config>", "The name of the build configuration to use for the build. This name is found in the " + OeBuilderConstants.OeProjectExtension + " file.\nDefaults to the first build configuration found in the project file.", CommandOptionType.SingleValue)]
@@ -64,7 +64,7 @@ This option allows you to share, with your colleagues, a common project file tha
 For each extra configuration, specify the path or the name of the project file and the configuration name to use. If the project file name if empty, the main <project> is used.")]
         public string[] ExtraConfigurations { get; set; }
 
-        [Option(CommandOptionType.MultipleValue, ShortName = "p", LongName = "property", ValueName = "key=value", Description = @"A pair of key/value to dynamically set a property for this build. The value set this way will prevail over the value defined in a project file.
+        [Option(CommandOptionType.MultipleValue, ShortName = "pr", LongName = "property", ValueName = "key=value", Description = @"A pair of key/value to dynamically set a property for this build. The value set this way will prevail over the value defined in a project file.
 Each pair should specify the name of the property to set and the value that should be used.
 Use the option " + PropertyHelpLongName + " to see the full list of properties available as well as their documentation.")]
         public string[] BuildProperties { get; set; }

@@ -155,10 +155,12 @@ sakoe st input -b2 s1024"
     )]
     internal class InputSelfTestCommand : ABaseCommand {
 
+        [Required]
         [Argument(0)]
         [LegalFilePath]
         public string FileTruc { get; }
 
+        [Required]
         [Argument(1)]
         public string Folder { get; }
 
@@ -169,8 +171,7 @@ sakoe st input -b2 s1024"
         [Option("-X|--request", Description = "HTTP Method: GET or POST. Defaults to post. HTTP Method: GET or POST. Defaults to post. HTTP Method: GET or POST. Defaults to post. HTTP Method: GET or POST. Defaults to post.")]
         public HttpMethod RequestMethod { get; } = HttpMethod.Post;
 
-        [Required]
-        [Option(Description = "Required. The message")]
+        [Option(Description = "The message")]
         public string Message { get; }
 
         [EmailAddress]

@@ -1,7 +1,7 @@
-﻿#region header
+#region header
 // ========================================================================
-// Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
-// This file (DatabaseProjectCommand.cs) is part of Oetools.Sakoe.
+// Copyright (c) 2019 - Julien Caillon (julien.caillon@gmail.com)
+// This file (DataDiggerCommand.cs) is part of Oetools.Sakoe.
 //
 // Oetools.Sakoe is a free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,34 +18,25 @@
 // ========================================================================
 #endregion
 
-using System.ComponentModel.DataAnnotations;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Utilities.Lib;
-using Oetools.Utilities.Openedge.Database;
 
-namespace Oetools.Sakoe.Command.Oe {
+namespace Oetools.Sakoe.Command.Oe.Database {
 
     [Command(
-        "project", "pr",
-        Description = "Manipulate a database belonging to a project."
+        "admin", "ad",
+        Description = "The openedge database administration tool."
     )]
-    [Subcommand(typeof(ConnectDatabaseProjectCommand))]
-    internal class ProjectDatabaseCommand : ABaseCommand {
+    [Subcommand(typeof(DatabaseAdminRunCommand))]
+    internal class DatabaseAdminCommand : AExpectSubCommand {
     }
 
     [Command(
-        "create", "cr",
-        Description = "TODO : repair database",
-        ExtendedHelpText = "TODO : database"
+        "run", "ru",
+        Description = "Run an instance of the database administration tool."
     )]
-    internal class ConnectDatabaseProjectCommand : AOeDlcCommand {
+    internal class DatabaseAdminRunCommand : ADatabaseToolCommand {
 
-        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-
-
-            return 0;
-        }
+        protected override ProcessArgs ToolArguments() =>  new ProcessArgs().Append("-p", "_admin.p");
     }
-
-
 }

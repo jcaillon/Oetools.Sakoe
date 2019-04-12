@@ -1,56 +1,73 @@
-﻿using System.ComponentModel.DataAnnotations;
+#region header
+// ========================================================================
+// Copyright (c) 2019 - Julien Caillon (julien.caillon@gmail.com)
+// This file (DataDiggerCommand.cs) is part of Oetools.Sakoe.
+//
+// Oetools.Sakoe is a free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Oetools.Sakoe is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
+// ========================================================================
+#endregion
+
+using System.ComponentModel.DataAnnotations;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Openedge.Database;
 
-namespace Oetools.Sakoe.Command.Oe {
+namespace Oetools.Sakoe.Command.Oe.Database {
 
     [Command(
-        "dump", "du",
-        Description = "Dump data or schema definition from a database."
+        "schema", "sc",
+        Description = "Operate on database schema."
     )]
-    [Subcommand(typeof(DumpDfDatabaseCommand))]
-    [Subcommand(typeof(DumpSqlDatabaseCommand))]
-    [Subcommand(typeof(DumpSqlDataDatabaseCommand))]
-    [Subcommand(typeof(DumpIncrementalDfDatabaseCommand))]
-    [Subcommand(typeof(DumpIncrementalDfFromDfDatabaseCommand))]
-    [Subcommand(typeof(DumpDataDatabaseCommand))]
-    [Subcommand(typeof(DumpSeqDatabaseCommand))]
-    //TODO: binary dump
-    internal class DumpDatabaseCommand : AExpectSubCommand {
+    [Subcommand(typeof(DatabaseSchemaLoadCommand))]
+    [Subcommand(typeof(DatabaseSchemaDumpCommand))]
+    [Subcommand(typeof(DatabaseSchemaDumpSqlCommand))]
+    [Subcommand(typeof(DatabaseSchemaDumpIncrementalCommand))]
+    [Subcommand(typeof(DatabaseSchemaDumpIncrementalFromDfCommand))]
+    internal class DatabaseSchemaCommand : AExpectSubCommand {
     }
 
     [Command(
-        "seq", "se",
-        Description = "Dump the database sequence values in a plain text file (.d)."
+        "load", "lo",
+        Description = "Load a schema definition (.df) to a database."
     )]
-    internal class DumpSeqDatabaseCommand : ADatabaseSingleConnectionCommand {
+    internal class DatabaseSchemaLoadCommand : ADatabaseSingleConnectionCommand {
 
         [Required]
-        [LegalFilePath]
-        [Argument(0, "<dump-file>", "File path that will contain the data dumped (usually has the .d extension).")]
-        public string DumpFilePath { get; set; }
+        [FileExists]
+        [Argument(0, "<df-file>", "Path to the " + UoeDatabaseLocation.SchemaDefinitionExtension + " file that contains the schema definition (or partial schema) of the database.")]
+        public string LoadFilePath { get; set; }
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             using (var ope = GetAdministrator()) {
-                ope.DumpSequenceData(GetSingleDatabaseConnection(), DumpFilePath);
+                ope.LoadSchemaDefinition(GetSingleDatabaseConnection(), LoadFilePath);
             }
             return 0;
         }
     }
 
     [Command(
-        "schema", "df",
+        "dump", "du",
         Description = "Dump the schema definition (" + UoeDatabaseLocation.SchemaDefinitionExtension + ") of a database."
     )]
-    internal class DumpDfDatabaseCommand : ADatabaseSingleConnectionCommand {
+    internal class DatabaseSchemaDumpCommand : ADatabaseSingleConnectionCommand {
 
         [Required]
         [LegalFilePath]
         [Argument(0, "<dump-file>", "Path to the output " + UoeDatabaseLocation.SchemaDefinitionExtension + " file that will contain the schema definition of the database (extension is optional).")]
         public string DumpFilePath { get; set; }
 
-        [Option("-t|--table", "A list of comma separated table names for which we need a schema definition dump. Defaults to `ALL` which dumps every table and sequence.", CommandOptionType.SingleValue)]
+        [Option("-t|--table <tables>", "A list of comma separated table names for which we need a schema definition dump. Defaults to `ALL` which dumps every table and sequence.", CommandOptionType.SingleValue)]
         public string TableName { get; set; } = "ALL";
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
@@ -62,17 +79,17 @@ namespace Oetools.Sakoe.Command.Oe {
     }
 
     [Command(
-        "sql-schema", "ss",
+        "dump-sql", "ds",
         Description = "Dump the SQL-92 schema of a database."
     )]
-    internal class DumpSqlDatabaseCommand : ADatabaseSingleConnectionCommand {
+    internal class DatabaseSchemaDumpSqlCommand : ADatabaseSingleConnectionCommand {
 
         [Required]
         [LegalFilePath]
         [Argument(0, "<dump-file>", "Path to the output " + UoeDatabaseLocation.SqlSchemaDefinitionExtension + " file that will contain the sql-92 definition of the database (extension is optional).")]
         public string DumpFilePath { get; set; }
 
-        [Option("-op|--options", @"Use options for the sqlschema utility (see the documentation online). Defaults to dumping everything.", CommandOptionType.SingleValue)]
+        [Option("-op|--options <args>", @"Use options for the sqlschema utility (see the documentation online). Defaults to dumping everything.", CommandOptionType.SingleValue)]
         public string Options { get; set; } = "-f %.% -g %.% -G %.% -n %.% -p %.% -q %.% -Q %.% -s %.% -t %.% -T %.%";
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
@@ -84,33 +101,11 @@ namespace Oetools.Sakoe.Command.Oe {
     }
 
     [Command(
-        "sql-data", "sd",
-        Description = "Dump data in SQL-92 format from a database."
-    )]
-    internal class DumpSqlDataDatabaseCommand : ADatabaseSingleConnectionCommand {
-
-        [Required]
-        [LegalFilePath]
-        [Argument(0, "<dump-directory>", "Directory path that will contain the data dumped. Each table of the database will be dumped as an individual " + UoeDatabaseLocation.SqlDataExtension + " file named like the table.")]
-        public string DumpDirectoryPath { get; set; }
-
-        [Option("-op|--options", @"Use options for the sqldump utility (see the documentation online). Defaults to dumping every table.", CommandOptionType.SingleValue)]
-        public string Options { get; set; } = "-t %.%";
-
-        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            using (var ope = GetAdministrator()) {
-                ope.DumpSqlData(GetSingleDatabaseConnection(), DumpDirectoryPath, new ProcessArgs().AppendFromQuotedArgs(Options));
-            }
-            return 0;
-        }
-    }
-
-    [Command(
-        "incremental", "inc", "in",
-        Description = "Dump an incremental schema definition (.df) allowing to update a database schema definition.",
+        "dump-inc", "di",
+        Description = "Dump an incremental schema definition (.df) by comparing 2 databases.",
         ExtendedHelpText = "Two databases schema definition are compared and the difference is written in a 'delta' `.df`. This `.df` file then allows to upgrade an older database schema to the new schema."
     )]
-    internal class DumpIncrementalDfDatabaseCommand : ADatabaseCommand {
+    internal class DatabaseSchemaDumpIncrementalCommand : ADatabaseCommand {
 
         [Required]
         [LegalFilePath]
@@ -127,7 +122,7 @@ namespace Oetools.Sakoe.Command.Oe {
         [Argument(2, "<dump-file>", "Path to the output incremental " + UoeDatabaseLocation.SchemaDefinitionExtension + " file (extension is optional).")]
         public string DumpFilePath { get; set; }
 
-        [Option("-rf|--rename-file", @"Path to the 'rename file'.
+        [Option("-rf|--rename-file <file>", @"Path to the 'rename file'.
 It is a plain text file used to identify database tables and fields that have changed names. This allows to avoid having a DROP then ADD table when you changed only the name of said table.
 
 The format of the file is simple (comma separated lines, don't forget to add a final empty line for IMPORT):
@@ -149,10 +144,10 @@ Missing entries or entries with an empty new name are considered to have been de
     }
 
     [Command(
-        "incremental-df", "id",
-        Description = "Dump an incremental schema definition (.df) by comparing .df files."
+        "dump-inc-df", "dd",
+        Description = "Dump an incremental schema definition (.df) by comparing 2 .df files."
     )]
-    internal class DumpIncrementalDfFromDfDatabaseCommand : ADatabaseCommand {
+    internal class DatabaseSchemaDumpIncrementalFromDfCommand : ADatabaseCommand {
 
         [Required]
         [FileExists]
@@ -169,7 +164,7 @@ Missing entries or entries with an empty new name are considered to have been de
         [Argument(2, "<dump-file>", "Path to the output incremental " + UoeDatabaseLocation.SchemaDefinitionExtension + " file (extension is optional).")]
         public string DumpFilePath { get; set; }
 
-        [Option("-rf|--rename-file", @"Path to the 'rename file'.
+        [Option("-rf|--rename-file <file>", @"Path to the 'rename file'.
 It is a plain text file used to identify database tables and fields that have changed names. This allows to avoid having a DROP then ADD table when you changed only the name of said table.
 
 The format of the file is simple (comma separated lines, don't forget to add a final empty line for IMPORT):
@@ -185,29 +180,6 @@ Missing entries or entries with an empty new name are considered to have been de
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             using (var ope = GetAdministrator()) {
                 ope.DumpIncrementalSchemaDefinition(OldDfPath?.ToAbsolutePath(), NewDfPath?.ToAbsolutePath(), DumpFilePath.AddFileExtention(UoeDatabaseLocation.SchemaDefinitionExtension), RenameFilePath);
-            }
-            return 0;
-        }
-    }
-
-    [Command(
-        "data", "da",
-        Description = "Dump the database data in plain text files (.d)."
-    )]
-    internal class DumpDataDatabaseCommand : ADatabaseSingleConnectionCommand {
-
-        [Required]
-        [LegalFilePath]
-        [Argument(0, "<dump-directory>", "Directory path that will contain the data dumped. Each table of the database will be dumped as an individual .d file named like the table.")]
-        public string DumpDirectoryPath { get; set; }
-
-
-        [Option("-t|--table", "A list of comma separated table names to dump. Defaults to `ALL` which dumps every table (extension is optional).", CommandOptionType.SingleValue)]
-        public string TableName { get; set; } = "ALL";
-
-        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            using (var ope = GetAdministrator()) {
-                ope.DumpData(GetSingleDatabaseConnection(), DumpDirectoryPath, TableName);
             }
             return 0;
         }
