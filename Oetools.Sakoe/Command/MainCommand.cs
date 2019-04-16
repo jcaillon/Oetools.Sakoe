@@ -47,13 +47,11 @@ namespace Oetools.Sakoe.Command {
     [Subcommand(typeof(UpdateCommand))]
     [Subcommand(typeof(DatabaseCommand))]
     [Subcommand(typeof(ProjectCommand))]
-    [Subcommand(typeof(BuildCommand))]
     [Subcommand(typeof(ShowVersionCommand))]
 //    [Subcommand(typeof(XcodeCommand))]
 //    [Subcommand(typeof(HashCommand))]
-    [Subcommand(typeof(ProHelpCommand))]
-    [Subcommand(typeof(ProUtilitiesCommand))]
-    [Subcommand(typeof(ExternalTools))]
+    [Subcommand(typeof(ProgressCommand))]
+    [Subcommand(typeof(ToolCommand))]
 #if !WINDOWSONLYBUILD
     [Subcommand(typeof(CreateStarterCommand))]
 #endif
@@ -66,7 +64,7 @@ namespace Oetools.Sakoe.Command {
             formatter.WriteOnNewLine(null);
             formatter.WriteSectionTitle("HOW TO");
             formatter.WriteOnNewLine($"Start by reading the manual for this tool: {typeof(ManCommand).GetFullCommandLine().PrettyQuote()}.");
-            formatter.WriteOnNewLine($"Get a full list of commands available: {typeof(ListAllCommandsManCommand).GetFullCommandLine().PrettyQuote()}.");
+            formatter.WriteOnNewLine($"Get a full list of commands available: {typeof(ManCommandListCommand).GetFullCommandLine().PrettyQuote()}.");
 
         }
 

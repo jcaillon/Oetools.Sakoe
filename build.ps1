@@ -58,7 +58,7 @@ function Update-Documentation {
 	
 	iu msbuild "$path" "/verbosity:minimal" "/t:Restore,Publish" "/p:Configuration=Release" "/p:TargetFramework=net461" "/bl:net461.binlog" "/p:PublishDir=$publishDir" $(If ([string]::IsNullOrEmpty($Version)) { "" } Else { "/p:Version=$Version" })
 	
-	iu "$(Join-Path -Path "$publishDir" -ChildPath "sakoe.exe")" manual markdown-file docs\index.md
+	iu "$(Join-Path -Path "$publishDir" -ChildPath "sakoe.exe")" manual export-md docs\index.md
 
 	Remove-Item -Path "$publishDir" -Force -Recurse 
 }

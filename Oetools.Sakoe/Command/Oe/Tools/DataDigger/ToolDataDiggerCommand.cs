@@ -36,8 +36,10 @@ namespace Oetools.Sakoe.Command.Oe.Database {
 
     [Command(
         "datadigger", "dd",
-        Description = "The DataDigger is a database explorer tool, fully written in Progress, that enables you to handle your data in a very natural way.",
-        ExtendedHelpText = @"If DataDigger is already installed on your computer, you can use the environment variable `OE_DATADIGGER_INSTALL_PATH` to specify the installation location so sakoe knows where to find the tool. Otherwise, simply let sakoe install it in the default location.
+        Description = "DataDigger is a tool for exploring and modifying the data of a database.",
+        ExtendedHelpText = @"The default sub command for this command is run.
+
+If DataDigger is already installed on your computer, you can use the environment variable `OE_DATADIGGER_INSTALL_PATH` to specify the installation location so sakoe knows where to find the tool. Otherwise, simply let sakoe install it in the default location.
 
 DataDigger is maintained by Patrick Tingen: https://github.com/patrickTingen/DataDigger.
 
@@ -46,7 +48,7 @@ Learn more here: https://datadigger.wordpress.com."
     [Subcommand(typeof(DataDiggerInstallCommand))]
     [Subcommand(typeof(DataDiggerRemoveCommand))]
     [Subcommand(typeof(DataDiggerRunCommand))]
-    internal class DataDiggerCommand : AExpectSubCommand {
+    internal class ToolDataDiggerCommand : AExpectSubCommand {
 
         /// <summary>
         /// DataDigger installation directory.
@@ -55,7 +57,7 @@ Learn more here: https://datadigger.wordpress.com."
             get {
                 var path = Environment.GetEnvironmentVariable("OE_DATADIGGER_INSTALL_PATH");
                 if (string.IsNullOrEmpty(path)) {
-                    path = Path.Combine(ExternalTools.ExternalToolInstallationDirectory, "DataDigger");
+                    path = Path.Combine(ToolCommand.ExternalToolInstallationDirectory, "DataDigger");
                 }
 
                 return path;
@@ -73,6 +75,10 @@ Learn more here: https://datadigger.wordpress.com."
         /// <param name="readOnly"></param>
         /// <returns></returns>
         public static UoeProcessArgs DataDiggerStartUpParameters(bool readOnly) => new UoeProcessArgs().Append("-pf").Append("DataDigger.pf").Append("-p").Append(readOnly ? "DataReader.p" : "DataDigger.p").Append("-T").Append(Utils.CreateTempDirectory()) as UoeProcessArgs;
+
+        protected override int OnExecute(CommandLineApplication app, IConsole console) {
+            return new DataDiggerRunCommand().Execute(app, console);
+        }
     }
 
     [Command(
@@ -85,18 +91,22 @@ Learn more here: https://datadigger.wordpress.com."
         [Option("-ro|--read-only", "Start DataDigger in read-only mode (records will not modifiable).", CommandOptionType.NoValue)]
         public bool ReadOnly { get; set; } = false;
 
-        protected override ProcessArgs ToolArguments() => DataDiggerCommand.DataDiggerStartUpParameters(ReadOnly);
+        protected override ProcessArgs ToolArguments() => ToolDataDiggerCommand.DataDiggerStartUpParameters(ReadOnly);
 
-        protected override string ExecutionWorkingDirectory => DataDiggerCommand.DataDiggerInstallationDirectory;
+        protected override string ExecutionWorkingDirectory => ToolDataDiggerCommand.DataDiggerInstallationDirectory;
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             if (!Utils.IsRuntimeWindowsPlatform) {
                 throw new CommandException("DataDigger can only run on windows platform.");
             }
-            if (!DataDiggerCommand.IsDataDiggerInstalled) {
+            if (!ToolDataDiggerCommand.IsDataDiggerInstalled) {
                 throw new CommandException($"DataDigger is not installed yet, use the command {typeof(DataDiggerInstallCommand).GetFullCommandLine().PrettyQuote()}.");
             }
             return base.ExecuteCommand(app, console);
+        }
+
+        public int Execute(CommandLineApplication app, IConsole console) {
+            return OnExecute(app, console);
         }
     }
 
@@ -112,14 +122,14 @@ Learn more here: https://datadigger.wordpress.com."
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
 
-            if (!DataDiggerCommand.IsDataDiggerInstalled) {
+            if (!ToolDataDiggerCommand.IsDataDiggerInstalled) {
                 Log.Warn("DataDigger is not installed.");
                 return 1;
             }
 
-            Directory.Delete(DataDiggerCommand.DataDiggerInstallationDirectory, true);
+            Directory.Delete(ToolDataDiggerCommand.DataDiggerInstallationDirectory, true);
 
-            Log.Done($"DataDigger removed from: {DataDiggerCommand.DataDiggerInstallationDirectory.PrettyQuote()}.");
+            Log.Done($"DataDigger removed from: {ToolDataDiggerCommand.DataDiggerInstallationDirectory.PrettyQuote()}.");
 
             return 0;
         }
@@ -127,7 +137,8 @@ Learn more here: https://datadigger.wordpress.com."
 
     [Command(
         "install", "in",
-        Description = "Install DataDigger in the default installation path. Use the environment variable `OE_DATADIGGER_INSTALL_PATH` to specify a different location."
+        Description = "Install DataDigger in the default installation path.",
+        ExtendedHelpText = "Use the environment variable `OE_DATADIGGER_INSTALL_PATH` to specify a different location."
     )]
     internal class DataDiggerInstallCommand : ABaseCommand {
         private const string RepoOwner = "patrickTingen";
@@ -144,8 +155,8 @@ Learn more here: https://datadigger.wordpress.com."
         public bool Force { get; set; } = false;
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            if (!Force && DataDiggerCommand.IsDataDiggerInstalled) {
-                Log.Warn($"DataDigger is already installed on path: {DataDiggerCommand.DataDiggerInstallationDirectory.PrettyQuote()}.");
+            if (!Force && ToolDataDiggerCommand.IsDataDiggerInstalled) {
+                Log.Warn($"DataDigger is already installed on path: {ToolDataDiggerCommand.DataDiggerInstallationDirectory.PrettyQuote()}.");
                 return 1;
             }
 
@@ -173,7 +184,7 @@ Learn more here: https://datadigger.wordpress.com."
                 Log.ReportProgress(100, (int) Math.Round((decimal) progress.NumberOfBytesDoneTotal / progress.NumberOfBytesTotal * 100), "Downloading the release.");
             });
 
-            var destinationDir = DataDiggerCommand.DataDiggerInstallationDirectory;
+            var destinationDir = ToolDataDiggerCommand.DataDiggerInstallationDirectory;
             Utils.CreateDirectoryIfNeeded(destinationDir);
 
             using (var zip = ZipFile.Open(tempFilePath, ZipArchiveMode.Read)) {

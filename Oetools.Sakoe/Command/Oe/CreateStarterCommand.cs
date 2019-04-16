@@ -31,7 +31,8 @@ namespace Oetools.Sakoe.Command.Oe {
 
     [Command(
         "starter", "st",
-        Description = "Create a platform specific starter script for sakoe to allow a more natural way of calling this tool: `sakoe [command]`."
+        Description = "Create a platform specific starter script for sakoe.",
+        ExtendedHelpText = "Allow a more natural way of calling this tool: `sakoe [command]`."
     )]
     internal class CreateStarterCommand : ABaseCommand {
 

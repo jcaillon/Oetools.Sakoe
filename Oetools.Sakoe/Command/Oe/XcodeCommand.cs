@@ -2,17 +2,17 @@
 // ========================================================================
 // Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
 // This file (XcodeCommand.cs) is part of Oetools.Sakoe.
-// 
+//
 // Oetools.Sakoe is a free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // Oetools.Sakoe is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
@@ -28,7 +28,7 @@ using Oetools.Utilities.Openedge;
 using Oetools.Utilities.Openedge.Exceptions;
 
 namespace Oetools.Sakoe.Command.Oe {
-    
+
     [Command(
         "xcode", "xc",
         Description = "Encrypt and decrypt files using the XCODE utility algorithm.",
@@ -43,24 +43,24 @@ namespace Oetools.Sakoe.Command.Oe {
     [Subcommand(typeof(DecryptXcodeCommand))]
     internal class XcodeCommand : AExpectSubCommand {
     }
-    
+
     [Command(
         "encrypt", "en",
         Description = "Encrypt files using the XCODE algorithm. Output the list of processed files.",
         ExtendedHelpText = ""
     )]
     internal class EncryptXcodeCommand : ProcessFileListBaseCommand {
-        
+
         [Option("-k|--key", @"The encryption key to use for the process. Defaults to ""Progress"".", CommandOptionType.SingleValue)]
         public string EncryptionKey { get; set; }
-        
-        [Option("-su|--suffix", "A suffix to append to each filename processed.", CommandOptionType.SingleValue)]
+
+        [Option("-su|--suffix <string>", "A suffix to append to each filename processed.", CommandOptionType.SingleValue)]
         public string OutputFileSuffix { get; }
-        
+
         [LegalFilePath]
-        [Option("-od|--output-directory", "Output all processed file in this common directory.", CommandOptionType.SingleValue)]
+        [Option("-od|--output-directory <dir>", "Output all processed file in this common directory.", CommandOptionType.SingleValue)]
         public string OutputDirectory { get; }
-        
+
         protected void ValidateOptions() {
             if (string.IsNullOrEmpty(EncryptionKey)) {
                 EncryptionKey = "Progress";
@@ -84,9 +84,9 @@ namespace Oetools.Sakoe.Command.Oe {
             Log.Info("Listing files...");
 
             var filesList = GetFilesList(app).ToList();
-            
+
             Log.Info($"Processing {filesList.Count} files.");
-            
+
             var xcode = new UoeEncryptor(EncryptionKey);
 
             var i = 0;
@@ -108,7 +108,7 @@ namespace Oetools.Sakoe.Command.Oe {
 
             Log.Info($"A total of {outputList.Count} files were converted.");
         }
-        
+
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             ProcessFiles(app, true);
             return 0;
@@ -117,7 +117,7 @@ namespace Oetools.Sakoe.Command.Oe {
 
     [Command(
         "decrypt", "de",
-        Description = "Decrypt files using the XCODE algorithm. Output the list of processed files.", 
+        Description = "Decrypt files using the XCODE algorithm. Output the list of processed files.",
         ExtendedHelpText = ""
     )]
     internal class DecryptXcodeCommand : EncryptXcodeCommand {
@@ -130,7 +130,7 @@ namespace Oetools.Sakoe.Command.Oe {
 
     [Command(
         "list", "li",
-        Description = "List only encrypted (or decrypted) files.", 
+        Description = "List only encrypted (or decrypted) files.",
         ExtendedHelpText = @"Examples:
 
   List only the encrypted files in a list of files in argument.
@@ -139,7 +139,7 @@ namespace Oetools.Sakoe.Command.Oe {
     sakoe xcode list -r -vb none -nop"
     )]
     internal class ListXcodeCommand : ProcessFileListBaseCommand {
-        
+
         [Option("-de|--decrypted", "List all decrypted files (or default to listing encrypted files).", CommandOptionType.NoValue)]
         public bool ListDecrypted { get; } = false;
 
@@ -148,9 +148,9 @@ namespace Oetools.Sakoe.Command.Oe {
             Log.Info("Listing files...");
 
             var filesList = GetFilesList(app).ToList();
-            
+
             Log.Info($"Starting the analyze on {filesList.Count} files.");
-            
+
             var xcode = new UoeEncryptor(null);
 
             var i = 0;

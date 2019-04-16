@@ -43,7 +43,7 @@ namespace Oetools.Sakoe.Command.Oe.Database {
     [Subcommand(typeof(DatabaseIndexCommand))]
     [Subcommand(typeof(DatabaseAdminCommand))]
     [Subcommand(typeof(DatabaseDictionaryCommand))]
-    [Subcommand(typeof(DataDiggerCommand))]
+    [Subcommand(typeof(ToolDataDiggerCommand))]
     [Subcommand(typeof(DatabaseProjectCommand))]
     [Subcommand(typeof(DatabaseDataCommand))]
     [Subcommand(typeof(DatabaseSchemaCommand))]
@@ -60,11 +60,12 @@ namespace Oetools.Sakoe.Command.Oe.Database {
     [Subcommand(typeof(DatabaseGetBusyCommand))]
     [Subcommand(typeof(DatabaseBackUpCommand))]
     [Subcommand(typeof(DatabaseRestoreCommand))]
+    [Subcommand(typeof(DatabaseCheckCommand))]
     internal class DatabaseCommand : AExpectSubCommand {
     }
 
     [Command(
-        "connect", "co",
+        "connect", "cn",
         Description = "Get the connection string to use to connect to a database."
     )]
     internal class DatabaseConnectCommand : ADatabaseSingleLocationCommand {
@@ -74,6 +75,22 @@ namespace Oetools.Sakoe.Command.Oe.Database {
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             Out.WriteResultOnNewLine(GetOperator().GetDatabaseConnection(GetSingleDatabaseLocation(), LogicalName).ToString());
+            return 0;
+        }
+    }
+
+    [Command(
+        "check", "ck",
+        Description = "Check if a database is alive.",
+        ExtendedHelpText = "Check if a database is alive by trying to connect to it using a openedge client."
+    )]
+    internal class DatabaseCheckCommand : ADatabaseSingleConnectionCommand {
+
+        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
+            using (var ope = GetAdministrator()) {
+                ope.CheckDatabaseConnection(GetSingleDatabaseConnection());
+            }
+            Log.Done("The database is alive.");
             return 0;
         }
     }
@@ -286,7 +303,7 @@ namespace Oetools.Sakoe.Command.Oe.Database {
 
     [Command(
         "busy", "bu",
-        Description = "Fetch the busy mode of a database, indicating if the database is used in single/multi user mode (or not busy at all)."
+        Description = "Check the usage mode of a database (busy mode)."
     )]
     internal class DatabaseGetBusyCommand : ADatabaseSingleLocationWithAccessArgsCommand {
 

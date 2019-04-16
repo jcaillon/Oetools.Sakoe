@@ -28,11 +28,12 @@ using Oetools.Utilities.Lib;
 namespace Oetools.Sakoe.Command.Oe {
 
     [Command(
-        "external-tools", "et",
+        "tool", "tl",
         Description = "Manage external tools usable in sakoe."
     )]
-    [Subcommand(typeof(DataDiggerCommand))]
-    internal class ExternalTools : AExpectSubCommand {
+    [Subcommand(typeof(ToolDataDiggerCommand))]
+    internal class ToolCommand : AExpectSubCommand {
+        
         /// <summary>
         /// Directory in which external tools are installed.
         /// </summary>

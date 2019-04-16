@@ -72,7 +72,7 @@ namespace Oetools.Sakoe.Command.Oe.Database {
 
     [Command(
         "remove", "rm",
-        Description = "Remove storage areas or extents within storage areas."
+        Description = "Remove storage areas or extents."
     )]
     internal class DatabaseStructureRemoveCommand : ADatabaseSingleLocationWithAccessArgsCommand {
 
@@ -92,7 +92,8 @@ namespace Oetools.Sakoe.Command.Oe.Database {
 
     [Command(
         "generate", "ge",
-        Description = "Generate the structure file (" + UoeDatabaseLocation.StructureFileExtension + ") for the given location, create all the needed AREA found in the given schema definition file (" + UoeDatabaseLocation.SchemaDefinitionExtension + ")."
+        Description = "Generate the structure file (" + UoeDatabaseLocation.StructureFileExtension + ") from a definition file (" + UoeDatabaseLocation.SchemaDefinitionExtension + ").",
+        ExtendedHelpText = "Create all the needed AREA found in the given schema definition file (" + UoeDatabaseLocation.SchemaDefinitionExtension + ")."
     )]
     internal class DatabaseStructureGenerateCommand : ADatabaseSingleLocationCommand {
 

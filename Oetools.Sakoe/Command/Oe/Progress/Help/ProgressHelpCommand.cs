@@ -31,23 +31,22 @@ using Oetools.Utilities.Openedge;
 namespace Oetools.Sakoe.Command.Oe {
 
     [Command(
-        "prohelp", "ph",
-        Description = "Access the Openedge help.",
-        ExtendedHelpText = ""
+        "help", "hp",
+        Description = "Access the Openedge help."
     )]
-    [Subcommand(typeof(ProMsgCommand))]
-    [Subcommand(typeof(ListChmProHelpCommand))]
-    [Subcommand(typeof(ChmProHelpCommand))]
-    [Subcommand(typeof(KeywordProHelpCommand))]
-    internal class ProHelpCommand : AExpectSubCommand {
+    [Subcommand(typeof(ProgressHelpMessageCommand))]
+    [Subcommand(typeof(ProgressHelpListCommand))]
+    [Subcommand(typeof(ProgressHelpOpenCommand))]
+    [Subcommand(typeof(ProgressHelpSearchCommand))]
+    internal class ProgressHelpCommand : AExpectSubCommand {
     }
 
     [Command(
-        "promsg", "pm",
-        Description = "Displays the extended error message using an error number.",
+        "message", "ms",
+        Description = "Display the extended error message using an error number.",
         ExtendedHelpText = "This command uses the content of files located in $DLC/prohelp/msgdata to display information."
     )]
-    internal class ProMsgCommand : AOeDlcCommand {
+    internal class ProgressHelpMessageCommand : AOeDlcCommand {
 
         [Required]
         [Argument(0, "<message number>", "The number of the error message to show.")]
@@ -71,7 +70,7 @@ namespace Oetools.Sakoe.Command.Oe {
         }
     }
 
-    internal class ChmDisplayProHelpCommand : AOeDlcCommand {
+    internal abstract class AProgressHelpOpenCommand : AOeDlcCommand {
 
         protected void OpenChmAndWait(string toOpen, string topic) {
             var helpWhdl = HtmlHelpInterop.DisplayIndex(toOpen, topic ?? "");
@@ -86,15 +85,14 @@ namespace Oetools.Sakoe.Command.Oe {
     }
 
     [Command(
-        "chm", "ch",
-        Description = "Opens a .chm file (windows help file) present in $DLC/prohelp.",
-        ExtendedHelpText = ""
+        "open", "on",
+        Description = "Open an help file (.chm) present in $DLC/prohelp."
     )]
-    internal class ChmProHelpCommand : ChmDisplayProHelpCommand {
+    internal class ProgressHelpOpenCommand : AProgressHelpOpenCommand {
 
         [Required]
         [LegalFilePath]
-        [Argument(0, "<chm file name>", "The file name of the .chm file to display.")]
+        [Argument(0, "<chm name>", "The file name of the .chm file to display.")]
         public string ChmFileName { get; }
 
 
@@ -120,10 +118,10 @@ namespace Oetools.Sakoe.Command.Oe {
     }
 
     [Command(
-        "keyword", "ke",
-        Description = "Look for help on the given Openedge keyword in the language windows help file."
+        "search", "sr",
+        Description = "Search for a keyword in the language windows help file."
     )]
-    internal class KeywordProHelpCommand : ChmDisplayProHelpCommand {
+    internal class ProgressHelpSearchCommand : AProgressHelpOpenCommand {
 
         [Required]
         [Argument(0, "<keyword>", "The keyword you would like to find in the help.")]
@@ -145,10 +143,10 @@ namespace Oetools.Sakoe.Command.Oe {
 
 
     [Command(
-        "listchm", "li",
+        "list", "ls",
         Description = "List all the .chm files (windows help files) available in $DLC/prohelp."
     )]
-    internal class ListChmProHelpCommand : AOeDlcCommand {
+    internal class ProgressHelpListCommand : AOeDlcCommand {
 
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
 

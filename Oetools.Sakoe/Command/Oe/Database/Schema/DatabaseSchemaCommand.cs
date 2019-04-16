@@ -21,6 +21,7 @@
 using System.ComponentModel.DataAnnotations;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Utilities.Lib;
+using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge.Database;
 
 namespace Oetools.Sakoe.Command.Oe.Database {
@@ -31,6 +32,7 @@ namespace Oetools.Sakoe.Command.Oe.Database {
     )]
     [Subcommand(typeof(DatabaseSchemaLoadCommand))]
     [Subcommand(typeof(DatabaseSchemaDumpCommand))]
+    [Subcommand(typeof(DatabaseSchemaDumpCustomCommand))]
     [Subcommand(typeof(DatabaseSchemaDumpSqlCommand))]
     [Subcommand(typeof(DatabaseSchemaDumpIncrementalCommand))]
     [Subcommand(typeof(DatabaseSchemaDumpIncrementalFromDfCommand))]
@@ -73,6 +75,25 @@ namespace Oetools.Sakoe.Command.Oe.Database {
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             using (var ope = GetAdministrator()) {
                 ope.DumpSchemaDefinition(GetSingleDatabaseConnection(), DumpFilePath.AddFileExtention(UoeDatabaseLocation.SchemaDefinitionExtension), TableName);
+            }
+            return 0;
+        }
+    }
+
+    [Command(
+        "dump-custom", "dc",
+        Description = "Dump the schema definition in a custom format."
+    )]
+    internal class DatabaseSchemaDumpCustomCommand : ADatabaseSingleConnectionCommand {
+
+        [Required]
+        [LegalFilePath]
+        [Argument(0, "<dump-file>", "Path to the output " + UoeDatabaseLocation.SchemaDefinitionExtension + " file that will contain the schema definition of the database.")]
+        public string DumpFilePath { get; set; }
+
+        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
+            using (var ope = GetAdministrator()) {
+                ope.GetDatabaseDefinition(GetSingleDatabaseConnection().Yield(), DumpFilePath);
             }
             return 0;
         }

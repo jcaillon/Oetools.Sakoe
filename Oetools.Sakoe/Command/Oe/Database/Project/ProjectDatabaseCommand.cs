@@ -26,23 +26,7 @@ namespace Oetools.Sakoe.Command.Oe.Database {
         "project", "pr",
         Description = "Operates on databases belonging to a project."
     )]
-    [Subcommand(typeof(DatabaseProjectConnectCommand))]
     internal class DatabaseProjectCommand : ABaseCommand {
     }
-
-    [Command(
-        "create", "cr",
-        Description = "TODO : repair database",
-        ExtendedHelpText = "TODO : database"
-    )]
-    internal class DatabaseProjectConnectCommand : AOeDlcCommand {
-
-        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-
-
-            return 0;
-        }
-    }
-
 
 }

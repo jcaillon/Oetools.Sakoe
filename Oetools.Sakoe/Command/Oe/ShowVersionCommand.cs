@@ -23,7 +23,7 @@ using Oetools.Sakoe.Utilities;
 namespace Oetools.Sakoe.Command.Oe {
 
     [Command(
-        "version", "ve",
+        "version", "vs",
         Description = "Show the version information of this tool.",
         ExtendedHelpText = ""
     )]

@@ -26,6 +26,7 @@ using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder.Project;
 using Oetools.Builder.Project.Properties;
 using Oetools.Builder.Utilities;
+using Oetools.Sakoe.Command.Oe.Database;
 using Oetools.Sakoe.Utilities;
 using Oetools.Sakoe.Utilities.Extension;
 using Oetools.Utilities.Lib.Extension;
@@ -34,10 +35,9 @@ namespace Oetools.Sakoe.Command.Oe {
 
     [Command(
         Name, "man", "ma",
-        Description = "The manual of this tool. Learn about its usage and about key concepts of sakoe."
+        Description = "The manual of this tool. Learn about the usage and key concepts of sakoe."
     )]
-    [Subcommand(typeof(ListAllCommandsManCommand))]
-    [Subcommand(typeof(BuildManCommand))]
+    [Subcommand(typeof(ManCommandCommand))]
     [Subcommand(typeof(CompleteManCommand))]
     [Subcommand(typeof(MarkdownManCommand))]
     [CommandAdditionalHelpTextAttribute(nameof(GetAdditionalHelpText))]
@@ -114,44 +114,6 @@ You are invited to STAR the project on github to increase its visibility!");
     }
 
     [Command(
-        "list", "li",
-        Description = "List all the commands of this tool."
-    )]
-    [CommandAdditionalHelpTextAttribute(nameof(GetAdditionalHelpText))]
-    internal class ListAllCommandsManCommand {
-
-        public static void GetAdditionalHelpText(IHelpFormatter formatter, CommandLineApplication app, int firstColumnWidth) {
-            formatter.WriteOnNewLine(null);
-            formatter.WriteSectionTitle("LIST OF ALL THE COMMANDS");
-            var rootCommand = app;
-            while (rootCommand.Parent != null) {
-                rootCommand = rootCommand.Parent;
-            }
-            formatter.WriteOnNewLine(rootCommand.Name);
-            ListCommands(formatter, rootCommand.Commands, "");
-            formatter.WriteOnNewLine(null);
-        }
-
-        private static void ListCommands(IHelpFormatter formatter, List<CommandLineApplication> subCommands, string linePrefix) {
-            var i = 0;
-            foreach (var subCommand in subCommands.OrderBy(c => c.Name)) {
-                formatter.WriteOnNewLine($"{linePrefix}{(i == subCommands.Count - 1 ? "└─ " : "├─ ")}{subCommand.Name}".PadRight(30));
-                var linePrefixForNewLine = $"{linePrefix}{(i == subCommands.Count - 1 ? "   " : "│  ")}";
-                formatter.Write(subCommand.Description, padding: 30, prefixForNewLines: linePrefixForNewLine);
-                if (subCommand.Commands != null && subCommand.Commands.Count > 0) {
-                    ListCommands(formatter, subCommand.Commands, linePrefixForNewLine);
-                }
-                i++;
-            }
-        }
-
-        protected virtual int OnExecute(CommandLineApplication app, IConsole console) {
-            GetAdditionalHelpText(HelpGenerator.Singleton, app, 0);
-            return 0;
-        }
-    }
-
-    [Command(
         Name, "co",
         Description = "Print the help of each command of this tool ."
     )]
@@ -193,8 +155,8 @@ You are invited to STAR the project on github to increase its visibility!");
 
 
     [Command(
-        "markdown-file", "mf",
-        Description = "Print the documentation of this tool in a markdown file."
+        "export-md", "md",
+        Description = "Export the documentation of this tool to a markdown file."
     )]
     internal class MarkdownManCommand {
 
@@ -285,62 +247,5 @@ You are invited to STAR the project on github to increase its visibility!");
         }
     }
 
-    [Command(
-        "build", "bu",
-        Description = "What is a build and how to configure it."
-    )]
-    [CommandAdditionalHelpTextAttribute(nameof(GetAdditionalHelpText))]
-    internal class BuildManCommand {
-
-        public static void GetAdditionalHelpText(IHelpFormatter formatter, CommandLineApplication app, int firstColumnWidth) {
-            formatter.WriteOnNewLine(null);
-            formatter.WriteSectionTitle("OVERVIEW");
-            formatter.WriteOnNewLine(@"With sakoe, you can 'build' your application. A build process is a succession of tasks that (typically) transform your source files into a deliverable format, usually called a release or package.
-
-In sakoe, you describe a build process using a 'build configuration'. A build configuration holds 'properties' of the build (for instance, the path to the openedge installation directory $DLC). It also holds the list of 'tasks' that will be executed successively during the build process.
-
-To illustrate this, here is a possible build process:
-  - Task 1: compile all your .p files to a `procedures` directory.
-  - Task 2: compile all your .w files into a pro-library `client.pl`.
-  - Task 3: zip the `procedures` and `client.pl` together into an archive file `release.zip`.
-
-In order to store these build configurations, sakoe uses project files: " + OeBuilderConstants.OeProjectExtension.PrettyQuote() + @".
-You can create them with the command: " + typeof(ProjectInitCommand).GetFullCommandLine().PrettyQuote() + @".");
-            formatter.WriteOnNewLine(null);
-            formatter.WriteOnNewLine(OeIncrementalBuildOptions.GetDefaultEnabledIncrementalBuild() ? "By default, a build is 'incremental'." : "A build can be 'incremental'.");
-            formatter.WriteOnNewLine("An incremental build is the opposite of a full build. In incremental mode, only the files that were added/modified/deleted since the previous build are taken into account. Unchanged files are simply not rebuilt.");
-            formatter.WriteOnNewLine(null);
-            formatter.WriteOnNewLine("The chapters below contain more details about a project, build configuration, properties and tasks. ");
-
-            // TODO: list all the node and their documentation, use a tree
-
-            formatter.WriteOnNewLine(null);
-            formatter.WriteSectionTitle("PROJECT");
-            formatter.WriteOnNewLine(BuilderHelp.GetPropertyDocumentation(typeof(OeProject).GetXmlName()));
-
-            formatter.WriteOnNewLine(null);
-            formatter.WriteSectionTitle("BUILD CONFIGURATION");
-            formatter.WriteOnNewLine(BuilderHelp.GetPropertyDocumentation(typeof(OeProject).GetXmlName(nameof(OeProject.BuildConfigurations))));
-
-            formatter.WriteOnNewLine(null);
-            formatter.WriteSectionTitle("BUILD CONFIGURATION VARIABLES");
-            formatter.WriteOnNewLine(BuilderHelp.GetPropertyDocumentation(typeof(OeBuildConfiguration).GetXmlName(nameof(OeBuildConfiguration.Variables))));
-
-            formatter.WriteOnNewLine(null);
-            formatter.WriteSectionTitle("BUILD CONFIGURATION PROPERTIES");
-            formatter.WriteOnNewLine(BuilderHelp.GetPropertyDocumentation(typeof(OeBuildConfiguration).GetXmlName(nameof(OeBuildConfiguration.Properties))));
-
-            formatter.WriteOnNewLine(null);
-            formatter.WriteSectionTitle("BUILD STEPS");
-            formatter.WriteOnNewLine(BuilderHelp.GetPropertyDocumentation(typeof(OeBuildConfiguration).GetXmlName(nameof(OeBuildConfiguration.BuildSteps))));
-
-            formatter.WriteOnNewLine(null);
-        }
-
-        protected virtual int OnExecute(CommandLineApplication app, IConsole console) {
-            GetAdditionalHelpText(HelpGenerator.Singleton, app, 0);
-            return 0;
-        }
-    }
 
 }

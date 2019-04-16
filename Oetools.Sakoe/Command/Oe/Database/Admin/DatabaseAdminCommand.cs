@@ -18,28 +18,35 @@
 // ========================================================================
 #endregion
 
+using System.Linq;
 using McMaster.Extensions.CommandLineUtils;
-using Oetools.Utilities.Openedge.Database;
+using McMaster.Extensions.CommandLineUtils.Conventions;
+using Oetools.Utilities.Lib;
 
 namespace Oetools.Sakoe.Command.Oe.Database {
 
     [Command(
-        "log", "lg",
-        Description = "Operate on database log files (" + UoeDatabaseLocation.LogFileExtention+ ")."
+        "admin", "am",
+        Description = "The openedge database administration tool.",
+        ExtendedHelpText = "The default sub command for this command is run."
     )]
-    [Subcommand(typeof(DatabaseLogTruncateCommand))]
-    internal class DatabaseLogCommand : AExpectSubCommand {
+    [Subcommand(typeof(DatabaseAdminRunCommand))]
+    internal class DatabaseAdminCommand : AExpectSubCommand {
+        protected override int OnExecute(CommandLineApplication app, IConsole console) {
+            return new DatabaseAdminRunCommand().Execute(app, console);
+        }
     }
 
     [Command(
-        "truncate", "tr",
-        Description = "Truncates the log file. If the database is started, it will re-log the database startup parameters to the log file."
+        "run", "rn",
+        Description = "Run an instance of the database administration tool."
     )]
-    internal class DatabaseLogTruncateCommand : ADatabaseSingleLocationCommand {
+    internal class DatabaseAdminRunCommand : ADatabaseToolCommand {
 
-        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
-            GetOperator().TruncateLog(GetSingleDatabaseLocation());
-            return 0;
+        protected override ProcessArgs ToolArguments() =>  new ProcessArgs().Append("-p", "_admin.p");
+
+        public int Execute(CommandLineApplication app, IConsole console) {
+            return OnExecute(app, console);
         }
     }
 }

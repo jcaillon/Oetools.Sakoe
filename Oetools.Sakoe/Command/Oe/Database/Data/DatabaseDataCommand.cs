@@ -38,6 +38,7 @@ namespace Oetools.Sakoe.Command.Oe.Database {
     [Subcommand(typeof(DatabaseDataLoadSqlCommand))]
     [Subcommand(typeof(DatabaseDataLoadBinaryCommand))]
     [Subcommand(typeof(DatabaseDataLoadBulkCommand))]
+    [Subcommand(typeof(DatabaseDataTruncateTableCommand))]
     internal class DatabaseDataCommand : AExpectSubCommand {
     }
 
@@ -236,6 +237,27 @@ namespace Oetools.Sakoe.Command.Oe.Database {
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             //TODO: fix this
             GetOperator().BulkLoad(GetSingleDatabaseLocation(), null, LoadDirectoryPath, new ProcessArgs().AppendFromQuotedArgs(DatabaseAccessStartupParameters), new ProcessArgs().AppendFromQuotedArgs(Options));
+            return 0;
+        }
+    }
+
+    [Command(
+        "truncate", "tc",
+        Description = "Deletes all the data of a given table."
+    )]
+    internal class DatabaseDataTruncateTableCommand : ADatabaseSingleLocationCommand {
+
+        [Required]
+        [Argument(0, "<tables>", "A list of comma separated table names to truncate.")]
+        public string TableNames { get; set; }
+
+        protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
+            using (var ope = GetAdministrator()) {
+                var connection = GetSingleDatabaseConnection(true);
+                foreach (var tableName in TableNames.Split(',')) {
+                    ope.TruncateTableData(connection, tableName);
+                }
+            }
             return 0;
         }
     }

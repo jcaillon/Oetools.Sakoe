@@ -20,7 +20,7 @@ namespace Oetools.Sakoe.Command.Oe.Database {
         protected const string OptionDatabaseFileShortName = "-f";
         protected const string OptionDatabaseConnectionShortName = "-c";
 
-        [Option("-cp|--cp-params", "Database server internationalization startup parameters such as `-cpinternal` codepage and `-cpstream` codepage. This option will be used for openedge commands that support them (_dbutil, _mprosrv, _mprshut, _proutil).", CommandOptionType.SingleValue)]
+        [Option("-cp|--cp-params <args>", "Database server internationalization startup parameters such as `-cpinternal` codepage and `-cpstream` codepage. This option will be used for openedge commands that support them (_dbutil, _mprosrv, _mprshut, _proutil).", CommandOptionType.SingleValue)]
         public string InternationalizationStartupParameters { get; set; }
 
         protected virtual IEnumerable<string> DatabasePaths { get; }
@@ -130,7 +130,7 @@ namespace Oetools.Sakoe.Command.Oe.Database {
     internal abstract class ADatabaseSingleLocationCommand : ADatabaseCommand {
 
         [LegalFilePath]
-        [Option(OptionDatabaseFileShortName + "|--file <path>", "Path to a database (" + UoeDatabaseLocation.Extension + " file). The " + UoeDatabaseLocation.Extension + " extension is optional and the path can be relative to the current directory. Defaults to the path of the unique " + UoeDatabaseLocation.Extension + " file found in the current directory.", CommandOptionType.SingleValue)]
+        [Option(OptionDatabaseFileShortName + "|--file <file>", "Path to a database (" + UoeDatabaseLocation.Extension + " file). The " + UoeDatabaseLocation.Extension + " extension is optional and the path can be relative to the current directory. Defaults to the path of the unique " + UoeDatabaseLocation.Extension + " file found in the current directory.", CommandOptionType.SingleValue)]
         public string DatabasePath { get; set; }
 
         protected override IEnumerable<string> DatabasePaths => DatabasePath.Yield();
@@ -152,7 +152,7 @@ namespace Oetools.Sakoe.Command.Oe.Database {
         public string DatabaseConnection { get; set; }
 
         [LegalFilePath]
-        [Option(OptionDatabaseFileShortName + "|--file <path>", "Path to a database (" + UoeDatabaseLocation.Extension + " file). The " + UoeDatabaseLocation.Extension + " extension is optional and the path can be relative to the current directory. Defaults to the path of the unique " + UoeDatabaseLocation.Extension + " file found in the current directory.", CommandOptionType.SingleValue)]
+        [Option(OptionDatabaseFileShortName + "|--file <file>", "Path to a database (" + UoeDatabaseLocation.Extension + " file). The " + UoeDatabaseLocation.Extension + " extension is optional and the path can be relative to the current directory. Defaults to the path of the unique " + UoeDatabaseLocation.Extension + " file found in the current directory.", CommandOptionType.SingleValue)]
         public string DatabasePath { get; set; }
 
         protected override IEnumerable<string> DatabasePaths => DatabasePath.Yield();
@@ -198,7 +198,7 @@ namespace Oetools.Sakoe.Command.Oe.Database {
             var dlcPath = GetDlcPath();
 
             var args = new UoeProcessArgs();
-            args.Append(ToolArguments(), GetDatabaseConnections());
+            args.Append(ToolArguments(), GetDatabaseConnections(true, false));
             if (UoeUtilities.CanProVersionUseNoSplashParameter(UoeUtilities.GetProVersionFromDlc(dlcPath))) {
                 args.Append("-nosplash");
             }

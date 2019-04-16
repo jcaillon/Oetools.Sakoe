@@ -40,7 +40,8 @@ namespace Oetools.Sakoe.Command.Oe.Database {
 
     [Command(
         "report", "re",
-        Description = @"Displays an analysis report. It is the combination of the output from proutil dbanalys, describe and iostats."
+        Description = @"Displays an analysis report.",
+        ExtendedHelpText = "An analysis report is the combination of the output from proutil dbanalys, describe and iostats."
     )]
     internal class DatabaseAnalysisReportCommand : ADatabaseSingleLocationWithAccessArgsCommand {
 

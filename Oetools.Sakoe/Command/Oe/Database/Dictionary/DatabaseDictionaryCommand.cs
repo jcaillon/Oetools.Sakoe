@@ -24,20 +24,28 @@ using Oetools.Utilities.Lib;
 namespace Oetools.Sakoe.Command.Oe.Database {
 
     [Command(
-        "dictionary", "di", "dic",
-        Description = "The openedge database dictionary tool."
+        "dictionary", "dt", "dic",
+        Description = "The openedge database dictionary tool.",
+        ExtendedHelpText = "The default sub command for this command is run."
     )]
     [Subcommand(typeof(DatabaseDictionaryRunCommand))]
     internal class DatabaseDictionaryCommand : AExpectSubCommand {
+        protected override int OnExecute(CommandLineApplication app, IConsole console) {
+            return new DatabaseDictionaryRunCommand().Execute(app, console);
+        }
     }
 
     [Command(
-        "run", "ru",
+        "run", "rn",
         Description = "Run an instance of the dictionary tool."
     )]
     internal class DatabaseDictionaryRunCommand : ADatabaseToolCommand {
 
         protected override ProcessArgs ToolArguments() => new ProcessArgs().Append("-p", "_dict.p");
+
+        public int Execute(CommandLineApplication app, IConsole console) {
+            return OnExecute(app, console);
+        }
 
     }
 }

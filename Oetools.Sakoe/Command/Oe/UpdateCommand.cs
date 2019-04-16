@@ -34,8 +34,7 @@ namespace Oetools.Sakoe.Command.Oe {
 
     [Command(
         "update", "up",
-        Description = "Update this tool with the latest release found on github.",
-        ExtendedHelpText = ""
+        Description = "Update this tool with the latest release found on github."
     )]
     internal class UpdateCommand : ABaseCommand {
 
@@ -46,7 +45,7 @@ namespace Oetools.Sakoe.Command.Oe {
         [Option("-b|--get-pre-release", "Accept to update from new pre-release (i.e. 'beta') versions of the tool.\nThis option will be used by default if the current version of the tool is a pre-release version. Otherwise, only stable releases will be used for updates. ", CommandOptionType.NoValue)]
         public bool GetPreRelease { get; set; }
 
-        [Option("-p|--proxy", "The http proxy to use for this update. Useful if you are behind a corporate firewall.\nThe expected format is: 'http(s)://[user:password@]host[:port]'.\nIt is also possible to use the environment variables OE_HTTP_PROXY or http_proxy to set this value.", CommandOptionType.SingleValue)]
+        [Option("-p|--proxy <url>", "The http proxy to use for this update. Useful if you are behind a corporate firewall.\nThe expected format is: 'http(s)://[user:password@]host[:port]'.\nIt is also possible to use the environment variables OE_HTTP_PROXY or http_proxy to set this value.", CommandOptionType.SingleValue)]
         public string HttpProxy { get; set; }
 
         [Option("-c|--check-only", "Check for new releases but exit the command before actually updating the tool.", CommandOptionType.NoValue)]
