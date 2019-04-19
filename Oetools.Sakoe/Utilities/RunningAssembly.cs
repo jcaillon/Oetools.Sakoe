@@ -22,10 +22,16 @@ using Oetools.Utilities.Lib;
 
 namespace Oetools.Sakoe.Utilities {
 
+    /// <summary>
+    /// The running assembly (Oetools.Sakoe).
+    /// </summary>
     internal static class RunningAssembly {
 
         private static AssemblyInfo _assemblyInfo;
 
+        /// <summary>
+        /// Get information on the assembly.
+        /// </summary>
         public static AssemblyInfo Info => _assemblyInfo ?? (_assemblyInfo = new AssemblyInfo(typeof(RunningAssembly).Assembly));
 
     }

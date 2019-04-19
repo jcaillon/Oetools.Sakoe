@@ -34,7 +34,7 @@ using Oetools.Utilities.Lib.Extension;
 namespace Oetools.Sakoe.Command.Oe {
 
     [Command(
-        Name, "man", "ma",
+        Name, "ma", "man",
         Description = "The manual of this tool. Learn about the usage and key concepts of sakoe."
     )]
     [Subcommand(typeof(ManCommandCommand))]

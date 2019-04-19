@@ -39,7 +39,7 @@ namespace Oetools.Sakoe.Command.Oe {
     internal class UpdateCommand : ABaseCommand {
 
         private const string RepoOwner = "jcaillon";
-        private const string RepoName = "battle-code"; // Oetools.Sakoe
+        private const string RepoName = "Oetools.Sakoe"; // battle-code
         public const string GitHubToken = "MmViMDJlNWVlYWZlMTIzNGIxN2VmOTkxMGQ1NzljMTRkM2E1ZDEyMw==";
 
         [Option("-b|--get-pre-release", "Accept to update from new pre-release (i.e. 'beta') versions of the tool.\nThis option will be used by default if the current version of the tool is a pre-release version. Otherwise, only stable releases will be used for updates. ", CommandOptionType.NoValue)]

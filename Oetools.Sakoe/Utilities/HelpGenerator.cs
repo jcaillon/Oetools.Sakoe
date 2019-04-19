@@ -86,15 +86,18 @@ namespace Oetools.Sakoe.Utilities {
             if (optionLongNameColumnWidth > 0) {
                 optionLongNameColumnWidth += 2; // --name
             }
-
-            var firstColumnWidth = Math.Max(optionShortNameColumnWidth + optionLongNameColumnWidth, commands.Count > 0 ? commands.Max(c => c.Name?.Length ?? 0) : 0);
+            var commandShortNameColumnWidth = commands.Max(c => c.Names.Skip(1).FirstOrDefault()?.Length ?? 0);
+            var commandLongNameColumnWidth = commands.Max(c => c.Name?.Length ?? 0);
+            if (commandShortNameColumnWidth > 0) {
+                commandShortNameColumnWidth += 2;
+            }
+            var firstColumnWidth = optionShortNameColumnWidth + optionLongNameColumnWidth;
+            firstColumnWidth = Math.Max(firstColumnWidth, commandShortNameColumnWidth + commandLongNameColumnWidth);
             firstColumnWidth = Math.Max(firstColumnWidth, arguments.Count > 0 ? arguments.Max(a => a.Name.IndexOf('[') < 0 ? a.Name.Length : a.Name.Length - 2) : 0);
             firstColumnWidth = Math.Max(firstColumnWidth, 20);
             firstColumnWidth = Math.Min(firstColumnWidth, 35);
-
-            if (firstColumnWidth != optionShortNameColumnWidth + optionLongNameColumnWidth) {
-                optionLongNameColumnWidth = firstColumnWidth - optionShortNameColumnWidth;
-            }
+            optionLongNameColumnWidth = firstColumnWidth - optionShortNameColumnWidth;
+            commandLongNameColumnWidth = firstColumnWidth - commandShortNameColumnWidth;
 
             var fullCommandLine = application.GetFullCommandLine();
 
@@ -110,7 +113,7 @@ namespace Oetools.Sakoe.Utilities {
             GenerateArguments(arguments, firstColumnWidth);
             GenerateOptions(options.Where(o => !o.Inherited).ToList(), optionShortNameColumnWidth, optionLongNameColumnWidth, false);
             GenerateOptions(options.Where(o => o.Inherited).ToList(), optionShortNameColumnWidth, optionLongNameColumnWidth, true);
-            GenerateCommands(application, fullCommandLine, commands, firstColumnWidth);
+            GenerateCommands(application, fullCommandLine, commands, commandShortNameColumnWidth, commandLongNameColumnWidth);
 
             var additionalHelpTextAttribute = (CommandAdditionalHelpTextAttribute) Attribute.GetCustomAttribute(commandType, typeof(CommandAdditionalHelpTextAttribute), true);
             if (additionalHelpTextAttribute != null) {
@@ -153,13 +156,6 @@ namespace Oetools.Sakoe.Utilities {
                     Write(" [-- <arg>...]");
                 }
             }
-
-            #if !WINDOWSONLYBUILD && !SELFCONTAINEDWITHEXE
-            if (!File.Exists(CreateStarterCommand.StartScriptFilePath)) {
-                WriteOnNewLine(null);
-                WriteTip($"Tip: use the command {typeof(CreateStarterCommand).GetFullCommandLine().PrettyQuote()} to simplify your invocation of sakoe.");
-            }
-            #endif
         }
 
         /// <summary>
@@ -214,15 +210,22 @@ namespace Oetools.Sakoe.Utilities {
         }
 
         /// <summary>
-        /// Generate the lines that show information about subcommands
+        /// Generate the lines that show information about subcommands.
         /// </summary>
-        protected virtual void GenerateCommands(CommandLineApplication application, string thisCommandLine, IReadOnlyList<CommandLineApplication> visibleCommands, int firstColumnWidth) {
+        protected virtual void GenerateCommands(CommandLineApplication application, string thisCommandLine, IReadOnlyList<CommandLineApplication> visibleCommands, int commandShortNameColumnWidth, int commandLongNameColumnWidth) {
+            var firstColumnWidth = commandShortNameColumnWidth + commandLongNameColumnWidth;
             if (visibleCommands.Any()) {
                 WriteOnNewLine(null);
                 WriteSectionTitle("COMMANDS");
 
                 foreach (var cmd in visibleCommands.OrderBy(c => c.Name)) {
-                    WriteOnNewLine(cmd.Name.PadRight(firstColumnWidth + 2));
+                    string firstColumn;
+                    if (cmd.Names.Count() <= 1) {
+                        firstColumn = cmd.Name;
+                    } else {
+                        firstColumn = $"{$"{cmd.Names.Skip(1).First()}, ".PadRight(commandShortNameColumnWidth)}{cmd.Name.PadRight(commandLongNameColumnWidth)}";
+                    }
+                    WriteOnNewLine(firstColumn.PadRight(firstColumnWidth + 2));
                     if (cmd.Name.Length > firstColumnWidth) {
                         WriteOnNewLine(cmd.Description, padding: firstColumnWidth + 2);
                     } else {
@@ -250,6 +253,11 @@ namespace Oetools.Sakoe.Utilities {
             _console.Write(result, color, padding + DefaultPadding + _currentPadding, DefaultPadding + _currentPadding == 0 || string.IsNullOrEmpty(prefixForNewLines) ? prefixForNewLines : prefixForNewLines.PadLeft(prefixForNewLines.Length + DefaultPadding + _currentPadding, ' '));
         }
 
+        /// <summary>
+        /// Write a section title.
+        /// </summary>
+        /// <param name="result"></param>
+        /// <param name="padding"></param>
         public virtual void WriteSectionTitle(string result, int padding = 0) {
             _currentPadding = 0;
             _console.WriteOnNewLine(result, ConsoleColor.Cyan, padding + DefaultPadding + _currentPadding);

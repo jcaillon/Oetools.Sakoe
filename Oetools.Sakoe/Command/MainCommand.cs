@@ -40,9 +40,6 @@ namespace Oetools.Sakoe.Command {
         Description = "SAKOE is a collection of tools aimed to simplify your work in Openedge environments."
     )]
     [HelpOption("-?|-h|" + HelpLongName, Description = "Show this help text.", Inherited = true)]
-#if DEBUG
-    [Subcommand(typeof(SelfTestCommand))]
-#endif
     [Subcommand(typeof(ManCommand))]
     [Subcommand(typeof(UpdateCommand))]
     [Subcommand(typeof(DatabaseCommand))]
