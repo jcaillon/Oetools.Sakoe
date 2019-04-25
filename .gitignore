@@ -378,3 +378,4 @@ _ReSharper*
 *.dll
 *.pdb
 /Oetools.Sakoe/Resources/Dependencies
+!/Oetools.Sakoe/Command/Oe/Database/Log
