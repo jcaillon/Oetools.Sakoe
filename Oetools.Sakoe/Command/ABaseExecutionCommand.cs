@@ -1,7 +1,7 @@
-#region header
+﻿#region header
 // ========================================================================
 // Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
-// This file (AExpectSubCommand.cs) is part of Oetools.Sakoe.
+// This file (ABaseCommand.cs) is part of Oetools.Sakoe.
 //
 // Oetools.Sakoe is a free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,27 +17,28 @@
 // along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
+using System.Threading;
+using CommandLineUtilsPlus.Command;
+using CommandLineUtilsPlus.Console;
 using McMaster.Extensions.CommandLineUtils;
-using Oetools.Sakoe.ConLog;
 using Oetools.Sakoe.Utilities;
+using Oetools.Utilities.Lib;
 using ILogger = Oetools.Builder.Utilities.ILogger;
 
 namespace Oetools.Sakoe.Command {
-    public abstract class AExpectSubCommand {
 
-        protected ILogger Log => ConsoleLogger2.Singleton;
 
-        protected IConsoleOutput Out => ConsoleLogger2.Singleton;
+    public abstract class ABaseExecutionCommand : AExecutionCommand {
 
-        protected virtual int OnExecute(CommandLineApplication app, IConsole console) {
-            if (app.Parent == null) {
-                MainCommand.DrawLogo(Out);
-            }
-            app.ShowHelp();
-            Log.Warn(HelpGenerator.GetHelpProvideCommand(app));
-            Log.Warn($"Exit code 1");
-            Out.WriteOnNewLine(null);
-            return 1;
+        protected ILogger GetLogger() => Log as ILogger;
+
+        protected override void DrawLogo(CommandLineApplication application, IConsoleWriter console) {
+            MainCommand.DrawLogo(console);
         }
     }
+
 }

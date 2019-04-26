@@ -18,14 +18,13 @@
 // ========================================================================
 #endregion
 using System;
-using System.IO;
-using System.Linq;
+using CommandLineUtilsPlus;
+using CommandLineUtilsPlus.Console;
+using CommandLineUtilsPlus.Extension;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Command.Oe;
 using Oetools.Sakoe.Command.Oe.Database;
-using Oetools.Sakoe.ConLog;
 using Oetools.Sakoe.Utilities;
-using Oetools.Sakoe.Utilities.Extension;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
 
@@ -52,55 +51,23 @@ namespace Oetools.Sakoe.Command {
 #if !WINDOWSONLYBUILD
     [Subcommand(typeof(CreateStarterCommand))]
 #endif
-    [CommandAdditionalHelpTextAttribute(nameof(GetAdditionalHelpText))]
-    internal class MainCommand : AExpectSubCommand {
+    [CommandAdditionalHelpText(nameof(GetAdditionalHelpText))]
+    internal class MainCommand : ABaseParentCommand {
 
         public const string HelpLongName = "--help";
 
-        public static void GetAdditionalHelpText(IHelpFormatter formatter, CommandLineApplication application, int firstColumnWidth) {
+        public static void GetAdditionalHelpText(IHelpWriter formatter, CommandLineApplication application, int firstColumnWidth) {
             formatter.WriteOnNewLine(null);
             formatter.WriteSectionTitle("HOW TO");
-            formatter.WriteOnNewLine($"Start by reading the manual for this tool: {typeof(ManCommand).GetFullCommandLine().PrettyQuote()}.");
-            formatter.WriteOnNewLine($"Get a full list of commands available: {typeof(ManCommandListCommand).GetFullCommandLine().PrettyQuote()}.");
+            formatter.WriteOnNewLine($"Start by reading the manual for this tool: {typeof(ManCommand).GetFullCommandLine<MainCommand>().PrettyQuote()}.");
+            formatter.WriteOnNewLine($"Get a full list of commands available: {typeof(ManCommandListCommand).GetFullCommandLine<MainCommand>().PrettyQuote()}.");
 
-        }
-
-        public static int ExecuteMainCommand(string[] args) {
-            var console = ConsoleImplementation2.Singleton;
-            try {
-                console.CursorVisible = false;
-                using (var app = new CommandLineApplicationCustomHint<MainCommand>(HelpGenerator.Singleton, console, Directory.GetCurrentDirectory(), true)) {
-                    app.Conventions.UseDefaultConventions();
-                    app.Conventions.AddConvention(new CommandCommonOptionsConvention());
-                    return app.Execute(args);
-                }
-            } catch (Exception ex) {
-                var log = ConsoleLogger2.Singleton;
-                log.LogTheshold = ConsoleLogThreshold.Debug;
-
-                if (ex is CommandParsingException) {
-                    log.Error(ex.Message);
-                    if (ex is UnrecognizedCommandParsingException unrecognizedCommandParsingException && unrecognizedCommandParsingException.NearestMatches.Any()) {
-                        log.Info($"Did you mean {unrecognizedCommandParsingException.NearestMatches.First()}?");
-                    }
-                    log.Info($"Specify {HelpLongName} for a list of available options and commands.");
-                } else {
-                    log.Error(ex.Message, ex);
-                }
-
-                log.Fatal($"Exit code {ABaseCommand.FatalExitCode}");
-                log.WriteOnNewLine(null);
-                return ABaseCommand.FatalExitCode;
-            } finally {
-                ConsoleLogger2.Singleton.Dispose();
-                console.CursorVisible = true;
-            }
         }
 
         /// <summary>
         /// Draw the logo of this tool.
         /// </summary>
-        public static void DrawLogo(IConsoleOutput console) {
+        public static void DrawLogo(IConsoleWriter console) {
             console.WriteOnNewLine(null);
             console.WriteOnNewLine(@"                '`.        ", ConsoleColor.Gray);
             console.Write(@"============ ", ConsoleColor.Gray);

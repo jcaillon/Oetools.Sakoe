@@ -26,6 +26,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Xml.Serialization;
+using CommandLineUtilsPlus;
+using CommandLineUtilsPlus.Extension;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder;
 using Oetools.Builder.History;
@@ -34,8 +36,6 @@ using Oetools.Builder.Project.Properties;
 using Oetools.Builder.Utilities;
 using Oetools.Sakoe.Command.Exceptions;
 using Oetools.Sakoe.Command.Oe.Database;
-using Oetools.Sakoe.Utilities;
-using Oetools.Sakoe.Utilities.Extension;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Attributes;
 using Oetools.Utilities.Lib.Extension;
@@ -53,7 +53,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Subcommand(typeof(ProjectGitignoreCommand))]
     [Subcommand(typeof(ProjectListCommand))]
     [Subcommand(typeof(ProjectUpdateCommand))]
-    internal class ProjectCommand : AExpectSubCommand {
+    internal class ProjectCommand : ABaseParentCommand {
     }
 
 
@@ -62,7 +62,7 @@ namespace Oetools.Sakoe.Command.Oe {
         Description = "Initialize a new Openedge project file (" + OeBuilderConstants.OeProjectExtension + ").",
         ExtendedHelpText = ""
     )]
-    internal class ProjectInitCommand : ABaseCommand {
+    internal class ProjectInitCommand : ABaseExecutionCommand {
 
         [LegalFilePath]
         [Option("-f|--file <name>", "The name of the project (project file) to create. Defaults to the current directory name.", CommandOptionType.SingleValue)]
@@ -114,9 +114,9 @@ namespace Oetools.Sakoe.Command.Oe {
 
             Log.Info($"Project created: {projectFilePath.PrettyQuote()}.");
 
-            HelpFormatter.WriteOnNewLine(null);
-            HelpFormatter.WriteSectionTitle("IMPORTANT README:");
-            HelpFormatter.WriteOnNewLine(@"
+            HelpWriter.WriteOnNewLine(null);
+            HelpWriter.WriteSectionTitle("IMPORTANT README:");
+            HelpWriter.WriteOnNewLine(@"
 The project file created (" + OeBuilderConstants.OeProjectExtension + @") is defined in XML format and has a provided XML schema definition file (" + OeProject.XsdName + @").
 
 The project XML schema is fully documented and should be used to enable intellisense in your favorite editor.
@@ -128,11 +128,11 @@ Example of xml editors with out-of-the-box intellisense (autocomplete) features 
 
 Drag and drop the created " + OeBuilderConstants.OeProjectExtension + @" file into the editor of your choice and start configuring your build.
 The file " + Path.Combine(OeBuilderConstants.GetProjectDirectory(""), $"{ProjectName}{OeBuilderConstants.OeProjectExtension}").PrettyQuote() + @" should be versioned in your source repository to allow anyone who clones your application to build it.
-The file " + OeProject.XsdName.PrettyQuote() + @", however, should not be versioned with your application because it depends on the version of this tool (sakoe). If this tool is updated, use the command " + typeof(ProjectUpdateCommand).GetFullCommandLine().PrettyQuote() + @" to update the " + OeProject.XsdName.PrettyQuote() + @" to the latest version.
+The file " + OeProject.XsdName.PrettyQuote() + @", however, should not be versioned with your application because it depends on the version of this tool (sakoe). If this tool is updated, use the command " + typeof(ProjectUpdateCommand).GetFullCommandLine<MainCommand>().PrettyQuote() + @" to update the " + OeProject.XsdName.PrettyQuote() + @" to the latest version.
 
 If you need to have a project file containing build configurations specific to your local machine, you can use the option " + (GetCommandOptionFromPropertyName(nameof(IsLocalProject))?.Template ?? "").PrettyQuote() + @". This will create the project file into the directory " + OeBuilderConstants.GetProjectDirectoryLocal("").PrettyQuote() + @" which should NOT be versioned.
-For git repositories, use the command " + typeof(ProjectGitignoreCommand).GetFullCommandLine().PrettyQuote() + @" to set up your .gitignore file for sakoe projects.");
-            HelpFormatter.WriteOnNewLine(null);
+For git repositories, use the command " + typeof(ProjectGitignoreCommand).GetFullCommandLine<MainCommand>().PrettyQuote() + @" to set up your .gitignore file for sakoe projects.");
+            HelpWriter.WriteOnNewLine(null);
             return 0;
         }
     }
@@ -142,7 +142,7 @@ For git repositories, use the command " + typeof(ProjectGitignoreCommand).GetFul
         Description = "Initialize a .gitignore file adapted for sakoe projects (or append to, if it exists).",
         ExtendedHelpText = ""
     )]
-    internal class ProjectGitignoreCommand : ABaseCommand {
+    internal class ProjectGitignoreCommand : ABaseExecutionCommand {
 
         [DirectoryExists]
         [Option("-d|--directory <dir>", "The repository base directory (source directory). Defaults to the current directory.", CommandOptionType.SingleValue)]
@@ -318,7 +318,7 @@ Each pair should specify the name of the variable to set and the value that shou
         /// <summary>
         /// Additional help
         /// </summary>
-        public static void GetAdditionalHelpText(IHelpFormatter formatter, CommandLineApplication application, int firstColumnWidth) {
+        public static void GetAdditionalHelpText(IHelpWriter formatter, CommandLineApplication application, int firstColumnWidth) {
             formatter.WriteOnNewLine(null);
             formatter.WriteSectionTitle("BUILD PROPERTIES");
 
@@ -360,8 +360,8 @@ This allow a lot of flexibility for organizing and partitioning your build proce
 
             formatter.WriteOnNewLine(null);
             formatter.WriteSectionTitle("NOTES");
-            formatter.WriteOnNewLine($"Create a new project file using the command: {typeof(ProjectInitCommand).GetFullCommandLine().PrettyQuote()}.");
-            formatter.WriteOnNewLine($"Get a more in-depth help and learn about the concept of a build (in sakoe) using the command: {typeof(BuildManCommand).GetFullCommandLine().PrettyQuote()}.");
+            formatter.WriteOnNewLine($"Create a new project file using the command: {typeof(ProjectInitCommand).GetFullCommandLine<MainCommand>().PrettyQuote()}.");
+            formatter.WriteOnNewLine($"Get a more in-depth help and learn about the concept of a build (in sakoe) using the command: {typeof(BuildManCommand).GetFullCommandLine<MainCommand>().PrettyQuote()}.");
         }
 
         /// <inheritdoc />
@@ -370,13 +370,13 @@ This allow a lot of flexibility for organizing and partitioning your build proce
 
             // show help.
             if (ShowBuildPropertyHelp) {
-                HelpFormatter.WriteOnNewLine(null);
-                HelpFormatter.WriteSectionTitle("BUILD PROPERTIES");
+                HelpWriter.WriteOnNewLine(null);
+                HelpWriter.WriteSectionTitle("BUILD PROPERTIES");
 
                 foreach (var property in GetAvailableBuildProperties().OrderBy(p => p.Key)) {
-                    HelpFormatter.WriteOnNewLine(property.Key);
-                    HelpFormatter.WriteOnNewLine(BuilderHelp.GetPropertyDocumentation(property.Key), padding: 20);
-                    HelpFormatter.WriteOnNewLine(null);
+                    HelpWriter.WriteOnNewLine(property.Key);
+                    HelpWriter.WriteOnNewLine(BuilderHelp.GetPropertyDocumentation(property.Key), padding: 20);
+                    HelpWriter.WriteOnNewLine(null);
                 }
                 return 0;
             }
@@ -461,7 +461,7 @@ This allow a lot of flexibility for organizing and partitioning your build proce
                 }
                 builder.BuildConfiguration.Properties.DlcDirectoryPath = GetDlcPath();
                 builder.CancelToken = CancelToken;
-                builder.Log = Log;
+                builder.Log = GetLogger();
                 builder.Build();
 
 

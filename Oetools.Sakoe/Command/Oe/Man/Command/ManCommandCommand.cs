@@ -20,12 +20,12 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using CommandLineUtilsPlus;
+using CommandLineUtilsPlus.Extension;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder.Project;
 using Oetools.Builder.Project.Properties;
 using Oetools.Builder.Utilities;
-using Oetools.Sakoe.Utilities;
-using Oetools.Sakoe.Utilities.Extension;
 using Oetools.Utilities.Lib.Extension;
 
 namespace Oetools.Sakoe.Command.Oe.Database {
@@ -36,7 +36,7 @@ namespace Oetools.Sakoe.Command.Oe.Database {
     )]
     [Subcommand(typeof(BuildManCommand))]
     [Subcommand(typeof(ManCommandListCommand))]
-    internal class ManCommandCommand : AExpectSubCommand {
+    internal class ManCommandCommand : ABaseParentCommand {
     }
 
     [Command(
@@ -46,7 +46,7 @@ namespace Oetools.Sakoe.Command.Oe.Database {
     [CommandAdditionalHelpText(nameof(GetAdditionalHelpText))]
     internal class BuildManCommand {
 
-        public static void GetAdditionalHelpText(IHelpFormatter formatter, CommandLineApplication app, int firstColumnWidth) {
+        public static void GetAdditionalHelpText(IHelpWriter formatter, CommandLineApplication app, int firstColumnWidth) {
             formatter.WriteOnNewLine(null);
             formatter.WriteSectionTitle("OVERVIEW");
             formatter.WriteOnNewLine(@"With sakoe, you can 'build' your project. A build process is a succession of tasks that (typically) transform your source files into a deliverable format, usually called a release or package.
@@ -59,7 +59,7 @@ To illustrate this, here is a possible build process:
   - Task 3: zip the `procedures` and `client.pl` together into an archive file `release.zip`.
 
 In order to store these build configurations, sakoe uses project files: " + OeBuilderConstants.OeProjectExtension.PrettyQuote() + @".
-You can create them with the command: " + typeof(ProjectInitCommand).GetFullCommandLine().PrettyQuote() + @".");
+You can create them with the command: " + typeof(ProjectInitCommand).GetFullCommandLine<MainCommand>().PrettyQuote() + @".");
             formatter.WriteOnNewLine(null);
             formatter.WriteOnNewLine(OeIncrementalBuildOptions.GetDefaultEnabledIncrementalBuild() ? "By default, a build is 'incremental'." : "A build can be 'incremental'.");
             formatter.WriteOnNewLine("An incremental build is the opposite of a full build. In incremental mode, only the files that were added/modified/deleted since the previous build are taken into account. Unchanged files are simply not rebuilt.");
@@ -92,7 +92,7 @@ You can create them with the command: " + typeof(ProjectInitCommand).GetFullComm
         }
 
         protected virtual int OnExecute(CommandLineApplication app, IConsole console) {
-            GetAdditionalHelpText(HelpGenerator.Singleton, app, 0);
+            GetAdditionalHelpText(app.HelpTextGenerator as IHelpWriter, app, 0);
             return 0;
         }
     }
@@ -104,7 +104,7 @@ You can create them with the command: " + typeof(ProjectInitCommand).GetFullComm
     [CommandAdditionalHelpTextAttribute(nameof(GetAdditionalHelpText))]
     internal class ManCommandListCommand {
 
-        public static void GetAdditionalHelpText(IHelpFormatter formatter, CommandLineApplication app, int firstColumnWidth) {
+        public static void GetAdditionalHelpText(IHelpWriter formatter, CommandLineApplication app, int firstColumnWidth) {
             formatter.WriteOnNewLine(null);
             formatter.WriteSectionTitle("LIST OF ALL THE COMMANDS");
             var rootCommand = app;
@@ -116,7 +116,7 @@ You can create them with the command: " + typeof(ProjectInitCommand).GetFullComm
             formatter.WriteOnNewLine(null);
         }
 
-        private static void ListCommands(IHelpFormatter formatter, List<CommandLineApplication> subCommands, string linePrefix) {
+        private static void ListCommands(IHelpWriter formatter, List<CommandLineApplication> subCommands, string linePrefix) {
             var i = 0;
             foreach (var subCommand in subCommands.OrderBy(c => c.Name)) {
                 formatter.WriteOnNewLine($"{linePrefix}{(i == subCommands.Count - 1 ? "└─ " : "├─ ")}{subCommand.Name}".PadRight(30));
@@ -130,7 +130,7 @@ You can create them with the command: " + typeof(ProjectInitCommand).GetFullComm
         }
 
         protected virtual int OnExecute(CommandLineApplication app, IConsole console) {
-            GetAdditionalHelpText(HelpGenerator.Singleton, app, 0);
+            GetAdditionalHelpText(app.HelpTextGenerator as IHelpWriter, app, 0);
             return 0;
         }
     }

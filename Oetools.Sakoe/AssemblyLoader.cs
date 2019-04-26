@@ -1,4 +1,5 @@
 ﻿#region header
+
 // ========================================================================
 // Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
 // This file (AssemblyLoader.cs) is part of Oetools.Sakoe.
@@ -16,15 +17,20 @@
 // You should have received a copy of the GNU General Public License
 // along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
+
 #endregion
+
 using System;
 using System.IO;
 using System.Reflection;
 using System.Linq;
 
 namespace Oetools.Sakoe {
-        internal static class AssemblyLoader {
 
+    /// <summary>
+    /// A static class with a method to load and resolve external assemblies needed by our main assembly.
+    /// </summary>
+    internal static class AssemblyLoader {
         private static string _executingAssemblyName = Assembly.GetExecutingAssembly().GetName().Name;
 
         /// <summary>

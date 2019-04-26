@@ -28,7 +28,7 @@ namespace Oetools.Sakoe.Command.Oe.Database {
         Description = "Operate on database indexes."
     )]
     [Subcommand(typeof(DatabaseIndexRebuildCommand))]
-    internal class DatabaseIndexCommand : AExpectSubCommand {
+    internal class DatabaseIndexCommand : ABaseParentCommand {
     }
 
     [Command(

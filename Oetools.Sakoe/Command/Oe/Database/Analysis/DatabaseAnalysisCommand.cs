@@ -34,7 +34,7 @@ namespace Oetools.Sakoe.Command.Oe.Database {
     )]
     [Subcommand(typeof(DatabaseAnalysisAdviceCommand))]
     [Subcommand(typeof(DatabaseAnalysisReportCommand))]
-    internal class DatabaseAnalysisCommand : AExpectSubCommand {
+    internal class DatabaseAnalysisCommand : ABaseParentCommand {
     }
 
 

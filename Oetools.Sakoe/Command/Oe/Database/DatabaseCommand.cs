@@ -22,9 +22,9 @@ using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using CommandLineUtilsPlus.Command;
+using CommandLineUtilsPlus.Console;
 using McMaster.Extensions.CommandLineUtils;
-using Oetools.Sakoe.Command.Exceptions;
-using Oetools.Sakoe.ConLog;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge.Database;
@@ -61,7 +61,7 @@ namespace Oetools.Sakoe.Command.Oe.Database {
     [Subcommand(typeof(DatabaseBackUpCommand))]
     [Subcommand(typeof(DatabaseRestoreCommand))]
     [Subcommand(typeof(DatabaseCheckCommand))]
-    internal class DatabaseCommand : AExpectSubCommand {
+    internal class DatabaseCommand : ABaseParentCommand {
     }
 
     [Command(
@@ -205,7 +205,7 @@ namespace Oetools.Sakoe.Command.Oe.Database {
         Description = "Kill all the broker/server processes running on this machine.",
         ExtendedHelpText = "A broker process is generally named: `_mprosrv`."
     )]
-    internal class DatabaseKillAllCommand : ABaseCommand {
+    internal class DatabaseKillAllCommand : ABaseExecutionCommand {
         protected override int ExecuteCommand(CommandLineApplication app, IConsole console) {
             UoeDatabaseOperator.KillAllMproSrv();
             return 0;

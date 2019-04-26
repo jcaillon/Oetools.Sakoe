@@ -27,7 +27,7 @@ namespace Oetools.Sakoe.Command.Oe {
         Description = "Show the version information of this tool.",
         ExtendedHelpText = ""
     )]
-    internal class ShowVersionCommand : ABaseCommand {
+    internal class ShowVersionCommand : ABaseExecutionCommand {
 
         [Option("-b|--bare-version", "Output the raw assembly version of the tool, without logo and pre-release tag.", CommandOptionType.NoValue)]
         public bool BareVersion { get; }

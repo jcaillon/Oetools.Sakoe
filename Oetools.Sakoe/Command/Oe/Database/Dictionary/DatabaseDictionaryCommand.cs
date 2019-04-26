@@ -29,7 +29,7 @@ namespace Oetools.Sakoe.Command.Oe.Database {
         ExtendedHelpText = "The default sub command for this command is run."
     )]
     [Subcommand(typeof(DatabaseDictionaryRunCommand))]
-    internal class DatabaseDictionaryCommand : AExpectSubCommand {
+    internal class DatabaseDictionaryCommand : ABaseParentCommand {
         protected override int OnExecute(CommandLineApplication app, IConsole console) {
             return new DatabaseDictionaryRunCommand().Execute(app, console);
         }

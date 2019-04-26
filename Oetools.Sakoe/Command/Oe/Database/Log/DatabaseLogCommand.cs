@@ -28,7 +28,7 @@ namespace Oetools.Sakoe.Command.Oe.Database {
         Description = "Operate on database log files (" + UoeDatabaseLocation.LogFileExtention+ ")."
     )]
     [Subcommand(typeof(DatabaseLogTruncateCommand))]
-    internal class DatabaseLogCommand : AExpectSubCommand {
+    internal class DatabaseLogCommand : ABaseParentCommand {
     }
 
     [Command(

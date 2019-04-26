@@ -26,7 +26,7 @@ namespace Oetools.Sakoe.Command.Oe.Database {
         "project", "pr",
         Description = "Operates on databases belonging to a project."
     )]
-    internal class DatabaseProjectCommand : ABaseCommand {
+    internal class DatabaseProjectCommand : ABaseExecutionCommand {
     }
 
 }

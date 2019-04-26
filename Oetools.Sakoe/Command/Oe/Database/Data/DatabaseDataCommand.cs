@@ -39,7 +39,7 @@ namespace Oetools.Sakoe.Command.Oe.Database {
     [Subcommand(typeof(DatabaseDataLoadBinaryCommand))]
     [Subcommand(typeof(DatabaseDataLoadBulkCommand))]
     [Subcommand(typeof(DatabaseDataTruncateTableCommand))]
-    internal class DatabaseDataCommand : AExpectSubCommand {
+    internal class DatabaseDataCommand : ABaseParentCommand {
     }
 
     [Command(

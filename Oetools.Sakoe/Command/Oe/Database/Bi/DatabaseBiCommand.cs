@@ -28,7 +28,7 @@ namespace Oetools.Sakoe.Command.Oe.Database {
         Description = "Operate on database before-image file."
     )]
     [Subcommand(typeof(BiTruncateCommand))]
-    internal class DatabaseBiCommand : AExpectSubCommand {
+    internal class DatabaseBiCommand : ABaseParentCommand {
     }
 
     [Command(

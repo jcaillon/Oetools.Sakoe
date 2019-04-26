@@ -18,6 +18,7 @@
 // ========================================================================
 #endregion
 using System;
+using CommandLineUtilsPlus.Command;
 
 namespace Oetools.Sakoe.Command.Exceptions {
     public class CommandValidationException : CommandException {

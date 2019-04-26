@@ -32,7 +32,7 @@ namespace Oetools.Sakoe.Command.Oe {
         Description = "Manage external tools usable in sakoe."
     )]
     [Subcommand(typeof(ToolDataDiggerCommand))]
-    internal class ToolCommand : AExpectSubCommand {
+    internal class ToolCommand : ABaseParentCommand {
         
         /// <summary>
         /// Directory in which external tools are installed.

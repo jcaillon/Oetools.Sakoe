@@ -24,10 +24,10 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using CommandLineUtilsPlus.Command;
+using CommandLineUtilsPlus.Extension;
 using GithubUpdater.GitHub;
 using McMaster.Extensions.CommandLineUtils;
-using Oetools.Sakoe.Command.Exceptions;
-using Oetools.Sakoe.Utilities.Extension;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge.Execution;
@@ -48,7 +48,7 @@ Learn more here: https://datadigger.wordpress.com."
     [Subcommand(typeof(DataDiggerInstallCommand))]
     [Subcommand(typeof(DataDiggerRemoveCommand))]
     [Subcommand(typeof(DataDiggerRunCommand))]
-    internal class ToolDataDiggerCommand : AExpectSubCommand {
+    internal class ToolDataDiggerCommand : ABaseParentCommand {
 
         /// <summary>
         /// DataDigger installation directory.
@@ -100,7 +100,7 @@ Learn more here: https://datadigger.wordpress.com."
                 throw new CommandException("DataDigger can only run on windows platform.");
             }
             if (!ToolDataDiggerCommand.IsDataDiggerInstalled) {
-                throw new CommandException($"DataDigger is not installed yet, use the command {typeof(DataDiggerInstallCommand).GetFullCommandLine().PrettyQuote()}.");
+                throw new CommandException($"DataDigger is not installed yet, use the command {typeof(DataDiggerInstallCommand).GetFullCommandLine<MainCommand>().PrettyQuote()}.");
             }
             return base.ExecuteCommand(app, console);
         }
@@ -114,7 +114,7 @@ Learn more here: https://datadigger.wordpress.com."
         "remove", "rm",
         Description = "Remove DataDigger from the installation path."
     )]
-    internal class DataDiggerRemoveCommand : ABaseCommand {
+    internal class DataDiggerRemoveCommand : ABaseExecutionCommand {
 
         [Required]
         [Option("-f|--force", "Mandatory option to force the removal and avoid bad manipulation.", CommandOptionType.NoValue)]
@@ -140,7 +140,7 @@ Learn more here: https://datadigger.wordpress.com."
         Description = "Install DataDigger in the default installation path.",
         ExtendedHelpText = "Use the environment variable `OE_DATADIGGER_INSTALL_PATH` to specify a different location."
     )]
-    internal class DataDiggerInstallCommand : ABaseCommand {
+    internal class DataDiggerInstallCommand : ABaseExecutionCommand {
         private const string RepoOwner = "patrickTingen";
         private const string RepoName = "DataDigger";
         private const string GitHubToken = UpdateCommand.GitHubToken;

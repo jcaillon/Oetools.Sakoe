@@ -41,7 +41,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Subcommand(typeof(ListXcodeCommand))]
     [Subcommand(typeof(EncryptXcodeCommand))]
     [Subcommand(typeof(DecryptXcodeCommand))]
-    internal class XcodeCommand : AExpectSubCommand {
+    internal class XcodeCommand : ABaseParentCommand {
     }
 
     [Command(

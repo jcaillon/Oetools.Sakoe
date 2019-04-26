@@ -36,7 +36,7 @@ namespace Oetools.Sakoe.Command.Oe.Database {
     [Subcommand(typeof(DatabaseSchemaDumpSqlCommand))]
     [Subcommand(typeof(DatabaseSchemaDumpIncrementalCommand))]
     [Subcommand(typeof(DatabaseSchemaDumpIncrementalFromDfCommand))]
-    internal class DatabaseSchemaCommand : AExpectSubCommand {
+    internal class DatabaseSchemaCommand : ABaseParentCommand {
     }
 
     [Command(

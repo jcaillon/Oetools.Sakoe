@@ -21,15 +21,15 @@
 using System;
 using System.IO;
 using System.Linq;
+using CommandLineUtilsPlus.Command;
+using CommandLineUtilsPlus.Extension;
 using Oetools.Builder.Utilities;
-using Oetools.Sakoe.Command.Exceptions;
-using Oetools.Sakoe.Utilities.Extension;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge;
 
 namespace Oetools.Sakoe.Command.Oe {
-    public abstract class AOeCommand : ABaseCommand {
+    public abstract class AOeCommand : ABaseExecutionCommand {
 
         /// <summary>
         /// Returns the path of the unique project file in the current directory (if any)
@@ -44,7 +44,7 @@ namespace Oetools.Sakoe.Command.Oe {
                     list = Directory.EnumerateFiles(oeDir, $"*{OeBuilderConstants.OeProjectExtension}", SearchOption.TopDirectoryOnly).ToList();
                 }
                 if (list.Count == 0) {
-                    throw new CommandException($"No project file {OeBuilderConstants.OeProjectExtension.PrettyQuote()} found in the current folder {Directory.GetCurrentDirectory().PrettyQuote()} nor the {OeBuilderConstants.OeProjectDirectory} directory. Initialize a new project file using the command: {typeof(ProjectInitCommand).GetFullCommandLine().PrettyQuote()}.");
+                    throw new CommandException($"No project file {OeBuilderConstants.OeProjectExtension.PrettyQuote()} found in the current folder {Directory.GetCurrentDirectory().PrettyQuote()} nor the {OeBuilderConstants.OeProjectDirectory} directory. Initialize a new project file using the command: {typeof(ProjectInitCommand).GetFullCommandLine<MainCommand>().PrettyQuote()}.");
                 }
 
                 if (list.Count > 1) {

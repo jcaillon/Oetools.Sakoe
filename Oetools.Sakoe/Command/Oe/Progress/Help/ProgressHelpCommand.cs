@@ -22,6 +22,7 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
+using CommandLineUtilsPlus.Command;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Command.Exceptions;
 using Oetools.Utilities.Lib;
@@ -38,7 +39,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Subcommand(typeof(ProgressHelpListCommand))]
     [Subcommand(typeof(ProgressHelpOpenCommand))]
     [Subcommand(typeof(ProgressHelpSearchCommand))]
-    internal class ProgressHelpCommand : AExpectSubCommand {
+    internal class ProgressHelpCommand : ABaseParentCommand {
     }
 
     [Command(
@@ -76,7 +77,7 @@ namespace Oetools.Sakoe.Command.Oe {
             var helpWhdl = HtmlHelpInterop.DisplayIndex(toOpen, topic ?? "");
 
             Out.WriteResultOnNewLine("Press CTRL+C to close the help window.");
-            SpinWait.SpinUntil(() => !IsWindow(helpWhdl) || _cancelSource.IsCancellationRequested);
+            SpinWait.SpinUntil(() => !IsWindow(helpWhdl) || CancellationSource.IsCancellationRequested);
         }
 
         [DllImport("user32.dll")]

@@ -26,6 +26,7 @@ using System.IO;
 using System.Text;
 using System.Xml;
 using System.Xml.Schema;
+using CommandLineUtilsPlus.Command;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Command.Exceptions;
 using Oetools.Utilities.Lib;
@@ -46,7 +47,7 @@ namespace Oetools.Sakoe.Command.Oe {
     [Subcommand(typeof(ProgressVersionCommand))]
     [Subcommand(typeof(ProgressWsdlDocCommand))]
     [Subcommand(typeof(ProgressGenerateDatasetCommand))]
-    internal class ProgressCommand : AExpectSubCommand {
+    internal class ProgressCommand : ABaseParentCommand {
     }
 
     [Command(
@@ -56,7 +57,7 @@ namespace Oetools.Sakoe.Command.Oe {
 - This command will ignore comment lines starting with #.
 - Resolves -pf parameters inside the .pf by reading the content of the files."
     )]
-    internal class ProgressReadPfCommand : ABaseCommand {
+    internal class ProgressReadPfCommand : ABaseExecutionCommand {
 
         [Required]
         [FileExists]

@@ -31,7 +31,7 @@ namespace Oetools.Sakoe.Command.Oe.Database {
         ExtendedHelpText = "The default sub command for this command is run."
     )]
     [Subcommand(typeof(DatabaseAdminRunCommand))]
-    internal class DatabaseAdminCommand : AExpectSubCommand {
+    internal class DatabaseAdminCommand : ABaseParentCommand {
         protected override int OnExecute(CommandLineApplication app, IConsole console) {
             return new DatabaseAdminRunCommand().Execute(app, console);
         }

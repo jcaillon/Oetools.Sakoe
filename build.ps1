@@ -34,6 +34,7 @@ function Main {
 		New-ArtifactDir
 		Publish-DotNetCore -Path "$path" -Version "$versionToBuild"	
         Publish-DotNetFramework -Path "$path" -Version "$versionToBuild"
+        Update-Documentation
 	}
     Pop-Location
 }

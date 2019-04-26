@@ -36,14 +36,14 @@ namespace Oetools.Sakoe.Command.Oe {
     )]
     [Subcommand(typeof(HashStringCommand))]
     [Subcommand(typeof(HashFilesCommand))]
-    internal class HashCommand : AExpectSubCommand {
+    internal class HashCommand : ABaseParentCommand {
     }
 
     [Command(
         "string", "st",
         Description = "Returns a 16 byte hash value from a string."
     )]
-    internal class HashStringCommand : ABaseCommand {
+    internal class HashStringCommand : ABaseExecutionCommand {
 
         [Required]
         [Argument(0, "<string>", "The string to hash.")]

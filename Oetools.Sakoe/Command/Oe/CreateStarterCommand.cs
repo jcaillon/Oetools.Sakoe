@@ -21,6 +21,7 @@
 #if !WINDOWSONLYBUILD
 using System.IO;
 using System.Reflection;
+using CommandLineUtilsPlus.Command;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Command.Exceptions;
 using Oetools.Sakoe.Utilities;
@@ -34,7 +35,7 @@ namespace Oetools.Sakoe.Command.Oe {
         Description = "Create a platform specific starter script for sakoe.",
         ExtendedHelpText = "Allow a more natural way of calling this tool: `sakoe [command]`."
     )]
-    internal class CreateStarterCommand : ABaseCommand {
+    internal class CreateStarterCommand : ABaseExecutionCommand {
 
         public static string StartScriptFilePath {
             get {
@@ -72,9 +73,9 @@ dotnet exec ""$DIR/" + Path.GetFileName(RunningAssembly.Info.Location) + @""" ""
 
             Log.Info($"Starter script created: {starterFilePath.PrettyQuote()}.");
 
-            HelpFormatter.WriteOnNewLine(null);
-            HelpFormatter.WriteSectionTitle("IMPORTANT README:");
-            HelpFormatter.WriteOnNewLine(@"
+            HelpWriter.WriteOnNewLine(null);
+            HelpWriter.WriteSectionTitle("IMPORTANT README:");
+            HelpWriter.WriteOnNewLine(@"
 A starter script has been created in the same directory as this executable: " + starterFilePath.PrettyQuote() + @".
 
 It allows you to call this tool in a more natural way: `sakoe [command]`. This strips the need to run the .dll with dotnet (the script does that for you).
@@ -82,7 +83,7 @@ It allows you to call this tool in a more natural way: `sakoe [command]`. This s
 The directory containing the starter script created should be added to your system PATH in order to be able to call `sakoe [command]` from anywhere on your system.
 
 The command to add this directory to your path is:");
-            HelpFormatter.WriteOnNewLine(null);
+            HelpWriter.WriteOnNewLine(null);
 
             if (Utils.IsRuntimeWindowsPlatform) {
                 Out.WriteResultOnNewLine("for /f \"usebackq tokens=2,*\" %A in (`reg query HKCU\\Environment /v PATH`) do set my_user_path=%B && SetX Path \"%my_user_path%;" + Path.GetDirectoryName(starterFilePath) + "\"");
@@ -90,7 +91,7 @@ The command to add this directory to your path is:");
                 Out.WriteResultOnNewLine("echo $\"export PATH=\\$PATH:" + Path.GetDirectoryName(starterFilePath) + "\" >> ~/.bashrc && source ~/.bashrc && chmod +x \"" + starterFilePath + "\"");
             }
 
-            HelpFormatter.WriteOnNewLine(null);
+            HelpWriter.WriteOnNewLine(null);
 
             return 0;
         }

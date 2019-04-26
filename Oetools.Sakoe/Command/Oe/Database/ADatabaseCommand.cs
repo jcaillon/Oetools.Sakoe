@@ -4,9 +4,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using CommandLineUtilsPlus.Command;
+using CommandLineUtilsPlus.Extension;
 using McMaster.Extensions.CommandLineUtils;
-using Oetools.Sakoe.Command.Exceptions;
-using Oetools.Sakoe.Utilities.Extension;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge;
@@ -50,7 +50,7 @@ namespace Oetools.Sakoe.Command.Oe.Database {
                 if (!throwWhenNoDatabaseFound) {
                     yield break;
                 }
-                throw new CommandException($"No database file {UoeDatabaseLocation.Extension.PrettyQuote()} found in the current folder: {Directory.GetCurrentDirectory().PrettyQuote()}. Initialize a new database using the command: {typeof(DatabaseCreateCommand).GetFullCommandLine().PrettyQuote()}.");
+                throw new CommandException($"No database file {UoeDatabaseLocation.Extension.PrettyQuote()} found in the current folder: {Directory.GetCurrentDirectory().PrettyQuote()}. Initialize a new database using the command: {typeof(DatabaseCreateCommand).GetFullCommandLine<MainCommand>().PrettyQuote()}.");
             }
             foreach (var path in list) {
                 var databaseLocation = new UoeDatabaseLocation(path);
@@ -114,14 +114,14 @@ namespace Oetools.Sakoe.Command.Oe.Database {
 
         protected UoeDatabaseOperator GetOperator() =>
             new UoeDatabaseOperator(GetDlcPath(), GetOperatorEncoding()) {
-                Log = Log,
+                Log = GetLogger(),
                 CancelToken = CancelToken,
                 InternationalizationStartupParameters = new UoeProcessArgs().AppendFromQuotedArgs(InternationalizationStartupParameters)
             };
 
         protected UoeDatabaseAdministrator GetAdministrator() =>
             new UoeDatabaseAdministrator(GetDlcPath(), GetOperatorEncoding()) {
-                Log = Log,
+                Log = GetLogger(),
                 CancelToken = CancelToken,
                 InternationalizationStartupParameters = new UoeProcessArgs().AppendFromQuotedArgs(InternationalizationStartupParameters)
             };

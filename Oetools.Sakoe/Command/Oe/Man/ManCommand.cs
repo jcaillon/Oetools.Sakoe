@@ -17,18 +17,20 @@
 // along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Text;
+using CommandLineUtilsPlus;
+using CommandLineUtilsPlus.Extension;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder.Project;
 using Oetools.Builder.Project.Properties;
 using Oetools.Builder.Utilities;
 using Oetools.Sakoe.Command.Oe.Database;
-using Oetools.Sakoe.Utilities;
-using Oetools.Sakoe.Utilities.Extension;
 using Oetools.Utilities.Lib.Extension;
 
 namespace Oetools.Sakoe.Command.Oe {
@@ -40,12 +42,12 @@ namespace Oetools.Sakoe.Command.Oe {
     [Subcommand(typeof(ManCommandCommand))]
     [Subcommand(typeof(CompleteManCommand))]
     [Subcommand(typeof(MarkdownManCommand))]
-    [CommandAdditionalHelpTextAttribute(nameof(GetAdditionalHelpText))]
+    [CommandAdditionalHelpText(nameof(GetAdditionalHelpText))]
     internal class ManCommand {
 
         public const string Name = "manual";
 
-        public static void GetAdditionalHelpText(IHelpFormatter formatter, CommandLineApplication app, int firstColumnWidth) {
+        public static void GetAdditionalHelpText(IHelpWriter formatter, CommandLineApplication app, int firstColumnWidth) {
             formatter.WriteOnNewLine(null);
             formatter.WriteSectionTitle("WHAT IS THIS TOOL");
             formatter.WriteOnNewLine(app.Parent?.Description);
@@ -85,7 +87,6 @@ In response files, you do not have to double quote arguments containing spaces, 
             formatter.WriteOnNewLine(@"The official page of this tool is:
   https://jcaillon.github.io/Oetools.Sakoe/.
 
-If you want to help, you are welcome to contribute to the github repo.
 You are invited to STAR the project on github to increase its visibility!");
 
             if (app.Commands != null && app.Commands.Count > 0) {
@@ -107,7 +108,7 @@ You are invited to STAR the project on github to increase its visibility!");
         }
 
         protected virtual int OnExecute(CommandLineApplication app, IConsole console) {
-            GetAdditionalHelpText(HelpGenerator.Singleton, app, 0);
+            GetAdditionalHelpText(app.HelpTextGenerator as IHelpWriter, app, 0);
             return 0;
         }
 
@@ -122,7 +123,7 @@ You are invited to STAR the project on github to increase its visibility!");
 
         public const string Name = "complete";
 
-        public static void GetAdditionalHelpText(IHelpFormatter formatter, CommandLineApplication app, int firstColumnWidth) {
+        public static void GetAdditionalHelpText(IHelpWriter formatter, CommandLineApplication app, int firstColumnWidth) {
             formatter.WriteOnNewLine(null);
             app.Parent.Commands.Remove(app);
             var rootCommand = app;
@@ -133,7 +134,7 @@ You are invited to STAR the project on github to increase its visibility!");
             formatter.WriteOnNewLine(null);
         }
 
-        private static void ListCommands(IHelpFormatter formatter, List<CommandLineApplication> subCommands) {
+        private static void ListCommands(IHelpWriter formatter, List<CommandLineApplication> subCommands) {
             var i = 0;
             foreach (var subCommand in subCommands.OrderBy(c => c.Name)) {
                 formatter.WriteSectionTitle("================");
@@ -148,7 +149,7 @@ You are invited to STAR the project on github to increase its visibility!");
         }
 
         protected virtual int OnExecute(CommandLineApplication app, IConsole console) {
-            GetAdditionalHelpText(HelpGenerator.Singleton, app, 0);
+            GetAdditionalHelpText(app.HelpTextGenerator as IHelpWriter, app, 0);
             return 0;
         }
     }
@@ -173,6 +174,8 @@ You are invited to STAR the project on github to increase its visibility!");
                     writer.WriteLine("# SAKOE");
                     writer.WriteLine();
                     writer.WriteLine($"> This markdown can be generated using the command: {app.GetFullCommandLine().PrettyQuote()}.");
+                    writer.WriteLine("> ");
+                    writer.WriteLine($"> This version has been generated on {DateTime.Now:yy-MM-dd} at {DateTime.Now:HH:mm:ss}.");
                     writer.WriteLine();
 
                     var rootCommand = app;

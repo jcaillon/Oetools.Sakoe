@@ -14,7 +14,7 @@ namespace Oetools.Sakoe.Command.Oe.Database {
     [Subcommand(typeof(DatabaseStructureAddCommand))]
     [Subcommand(typeof(DatabaseStructureRemoveCommand))]
     [Subcommand(typeof(DatabaseStructureGenerateCommand))]
-    internal class DatabaseStructureCommand : AExpectSubCommand {
+    internal class DatabaseStructureCommand : ABaseParentCommand {
     }
 
     [Command(

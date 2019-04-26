@@ -1,6 +1,6 @@
-﻿#region header
+#region header
 // ========================================================================
-// Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
+// Copyright (c) 2019 - Julien Caillon (julien.caillon@gmail.com)
 // This file (EntryPoint.cs) is part of Oetools.Sakoe.
 //
 // Oetools.Sakoe is a free software: you can redistribute it and/or modify
@@ -17,21 +17,26 @@
 // along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
-using System;
+
+using CommandLineUtilsPlus;
 using Oetools.Sakoe.Command;
+using Oetools.Sakoe.Utilities;
 
 namespace Oetools.Sakoe {
 
     /// <summary>
-    /// Main entry point for this CLI program
+    /// The underlying entry point of this program.
     /// </summary>
-    /// <remarks>
-    /// we can't reference a lib in this class if we want the assembly loader to work correctly
-    /// </remarks>
+    /// <remarks>We can reference external libraries in this class because the assemblies can be resolved at this point.</remarks>
     public static class EntryPoint {
-        public static int Main(string[] args) {
-            AppDomain.CurrentDomain.AssemblyResolve += AssemblyLoader.AssemblyResolver;
-            return MainCommand.ExecuteMainCommand(args);
+
+        /// <summary>
+        /// Main method.
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        public static int Execute(string[] args) {
+            return CommandLineApplicationPlus<MainCommand>.ExecuteCommand(args, ci => new GlobalLogger(ci));
         }
     }
 }

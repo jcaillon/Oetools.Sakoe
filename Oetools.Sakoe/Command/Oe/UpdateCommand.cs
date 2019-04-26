@@ -22,6 +22,8 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using CommandLineUtilsPlus.Command;
+using CommandLineUtilsPlus.Console;
 using GithubUpdater;
 using GithubUpdater.GitHub;
 using McMaster.Extensions.CommandLineUtils;
@@ -36,7 +38,7 @@ namespace Oetools.Sakoe.Command.Oe {
         "update", "up",
         Description = "Update this tool with the latest release found on github."
     )]
-    internal class UpdateCommand : ABaseCommand {
+    internal class UpdateCommand : ABaseExecutionCommand {
 
         private const string RepoOwner = "jcaillon";
         private const string RepoName = "Oetools.Sakoe"; // battle-code
@@ -143,7 +145,7 @@ namespace Oetools.Sakoe.Command.Oe {
             return 0;
         }
 
-        public static void SetUpdaterProxy(GitHubUpdater updater, string httpProxy, ILog log) {
+        public static void SetUpdaterProxy(GitHubUpdater updater, string httpProxy, IConsoleLogger log) {
             var httpProxyFromEnv = Environment.GetEnvironmentVariable("OE_HTTP_PROXY");
 
             if (string.IsNullOrEmpty(httpProxy) && !string.IsNullOrEmpty(httpProxyFromEnv)) {
