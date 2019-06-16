@@ -48,7 +48,7 @@ namespace Oetools.Sakoe.Command {
 //    [Subcommand(typeof(HashCommand))]
     [Subcommand(typeof(ProgressCommand))]
     [Subcommand(typeof(ToolCommand))]
-#if !WINDOWSONLYBUILD
+#if !WINDOWSONLYBUILD && !SELFCONTAINEDWITHEXE
     [Subcommand(typeof(CreateStarterCommand))]
 #endif
     [CommandAdditionalHelpText(nameof(GetAdditionalHelpText))]

@@ -25,6 +25,7 @@ using System.Threading;
 using CommandLineUtilsPlus.Command;
 using CommandLineUtilsPlus.Console;
 using McMaster.Extensions.CommandLineUtils;
+using Oetools.Builder.Utilities;
 using Oetools.Sakoe.Utilities;
 using Oetools.Utilities.Lib;
 using ILogger = Oetools.Builder.Utilities.ILogger;
@@ -38,6 +39,13 @@ namespace Oetools.Sakoe.Command {
 
         protected override void DrawLogo(CommandLineApplication application, IConsoleWriter console) {
             MainCommand.DrawLogo(console);
+        }
+
+        protected override string GetLogFilePathDefaultValue() {
+            if (Directory.Exists(OeBuilderConstants.GetProjectDirectory(Directory.GetCurrentDirectory()))) {
+                return Path.Combine(OeBuilderConstants.GetProjectDirectoryLocal(Directory.GetCurrentDirectory()), "logs", "sakoe.log");
+            }
+            return Path.Combine(Directory.GetCurrentDirectory(), "sakoe.log");
         }
     }
 

@@ -36,7 +36,7 @@ namespace Oetools.Sakoe {
         /// <param name="args"></param>
         /// <returns></returns>
         public static int Execute(string[] args) {
-            return CommandLineApplicationPlus<MainCommand>.ExecuteCommand(args, ci => new GlobalLogger(ci));
+            return CommandLineApplicationPlus<MainCommand>.ExecuteCommand(args, ci => new SakoeLogger(ci), cw => new SakoeHelperGenerator(cw));
         }
     }
 }

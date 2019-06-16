@@ -27,16 +27,21 @@ namespace Oetools.Sakoe.Utilities {
     /// <summary>
     /// Gloabl logger.
     /// </summary>
-    public class GlobalLogger : CommandLineConsoleLogger, ILogger, ITraceLogger {
+    public class SakoeLogger : CommandLineConsoleLogger, ILogger, ITraceLogger {
 
         /// <inheritdoc />
-        public GlobalLogger(IConsoleInterface console) : base(console) { }
+        public SakoeLogger(IConsoleInterface console) : base(console) { }
 
         /// <inheritdoc />
         public new ITraceLogger Trace => LogTheshold <= ConsoleLogThreshold.Debug ? this : null;
 
         /// <inheritdoc />
         public new ILogger If(bool condition) => condition ? this : null;
+
+        protected override string FormatLogPrefix(ConsoleLogThreshold level) {
+            var elapsed = Stopwatch.Elapsed;
+            return $"[{elapsed.Minutes:D2}:{elapsed.Seconds:D2}.{elapsed.Milliseconds:D3}] ";
+        }
     }
 
 }

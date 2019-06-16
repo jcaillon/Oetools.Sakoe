@@ -18,7 +18,7 @@
 // ========================================================================
 #endregion
 
-#if !WINDOWSONLYBUILD
+#if !WINDOWSONLYBUILD && !SELFCONTAINEDWITHEXE
 using System.IO;
 using System.Reflection;
 using CommandLineUtilsPlus.Command;
