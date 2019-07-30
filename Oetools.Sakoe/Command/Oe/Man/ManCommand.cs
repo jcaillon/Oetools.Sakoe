@@ -137,9 +137,6 @@ You are invited to STAR the project on github to increase its visibility!");
         private static void ListCommands(IHelpWriter formatter, List<CommandLineApplication> subCommands) {
             var i = 0;
             foreach (var subCommand in subCommands.OrderBy(c => c.Name)) {
-                formatter.WriteSectionTitle("================");
-                formatter.WriteSectionTitle(subCommand.GetFullCommandLine());
-                formatter.WriteSectionTitle("================");
                 subCommand.ShowHelp();
                 if (subCommand.Commands != null && subCommand.Commands.Count > 0) {
                     ListCommands(formatter, subCommand.Commands);

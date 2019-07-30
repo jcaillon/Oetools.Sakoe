@@ -18,17 +18,15 @@
 // ========================================================================
 #endregion
 
-#if !WINDOWSONLYBUILD && !SELFCONTAINEDWITHEXE
-using System.IO;
-using System.Reflection;
 using CommandLineUtilsPlus.Command;
 using McMaster.Extensions.CommandLineUtils;
-using Oetools.Sakoe.Command.Exceptions;
 using Oetools.Sakoe.Utilities;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
+#if !WINDOWSONLYBUILD && !SELFCONTAINEDWITHEXE
+using System.IO;
 
-namespace Oetools.Sakoe.Command.Oe {
+namespace Oetools.Sakoe.Command.Oe.Starter {
 
     [Command(
         "starter", "st",

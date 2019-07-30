@@ -18,17 +18,19 @@
 // ========================================================================
 #endregion
 
-using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using CommandLineUtilsPlus.Command;
 using CommandLineUtilsPlus.Extension;
+using Oetools.Builder.History;
+using Oetools.Builder.Project.Task;
 using Oetools.Builder.Utilities;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
-using Oetools.Utilities.Openedge;
 
 namespace Oetools.Sakoe.Command.Oe {
+
     public abstract class AOeCommand : ABaseExecutionCommand {
 
         /// <summary>
@@ -84,6 +86,52 @@ namespace Oetools.Sakoe.Command.Oe {
                 return path;
             }
             throw new CommandException($"No project file ({OeBuilderConstants.OeProjectExtension}) named {projectFileName} found in the current folder {Directory.GetCurrentDirectory().PrettyQuote()} nor the {OeBuilderConstants.OeProjectDirectory} directory.");
+        }
+
+        /// <summary>
+        /// Returns a list of files (full path) from a wildcards path.
+        /// </summary>
+        /// <param name="wildcardsPath"></param>
+        /// <returns></returns>
+        /// <exception cref="CommandException"></exception>
+        protected IEnumerable<string> GetFilesFromWildcardsPath(string wildcardsPath) {
+            var taskFile = new OeTaskFile {
+                Include = wildcardsPath
+            };
+            taskFile.SetLog(GetLogger());
+            taskFile.SetCancelToken(CancelToken);
+
+            foreach (var oeFile in taskFile.GetFilesToProcessFromIncludes()) {
+                yield return oeFile.Path;
+            }
+        }
+
+        /// <summary>
+        /// Returns a list of files (full path) from a wildcards path.
+        /// </summary>
+        /// <param name="wildcardsPath"></param>
+        /// <returns></returns>
+        /// <exception cref="CommandException"></exception>
+        protected IEnumerable<string> GetDirectoriesFromWildcardsPath(string wildcardsPath) {
+            var taskFile = new OeTaskDirectory {
+                Include = wildcardsPath
+            };
+            taskFile.SetLog(GetLogger());
+            taskFile.SetCancelToken(CancelToken);
+
+            foreach (var oeFile in taskFile.GetDirectoriesToProcessFromIncludes()) {
+                yield return oeFile.Path;
+            }
+        }
+
+        private class OeTaskFile : AOeTaskFile {
+            protected override void ExecuteInternal() {}
+            protected override void ExecuteTestModeInternal() {}
+        }
+
+        private class OeTaskDirectory : AOeTaskDirectory {
+            protected override void ExecuteInternal() {}
+            protected override void ExecuteTestModeInternal() {}
         }
     }
 }

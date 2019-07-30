@@ -35,9 +35,6 @@ namespace Oetools.Sakoe.Command.Oe.Abstract {
         [Option("-d|--directory <path>", "Directory containing files that should be added to the listing. Can be used multiple times.", CommandOptionType.MultipleValue)]
         public string[] Directories { get; protected set; }
 
-        [Option("-r|--recursive", "Recursive listing in the directories.", CommandOptionType.NoValue)]
-        public bool RecursiveListing { get; }
-
         [Option("-i|--include <filter>", "Include filter for directory listing. Can use wildcards (**,*,?).", CommandOptionType.SingleValue)]
         public string IncludeFilter { get; }
 
@@ -49,6 +46,9 @@ namespace Oetools.Sakoe.Command.Oe.Abstract {
 
         [Option("-er|--exclude-regex <filter>", "Regular expression include filter for directory listing..", CommandOptionType.SingleValue)]
         public string ExcludeRegexFilter { get; }
+
+        [Option("-r|--recursive", "Recursive listing in the directories when using filters.", CommandOptionType.NoValue)]
+        public bool RecursiveListing { get; }
 
         public virtual IEnumerable<string> GetFilesList(CommandLineApplication app) {
             if (Files == null && Directories == null) {

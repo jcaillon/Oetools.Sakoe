@@ -23,10 +23,17 @@ using CommandLineUtilsPlus.Console;
 using CommandLineUtilsPlus.Extension;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Command.Oe;
+using Oetools.Sakoe.Command.Oe.Cabinet;
 using Oetools.Sakoe.Command.Oe.Database;
+using Oetools.Sakoe.Command.Oe.Update;
+using Oetools.Sakoe.Command.Oe.Version;
 using Oetools.Sakoe.Utilities;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
+
+#if !WINDOWSONLYBUILD && !SELFCONTAINEDWITHEXE
+using Oetools.Sakoe.Command.Oe.Starter;
+#endif
 
 namespace Oetools.Sakoe.Command {
 
@@ -48,6 +55,7 @@ namespace Oetools.Sakoe.Command {
 //    [Subcommand(typeof(HashCommand))]
     [Subcommand(typeof(ProgressCommand))]
     [Subcommand(typeof(ToolCommand))]
+    [Subcommand(typeof(CabinetCommand))]
 #if !WINDOWSONLYBUILD && !SELFCONTAINEDWITHEXE
     [Subcommand(typeof(CreateStarterCommand))]
 #endif
@@ -61,7 +69,6 @@ namespace Oetools.Sakoe.Command {
             formatter.WriteSectionTitle("HOW TO");
             formatter.WriteOnNewLine($"Start by reading the manual for this tool: {typeof(ManCommand).GetFullCommandLine<MainCommand>().PrettyQuote()}.");
             formatter.WriteOnNewLine($"Get a full list of commands available: {typeof(ManCommandListCommand).GetFullCommandLine<MainCommand>().PrettyQuote()}.");
-
         }
 
         /// <summary>

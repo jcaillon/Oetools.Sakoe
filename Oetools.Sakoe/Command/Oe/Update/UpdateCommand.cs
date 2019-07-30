@@ -17,6 +17,7 @@
 // along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -27,12 +28,11 @@ using CommandLineUtilsPlus.Console;
 using GithubUpdater;
 using GithubUpdater.GitHub;
 using McMaster.Extensions.CommandLineUtils;
-using Oetools.Sakoe.Command.Exceptions;
 using Oetools.Sakoe.Utilities;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
 
-namespace Oetools.Sakoe.Command.Oe {
+namespace Oetools.Sakoe.Command.Oe.Update {
 
     [Command(
         "update", "up",
@@ -44,7 +44,7 @@ namespace Oetools.Sakoe.Command.Oe {
         private const string RepoName = "Oetools.Sakoe"; // battle-code
         public const string GitHubToken = "MmViMDJlNWVlYWZlMTIzNGIxN2VmOTkxMGQ1NzljMTRkM2E1ZDEyMw==";
 
-        [Option("-b|--get-pre-release", "Accept to update from new pre-release (i.e. 'beta') versions of the tool.\nThis option will be used by default if the current version of the tool is a pre-release version. Otherwise, only stable releases will be used for updates. ", CommandOptionType.NoValue)]
+        [Option("-pr|--get-pre-release", "Accept to update from new pre-release (i.e. 'beta') versions of the tool.\nThis option will be used by default if the current version of the tool is a pre-release version. Otherwise, only stable releases will be used for updates. ", CommandOptionType.NoValue)]
         public bool GetPreRelease { get; set; }
 
         [Option("-p|--proxy <url>", "The http proxy to use for this update. Useful if you are behind a corporate firewall.\nThe expected format is: 'http(s)://[user:password@]host[:port]'.\nIt is also possible to use the environment variables OE_HTTP_PROXY or http_proxy to set this value.", CommandOptionType.SingleValue)]

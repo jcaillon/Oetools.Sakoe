@@ -23,12 +23,11 @@ using System.Reflection;
 using CommandLineUtilsPlus;
 using CommandLineUtilsPlus.Console;
 using McMaster.Extensions.CommandLineUtils;
-
 #if !WINDOWSONLYBUILD && !SELFCONTAINEDWITHEXE
 using System.IO;
 using CommandLineUtilsPlus.Extension;
 using Oetools.Sakoe.Command;
-using Oetools.Sakoe.Command.Oe;
+using Oetools.Sakoe.Command.Oe.Starter;
 using Oetools.Utilities.Lib.Extension;
 #endif
 

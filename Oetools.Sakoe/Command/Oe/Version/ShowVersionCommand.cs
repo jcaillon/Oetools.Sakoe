@@ -17,10 +17,11 @@
 // along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Utilities;
 
-namespace Oetools.Sakoe.Command.Oe {
+namespace Oetools.Sakoe.Command.Oe.Version {
 
     [Command(
         "version", "vs",

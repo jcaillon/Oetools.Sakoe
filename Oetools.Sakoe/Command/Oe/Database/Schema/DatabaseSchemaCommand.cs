@@ -19,6 +19,7 @@
 #endregion
 
 using System.ComponentModel.DataAnnotations;
+using CommandLineUtilsPlus;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Utilities.Lib;
 using Oetools.Utilities.Lib.Extension;
@@ -82,7 +83,10 @@ namespace Oetools.Sakoe.Command.Oe.Database {
 
     [Command(
         "dump-custom", "dc",
-        Description = "Dump the schema definition in a custom format."
+        Description = "Dump the schema definition in a custom format.",
+        ExtendedHelpText = @"This format is actually the format used internally by this program to extract the definition of an openedge database into a file which is later imported as a collection of objects in dotnet.
+
+It is made available here because it is human readable and could be handy for some people."
     )]
     internal class DatabaseSchemaDumpCustomCommand : ADatabaseSingleConnectionCommand {
 
