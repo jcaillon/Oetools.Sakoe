@@ -17,17 +17,12 @@
 // along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+
 using System.IO;
-using System.Threading;
 using CommandLineUtilsPlus.Command;
 using CommandLineUtilsPlus.Console;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder.Utilities;
-using Oetools.Sakoe.Utilities;
-using Oetools.Utilities.Lib;
 using ILogger = Oetools.Builder.Utilities.ILogger;
 
 namespace Oetools.Sakoe.Command {

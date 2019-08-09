@@ -23,11 +23,10 @@ using System.IO;
 using System.Linq;
 using CommandLineUtilsPlus.Command;
 using CommandLineUtilsPlus.Extension;
-using Oetools.Builder.History;
+using DotUtilities;
+using DotUtilities.Extensions;
 using Oetools.Builder.Project.Task;
 using Oetools.Builder.Utilities;
-using Oetools.Utilities.Lib;
-using Oetools.Utilities.Lib.Extension;
 
 namespace Oetools.Sakoe.Command.Oe {
 

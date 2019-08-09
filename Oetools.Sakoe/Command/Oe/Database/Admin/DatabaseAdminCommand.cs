@@ -18,10 +18,8 @@
 // ========================================================================
 #endregion
 
-using System.Linq;
+using DotUtilities.Process;
 using McMaster.Extensions.CommandLineUtils;
-using McMaster.Extensions.CommandLineUtils.Conventions;
-using Oetools.Utilities.Lib;
 
 namespace Oetools.Sakoe.Command.Oe.Database {
 

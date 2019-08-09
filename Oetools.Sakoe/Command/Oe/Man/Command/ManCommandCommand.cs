@@ -22,11 +22,11 @@ using System.Collections.Generic;
 using System.Linq;
 using CommandLineUtilsPlus;
 using CommandLineUtilsPlus.Extension;
+using DotUtilities.Extensions;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder.Project;
 using Oetools.Builder.Project.Properties;
 using Oetools.Builder.Utilities;
-using Oetools.Utilities.Lib.Extension;
 
 namespace Oetools.Sakoe.Command.Oe.Database {
 

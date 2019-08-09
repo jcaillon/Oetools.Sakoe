@@ -22,8 +22,8 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.IO;
+using DotUtilities;
 using McMaster.Extensions.CommandLineUtils;
-using Oetools.Utilities.Lib;
 using Oetools.Utilities.Openedge.Execution;
 
 namespace Oetools.Sakoe.Command.Oe.Database {

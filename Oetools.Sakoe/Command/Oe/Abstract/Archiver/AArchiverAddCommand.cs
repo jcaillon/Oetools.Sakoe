@@ -21,9 +21,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using McMaster.Extensions.CommandLineUtils;
-using Oetools.Builder.Project.Properties;
 using Oetools.Builder.Project.Task;
-using Oetools.Utilities.Lib;
 
 namespace Oetools.Sakoe.Command.Oe.Abstract.Archiver {
     internal abstract class AArchiverAddCommand : ABaseExecutionCommand {

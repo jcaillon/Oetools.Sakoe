@@ -23,10 +23,10 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using CommandLineUtilsPlus.Command;
+using DotUtilities;
+using DotUtilities.Extensions;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Command.Exceptions;
-using Oetools.Utilities.Lib;
-using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge;
 
 namespace Oetools.Sakoe.Command.Oe {

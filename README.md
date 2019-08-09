@@ -25,8 +25,12 @@ Details/help on [how to build this project](docs/BUILD.md).
 
 ## Submodules
 
-- [Oetools.Utilities](https://github.com/jcaillon/Oetools.Utilities).
 - [Oetools.Builder](https://github.com/jcaillon/Oetools.Builder).
+- [GithubUpdater](https://github.com/jcaillon/GithubUpdater).
+- [CommandLineUtilsPlus](https://github.com/jcaillon/CommandLineUtilsPlus).
+- [Oetools.Utilities](https://github.com/jcaillon/Oetools.Utilities).
+- [CabinetManager](https://github.com/jcaillon/CabinetManager).
+- [DotUtilities](https://github.com/jcaillon/DotUtilities).
 
 ## Thanks
 

@@ -28,7 +28,7 @@ using System.IO;
 using CommandLineUtilsPlus.Extension;
 using Oetools.Sakoe.Command;
 using Oetools.Sakoe.Command.Oe.Starter;
-using Oetools.Utilities.Lib.Extension;
+using DotUtilities.Extensions;
 #endif
 
 namespace Oetools.Sakoe.Utilities {

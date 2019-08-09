@@ -28,6 +28,9 @@ using System.Text;
 using System.Xml.Serialization;
 using CommandLineUtilsPlus;
 using CommandLineUtilsPlus.Extension;
+using DotUtilities;
+using DotUtilities.Attributes;
+using DotUtilities.Extensions;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder;
 using Oetools.Builder.History;
@@ -36,9 +39,6 @@ using Oetools.Builder.Project.Properties;
 using Oetools.Builder.Utilities;
 using Oetools.Sakoe.Command.Exceptions;
 using Oetools.Sakoe.Command.Oe.Database;
-using Oetools.Utilities.Lib;
-using Oetools.Utilities.Lib.Attributes;
-using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge;
 
 namespace Oetools.Sakoe.Command.Oe {

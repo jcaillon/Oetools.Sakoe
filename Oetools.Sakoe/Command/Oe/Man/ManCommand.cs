@@ -26,12 +26,9 @@ using System.Linq;
 using System.Text;
 using CommandLineUtilsPlus;
 using CommandLineUtilsPlus.Extension;
+using DotUtilities.Extensions;
 using McMaster.Extensions.CommandLineUtils;
-using Oetools.Builder.Project;
-using Oetools.Builder.Project.Properties;
-using Oetools.Builder.Utilities;
 using Oetools.Sakoe.Command.Oe.Database;
-using Oetools.Utilities.Lib.Extension;
 
 namespace Oetools.Sakoe.Command.Oe {
 

@@ -18,17 +18,10 @@
 // ========================================================================
 #endregion
 
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Builder.Project.Task;
-using Oetools.Sakoe.Command.Oe.Abstract;
 using Oetools.Sakoe.Command.Oe.Abstract.Archiver;
-using Oetools.Sakoe.Command.Oe.Database;
-using Oetools.Utilities.Lib.Extension;
-using Oetools.Utilities.Openedge;
-using Oetools.Utilities.Openedge.Exceptions;
 
 namespace Oetools.Sakoe.Command.Oe.Cabinet {
 
@@ -43,7 +36,8 @@ namespace Oetools.Sakoe.Command.Oe.Cabinet {
 
     [Command(
         "add", "ad",
-        Description = "Add."
+        Description = "Add.",
+        ExtendedHelpText = "ex: sakoe cab add -d {{1}} file.cab ((**))*"
     )]
     internal class CabinetAddCommand : AArchiverAddCommand {
         public override AOeTaskFileArchiverArchive GetArchiverTask() => new OeTaskFileArchiverArchiveCab {

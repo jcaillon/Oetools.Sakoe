@@ -6,7 +6,7 @@ You can simply install the latest visual studio version (2017 atm).
 
 Or, if you don't want to install everything but just build with `build.bat` or a third party IDE, you can install msbuild tools :
 
-https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2017
+https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019
 
 With the following options :
 
@@ -72,3 +72,9 @@ So yeah. I have to explicitly target net461.
 - Update the Version in .csproj, the format should be X.X.X-suffix (with suffix being optional)
 - Create a new tag : `git tag X.X.X-suffix`
 - Push the tag `git push --tags` : this will trigger the build with the deployment on the appveyor
+
+## Testing with docker
+
+```bash
+docker run -it --rm --init --name test-sakoe -v /C/data/repo/_github/Oetools.Sakoe/artifacts/sakoe.core.no-runtime:/sakoe mcr.microsoft.com/dotnet/core/runtime:2.2 dotnet /sakoe/sakoe.dll
+```

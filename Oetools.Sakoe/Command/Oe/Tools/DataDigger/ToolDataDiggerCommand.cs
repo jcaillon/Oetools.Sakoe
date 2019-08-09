@@ -26,11 +26,12 @@ using System.Linq;
 using System.Text;
 using CommandLineUtilsPlus.Command;
 using CommandLineUtilsPlus.Extension;
+using DotUtilities;
+using DotUtilities.Extensions;
+using DotUtilities.Process;
 using GithubUpdater.GitHub;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Command.Oe.Update;
-using Oetools.Utilities.Lib;
-using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge.Execution;
 
 namespace Oetools.Sakoe.Command.Oe.Database {

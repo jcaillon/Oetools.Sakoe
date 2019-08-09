@@ -19,8 +19,8 @@
 #endregion
 using System;
 using System.IO;
+using DotUtilities.Extensions;
 using McMaster.Extensions.CommandLineUtils;
-using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge;
 
 namespace Oetools.Sakoe.Command.Oe {

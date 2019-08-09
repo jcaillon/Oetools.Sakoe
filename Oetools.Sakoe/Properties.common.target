@@ -92,7 +92,7 @@ See more details about this release on github: https://github.com/$(ProjReposito
   </PropertyGroup>
   <ItemGroup Label="SourceLink reference">
     <!-- PackageReference specific for your source control provider -->
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-18618-05" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19367-01" PrivateAssets="All" />
   </ItemGroup>
 
   <PropertyGroup Label="Debug type">

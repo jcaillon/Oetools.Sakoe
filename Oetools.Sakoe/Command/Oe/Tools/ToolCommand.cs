@@ -21,9 +21,9 @@
 #endregion
 
 using System.IO;
+using DotUtilities;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Command.Oe.Database;
-using Oetools.Utilities.Lib;
 
 namespace Oetools.Sakoe.Command.Oe {
 
@@ -33,7 +33,7 @@ namespace Oetools.Sakoe.Command.Oe {
     )]
     [Subcommand(typeof(ToolDataDiggerCommand))]
     internal class ToolCommand : ABaseParentCommand {
-        
+
         /// <summary>
         /// Directory in which external tools are installed.
         /// </summary>

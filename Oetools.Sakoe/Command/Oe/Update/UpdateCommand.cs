@@ -25,12 +25,12 @@ using System.Linq;
 using System.Text;
 using CommandLineUtilsPlus.Command;
 using CommandLineUtilsPlus.Console;
+using DotUtilities;
+using DotUtilities.Extensions;
 using GithubUpdater;
 using GithubUpdater.GitHub;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Utilities;
-using Oetools.Utilities.Lib;
-using Oetools.Utilities.Lib.Extension;
 
 namespace Oetools.Sakoe.Command.Oe.Update {
 

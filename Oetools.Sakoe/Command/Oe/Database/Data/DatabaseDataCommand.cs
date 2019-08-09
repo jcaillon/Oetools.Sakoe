@@ -19,8 +19,9 @@
 #endregion
 
 using System.ComponentModel.DataAnnotations;
+using DotUtilities;
+using DotUtilities.Process;
 using McMaster.Extensions.CommandLineUtils;
-using Oetools.Utilities.Lib;
 using Oetools.Utilities.Openedge.Database;
 
 namespace Oetools.Sakoe.Command.Oe.Database {

@@ -21,6 +21,8 @@ using System;
 using CommandLineUtilsPlus;
 using CommandLineUtilsPlus.Console;
 using CommandLineUtilsPlus.Extension;
+using DotUtilities;
+using DotUtilities.Extensions;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Command.Oe;
 using Oetools.Sakoe.Command.Oe.Cabinet;
@@ -28,8 +30,6 @@ using Oetools.Sakoe.Command.Oe.Database;
 using Oetools.Sakoe.Command.Oe.Update;
 using Oetools.Sakoe.Command.Oe.Version;
 using Oetools.Sakoe.Utilities;
-using Oetools.Utilities.Lib;
-using Oetools.Utilities.Lib.Extension;
 
 #if !WINDOWSONLYBUILD && !SELFCONTAINEDWITHEXE
 using Oetools.Sakoe.Command.Oe.Starter;

@@ -24,9 +24,10 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using CommandLineUtilsPlus.Command;
 using CommandLineUtilsPlus.Console;
+using DotUtilities;
+using DotUtilities.Extensions;
+using DotUtilities.Process;
 using McMaster.Extensions.CommandLineUtils;
-using Oetools.Utilities.Lib;
-using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge.Database;
 using Oetools.Utilities.Openedge.Execution;
 

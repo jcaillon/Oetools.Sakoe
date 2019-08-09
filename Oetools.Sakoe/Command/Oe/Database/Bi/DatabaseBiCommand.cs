@@ -19,7 +19,6 @@
 #endregion
 
 using McMaster.Extensions.CommandLineUtils;
-using Oetools.Utilities.Openedge.Database;
 
 namespace Oetools.Sakoe.Command.Oe.Database {
 

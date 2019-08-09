@@ -17,13 +17,13 @@
 // along with Oetools.Sakoe. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
-using System;
+
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using DotUtilities.Extensions;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Command.Oe.Abstract;
-using Oetools.Utilities.Lib.Extension;
 using Oetools.Utilities.Openedge;
 using Oetools.Utilities.Openedge.Exceptions;
 

@@ -20,9 +20,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using DotUtilities.Extensions;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Command.Exceptions;
-using Oetools.Utilities.Lib.Extension;
 
 namespace Oetools.Sakoe.Command.Oe.Abstract {
 
