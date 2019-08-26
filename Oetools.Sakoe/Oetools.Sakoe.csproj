@@ -51,7 +51,7 @@
     <ProjectReference Include="..\CommandLineUtilsPlus\CommandLineUtilsPlus\CommandLineUtilsPlus.csproj" />
     <ProjectReference Include="..\Oetools.Builder\Oetools.Builder\Oetools.Builder.csproj" />
     <ProjectReference Include="..\Oetools.Builder\Oetools.Utilities\Oetools.Utilities\Oetools.Utilities.csproj" />
-    <ProjectReference Include="..\GithubUpdater\GithubUpdater\GithubUpdater.csproj" />
+    <ProjectReference Include="..\SoftwareUpdater\SoftwareUpdater\SoftwareUpdater.csproj" />
   </ItemGroup>
 
   <ItemGroup>

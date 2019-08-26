@@ -29,7 +29,7 @@ using CommandLineUtilsPlus.Extension;
 using DotUtilities;
 using DotUtilities.Extensions;
 using DotUtilities.Process;
-using GithubUpdater.GitHub;
+using SoftwareUpdater.GitHub;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Command.Oe.Update;
 using Oetools.Utilities.Openedge.Execution;

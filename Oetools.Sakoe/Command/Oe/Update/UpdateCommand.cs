@@ -27,8 +27,8 @@ using CommandLineUtilsPlus.Command;
 using CommandLineUtilsPlus.Console;
 using DotUtilities;
 using DotUtilities.Extensions;
-using GithubUpdater;
-using GithubUpdater.GitHub;
+using SoftwareUpdater;
+using SoftwareUpdater.GitHub;
 using McMaster.Extensions.CommandLineUtils;
 using Oetools.Sakoe.Utilities;
 

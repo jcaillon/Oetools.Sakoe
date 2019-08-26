@@ -30,7 +30,7 @@ function Main {
 		Start-Tests -AllTests $True
 	} else {
 		Invoke-Script -ScriptWithParameters ".\Oetools.Builder\build.ps1 -UpdateXsdOnly 1"
-		Invoke-Script -ScriptWithParameters ".\GithubUpdater\build.ps1 -BuildSimpleUpdaterOnly 1"
+		Invoke-Script -ScriptWithParameters ".\SoftwareUpdater\build.ps1 -BuildSimpleUpdaterOnly 1"
 		Start-Tests
 		New-ArtifactDir
 		Publish-DotNetCore -Path "$path" -Version "$versionToBuild"	
