@@ -1,9 +1,9 @@
 [submodule "Oetools.Builder"]
 	path = Oetools.Builder
 	url = ../Oetools.Builder.git
-[submodule "GithubUpdater"]
-	path = GithubUpdater
-	url = ../GithubUpdater.git
 [submodule "CommandLineUtilsPlus"]
 	path = CommandLineUtilsPlus
 	url = ../CommandLineUtilsPlus.git
+[submodule "SoftwareUpdater"]
+	path = SoftwareUpdater
+	url = ../SoftwareUpdater
