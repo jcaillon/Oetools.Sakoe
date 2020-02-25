@@ -158,6 +158,7 @@ function Publish-DotNetCore {
 		$selfContainedSuffix = If ([string]::IsNullOrEmpty($rid)) { ".no-runtime" } Else { ".$rid" }
 
         if ([string]::IsNullOrEmpty($rid)) {
+			# /p:PublishTrimmed=true (from dotnet 3.0)
             iu dotnet publish "$path" --framework "netcoreapp2.2" --configuration "Release" --verbosity "minimal" "/p:TrimUnusedDependencies=true" "/p:ShowLinkerSizeComparison=true" "/p:PublishDir=$publishDir" $(If ([string]::IsNullOrEmpty($Version)) { "" } Else { "/p:Version=$Version" })
         } else {
             iu dotnet publish "$path" --framework "netcoreapp2.2" --configuration "Release" --verbosity "minimal" --runtime "$rid" --self-contained "true" "/p:UseAppHost=true" "/p:TrimUnusedDependencies=true" "/p:ShowLinkerSizeComparison=true" "/p:PublishDir=$publishDir" $(If ([string]::IsNullOrEmpty($Version)) { "" } Else { "/p:Version=$Version" })
